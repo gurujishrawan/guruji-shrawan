@@ -8,7 +8,12 @@ const poppins = Poppins({
 
 export const metadata = {
   title: "Guruji Shrawan",
+  description: "Official website of Guruji Shrawan",
+  verification: {
+    google: "PV_yw-25yz-0yldphda62paYM3zKguklzyORuD4jHtM",
+  },
 };
+
 
 export default function RootLayout({ children }) {
   return (
