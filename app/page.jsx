@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+
 
 import {
   FaYoutube,
@@ -16,6 +17,23 @@ import {
 } from "react-icons/fa";
 
 export default function Page() {
+
+
+  /* ================= SCROLL TO TOP ================= */
+const [showTop, setShowTop] = useState(false);
+
+useEffect(() => {
+  const handleScroll = () => {
+    setShowTop(window.scrollY > 300);
+  };
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
+const scrollToTop = useCallback(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, []);
+
   /* ================= QUOTES ================= */
   const quotes = [
     "Clarity matters more than comfort.",
@@ -37,7 +55,22 @@ export default function Page() {
   }, []);
 
   /* ================= NAVBAR ================= */
+
+
   const [menuOpen, setMenuOpen] = useState(false);
+
+ /* ================= BODY SCROLL LOCK ================= */
+useEffect(() => {
+  if (menuOpen) {
+  document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   /* ================= HERO IMAGES ================= */
   const heroImages = [
@@ -108,45 +141,80 @@ export default function Page() {
           </nav>
 
           {/* Mobile */}
-          <button
-            className="md:hidden text-2xl text-black"
-            onClick={() => setMenuOpen(true)}
-          >
-            <FaBars />
-          </button>
+<button
+  className="md:hidden text-2xl"
+  onClick={() => setMenuOpen(true)}
+  aria-label="Open menu"
+>
+  <FaBars />
+</button>
+
         </div>
 
-        {/* Mobile Drawer */}
-        {menuOpen && (
-          <div className="fixed inset-0 bg-white z-50 p-6">
-            <button
-              className="text-2xl mb-8 text-black"
-              onClick={() => setMenuOpen(false)}
-            >
-              <FaTimes />
-            </button>
+{/* ================= MOBILE MENU ================= */}
+<div
+  className={`fixed inset-0 z-[100] transition-opacity duration-300 ${
+    menuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+  }`}
+>
+  {/* Backdrop */}
+  <div
+    className="absolute inset-0 bg-black/40"
+    onClick={() => setMenuOpen(false)}
+  />
 
-            <nav className="flex flex-col gap-6 text-xl">
-              <a href="#home" onClick={() => setMenuOpen(false)} className="text-black">
-                Home
-              </a>
-              <a href="#shorts" onClick={() => setMenuOpen(false)} className="text-black">
-                Shorts
-              </a>
-              <a href="#biography" onClick={() => setMenuOpen(false)} className="text-black">
-                Biography
-              </a>
-              <a
-                href="https://whatsapp.com/channel/0029VbCDS8a0gcfQ34r9Ez37"
-                target="_blank"
-                rel="noreferrer"
-                className="text-black"
-              >
-                Join WhatsApp Channel
-              </a>
-            </nav>
-          </div>
-        )}
+  {/* Drawer */}
+  <div
+    className={`absolute top-0 right-0 h-full w-[80%] max-w-sm bg-white shadow-xl transform transition-transform duration-300 ${
+      menuOpen ? "translate-x-0" : "translate-x-full"
+    }`}
+  >
+    <div className="p-6">
+      {/* Close button */}
+      <button
+        className="text-2xl mb-8"
+        onClick={() => setMenuOpen(false)}
+      >
+        <FaTimes />
+      </button>
+
+      <nav className="flex flex-col gap-6 text-lg font-medium">
+        <a
+          href="#home"
+          onClick={() => setMenuOpen(false)}
+          className="hover:text-gray-600"
+        >
+          Home
+        </a>
+        <a
+          href="#shorts"
+          onClick={() => setMenuOpen(false)}
+          className="hover:text-gray-600"
+        >
+          Shorts
+        </a>
+        <a
+          href="#biography"
+          onClick={() => setMenuOpen(false)}
+          className="hover:text-gray-600"
+        >
+          Biography
+        </a>
+
+        <a
+          href="https://whatsapp.com/channel/0029VbCDS8a0gcfQ34r9Ez37"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-4 inline-block text-center border border-black px-4 py-2 rounded hover:bg-black hover:text-white transition"
+        >
+          Join WhatsApp Channel
+        </a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
       </header>
 
       {/* ================= HERO ================= */}
@@ -268,6 +336,60 @@ export default function Page() {
           </div>
         </div>
       </section>
+      {/* ================= FOOTER ================= */}
+<footer className="bg-gray-50 border-t border-black/10 py-12">
+  <div className="max-w-7xl mx-auto px-6 text-center">
+    <h4 className="text-xl font-bold mb-2">Guruji Shrawan</h4>
+    <p className="text-gray-600 mb-6">
+      Clarity. Awareness. Freedom.
+    </p>
+
+    {/* Social Links */}
+    <div className="flex justify-center gap-6 text-2xl">
+      <a
+        href="https://www.youtube.com/@gurujishrawan"
+        target="_blank"
+        rel="noreferrer"
+        className="text-gray-600 hover:text-red-600 transition"
+      >
+        <FaYoutube />
+      </a>
+
+      <a
+        href="https://www.instagram.com/gurujishrawan/"
+        target="_blank"
+        rel="noreferrer"
+        className="text-gray-600 hover:text-pink-500 transition"
+      >
+        <FaInstagram />
+      </a>
+
+      <a
+        href="https://www.facebook.com/gurujishrawan"
+        target="_blank"
+        rel="noreferrer"
+        className="text-gray-600 hover:text-blue-600 transition"
+      >
+        <FaFacebook />
+      </a>
+    </div>
+
+    <p className="text-xs text-gray-500 mt-8">
+      © {new Date().getFullYear()} Guruji Shrawan. All rights reserved.
+    </p>
+  </div>
+</footer>
+{/* ================= SCROLL TO TOP BUTTON ================= */}
+{showTop && (
+  <button
+    onClick={scrollToTop}
+    className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-black text-white flex items-center justify-center shadow-lg hover:bg-gray-800 transition transform hover:-translate-y-1"
+    aria-label="Scroll to top"
+  >
+    ↑
+  </button>
+)}
+
     </main>
   );
 }
