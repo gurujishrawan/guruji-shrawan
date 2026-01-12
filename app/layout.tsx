@@ -7,6 +7,7 @@ const poppins = Poppins({
 });
 
 export const metadata = {
+  
   title: "Guruji Shrawan",
   description: "Official website of Guruji Shrawan",
   verification: {
@@ -18,6 +19,19 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Guruji Shrawan",
+              url: "https://guruji-shrawan.vercel.app",
+            }),
+          }}
+        />
+      </head>
       <body className={`${poppins.className} bg-black text-white`}>
         {children}
       </body>
