@@ -1,13 +1,17 @@
 import "./globals.css";
 import { Poppins } from "next/font/google";
+import { LanguageProvider } from "./context/LanguageContext";
+import type { ReactNode } from "react";
+import Navbar from "./components/Navbar";
+
+
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300","400","500","600","700","800"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata = {
-  
   title: "Guruji Shrawan",
   description: "Official website of Guruji Shrawan",
   verification: {
@@ -15,11 +19,11 @@ export const metadata = {
   },
 };
 
-
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-       <head>
+      <head>
+        {/* Website Schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -31,9 +35,28 @@ export default function RootLayout({ children }) {
             }),
           }}
         />
+
+        {/* Person Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Guruji Shrawan",
+              jobTitle: "Spiritual Teacher & Author",
+              sameAs: [
+                "https://youtube.com/@gurujishrawan",
+                "https://instagram.com/gurujishrawan",
+                "https://facebook.com/gurujishrawan",
+              ],
+            }),
+          }}
+        />
       </head>
+
       <body className={`${poppins.className} bg-black text-white`}>
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );

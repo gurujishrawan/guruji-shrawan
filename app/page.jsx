@@ -1,395 +1,226 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-
-
+import { useRouter, usePathname } from "next/navigation";
+import { useLanguage } from "./context/LanguageContext";
+import { siteContent } from "./content/siteContent";
+import VideoGallery from "./components/VideoGallery";
+import Footer from "./components/Footer";
 import {
   FaYoutube,
   FaInstagram,
   FaFacebook,
-  FaWhatsapp,
-  FaBars,
-  FaTimes,
 } from "react-icons/fa";
 
-export default function Page() {
-
-
-  /* ================= SCROLL TO TOP ================= */
-const [showTop, setShowTop] = useState(false);
-
-useEffect(() => {
-  const handleScroll = () => {
-    setShowTop(window.scrollY > 300);
-  };
-  window.addEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
-
-const scrollToTop = useCallback(() => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}, []);
-
-  /* ================= QUOTES ================= */
-  const quotes = [
-    "Clarity matters more than comfort.",
-    "Truth without apology.",
-    "Question deeply. Live honestly.",
-  ];
-  const [quoteIndex, setQuoteIndex] = useState(0);
-  const [fade, setFade] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setQuoteIndex((prev) => (prev + 1) % quotes.length);
-        setFade(true);
-      }, 500);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  /* ================= NAVBAR ================= */
-
-
-  const [menuOpen, setMenuOpen] = useState(false);
-
- /* ================= BODY SCROLL LOCK ================= */
-useEffect(() => {
-  if (menuOpen) {
-  document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
-
-  /* ================= HERO IMAGES ================= */
-  const heroImages = [
-    "images/hero1.jpg",
-    "images/hero2.jpg",
-    "images/hero3.jpg",
-  ];
-  const [heroIndex, setHeroIndex] = useState(0);
-
-  useEffect(() => {
-    const imgInterval = setInterval(() => {
-      setHeroIndex((p) => (p + 1) % heroImages.length);
-    }, 4000);
-    return () => clearInterval(imgInterval);
-  }, []);
-
-  /* ================= YOUTUBE SHORT IDS ================= */
-  const shorts = [
-    "eJ-_kdBVlaY",
-    "UhGADiUrGFQ",
-    "P-o8d-dmFH4",
-    "ZX81lMSwy-E",
-    "oHg7pNF2cFg",
-  ];
+/* ---------------- NAV LINK ---------------- */
+function NavLink({ href, label }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const isActive = pathname === href;
 
   return (
-    <main className="bg-white text-black font-sans">
-      {/* ================= NAVBAR ================= */}
-      <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur border-b border-black/10">
+    <button
+      onClick={() => router.push(href)}
+      className={`text-sm font-medium transition ${
+        isActive
+          ? "text-[#e4572e] border-b-2 border-[#e4572e]"
+          : "text-[#1c1c1c] hover:text-[#e4572e]"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+/* ---------------- DONATION STRIP ---------------- */
+function DonationStrip() {
+  const router = useRouter();
+  const { lang } = useLanguage();
+  const t = siteContent[lang];
+
+  return (
+    <div className="bg-[#111] text-white text-sm py-2 text-center">
+      {t.donateStrip}
+      <button
+        onClick={() => router.push("/donate")}
+        className="ml-2 underline text-[#e4572e]"
+      >
+        {t.donateCTA}
+      </button>
+    </div>
+  );
+}
+
+/* ---------------- HOME PAGE ---------------- */
+export default function HomePage() {
+  const router = useRouter();
+  const { lang, setLang } = useLanguage();
+  const t = siteContent[lang];
+
+  return (
+    <main className="bg-[#f7f5f2] text-[#1c1c1c]">
+      {/* Donation Strip */}
+      <DonationStrip />
+
+      {/* ================= HEADER ================= */}
+      <header className="sticky top-0 z-50 bg-[#f7f5f2]/90 backdrop-blur border-b border-black/10">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <img
-              src="images/guruji.jpg"
-              alt="Guruji"
-              className="w-9 h-9 rounded-full object-cover"
-            />
-            <div className="leading-tight">
-              <div className="text-xs tracking-widest text-gray-600">
-                GURUJI
-              </div>
-              <div className="text-lg font-extrabold tracking-tight">
-                SHRAWAN
-              </div>
-            </div>
+          <div className="font-extrabold tracking-wide">
+            GURUJI SHRAWAN
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8 text-sm">
-            {["Home", "Shorts", "Biography"].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="relative hover:text-black text-gray-600 after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-black after:transition-all hover:after:w-full"
-              >
-                {item}
-              </a>
-            ))}
+          <nav className="flex items-center gap-8">
+            <NavLink href="/" label="Home" />
+            <NavLink href="/articles" label={t.nav.articles} />
+            <NavLink href="/biography" label={t.nav.biography} />
 
-            <a
-              href="https://whatsapp.com/channel/0029VbCDS8a0gcfQ34r9Ez37"
-              target="_blank"
-              rel="noreferrer"
-              className="px-4 py-2 rounded-full border border-black/20 hover:bg-black hover:text-white transition"
+            <button
+              onClick={() => router.push("/donate")}
+              className="bg-[#e4572e] text-white px-4 py-1.5 rounded-sm text-sm font-medium"
             >
-              Join Channel
-            </a>
+              {t.nav.donate}
+            </button>
+
+            <button
+              onClick={() => setLang(lang === "en" ? "hi" : "en")}
+              className="text-xs border px-2 py-1"
+            >
+              {lang === "en" ? "हिंदी" : "EN"}
+            </button>
           </nav>
-
-          {/* Mobile */}
-<button
-  className="md:hidden text-2xl"
-  onClick={() => setMenuOpen(true)}
-  aria-label="Open menu"
->
-  <FaBars />
-</button>
-
         </div>
-
-{/* ================= MOBILE MENU ================= */}
-<div
-  className={`fixed inset-0 z-[100] transition-opacity duration-300 ${
-    menuOpen ? "opacity-100 visible" : "opacity-0 invisible"
-  }`}
->
-  {/* Backdrop */}
-  <div
-    className="absolute inset-0 bg-black/40"
-    onClick={() => setMenuOpen(false)}
-  />
-
-  {/* Drawer */}
-  <div
-    className={`absolute top-0 right-0 h-full w-[80%] max-w-sm bg-white shadow-xl transform transition-transform duration-300 ${
-      menuOpen ? "translate-x-0" : "translate-x-full"
-    }`}
-  >
-    <div className="p-6">
-      {/* Close button */}
-      <button
-        className="text-2xl mb-8"
-        onClick={() => setMenuOpen(false)}
-      >
-        <FaTimes />
-      </button>
-
-      <nav className="flex flex-col gap-6 text-lg font-medium">
-        <a
-          href="#home"
-          onClick={() => setMenuOpen(false)}
-          className="hover:text-gray-600"
-        >
-          Home
-        </a>
-        <a
-          href="#shorts"
-          onClick={() => setMenuOpen(false)}
-          className="hover:text-gray-600"
-        >
-          Shorts
-        </a>
-        <a
-          href="#biography"
-          onClick={() => setMenuOpen(false)}
-          className="hover:text-gray-600"
-        >
-          Biography
-        </a>
-
-        <a
-          href="https://whatsapp.com/channel/0029VbCDS8a0gcfQ34r9Ez37"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-block text-center border border-black px-4 py-2 rounded hover:bg-black hover:text-white transition"
-        >
-          Join WhatsApp Channel
-        </a>
-      </nav>
-    </div>
-  </div>
-</div>
-
-
       </header>
 
       {/* ================= HERO ================= */}
-      <section
-        id="home"
-        className="min-h-screen pt-16 grid md:grid-cols-[42%_58%]"
-      >
-        {/* Left */}
-        <div className="flex flex-col justify-center px-8 md:px-16 bg-white">
-          <div className="text-xs tracking-widest text-gray-600 mb-2">
-            GURUJI
-          </div>
-
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-6">
-            SHRAWAN
+      <section className="max-w-7xl mx-auto px-6 py-28 grid md:grid-cols-2 gap-16 items-center">
+        <div>
+          <h1 className="text-5xl font-extrabold leading-tight mb-6">
+            A Voice for Clarity <br /> in a Noisy World
           </h1>
 
-          <p
-            className={`text-xl md:text-2xl max-w-xl transition-all duration-500 ${fade ? "opacity-100" : "opacity-0"
-              }`}
-          >
-            {quotes[quoteIndex]}
+          <p className="text-[#5f5f5f] text-lg max-w-xl">
+            Guruji Shrawan shares direct, honest insights on life,
+            conditioning, fear, ambition, and self-understanding through
+            digital platforms and public discourse.
           </p>
 
-          <p className="text-gray-600 mt-4 max-w-lg">
-            Short, clear teachings focused on clarity and freedom — not belief or ritual.
-          </p>
+          <div className="flex gap-4 mt-10">
+            <button
+              onClick={() => router.push("/biography")}
+              className="border border-black px-6 py-3 text-sm"
+            >
+              Read Biography →
+            </button>
 
-          <div className="flex gap-4 mt-8 flex-wrap">
-            <a
-              href="#biography"
-              className="bg-black text-white px-6 py-3 rounded font-semibold hover:bg-gray-800 transition"
+            <button
+              onClick={() => router.push("/articles")}
+              className="bg-black text-white px-6 py-3 text-sm"
             >
-              Read Biography
-            </a>
-            <a
-              href="#shorts"
-              className="border border-black px-6 py-3 rounded hover:bg-black hover:text-white transition"
-            >
-              Watch Shorts
-            </a>
+              Explore Articles
+            </button>
           </div>
         </div>
 
-        {/* Right Image */}
-        <div className="relative w-full h-full">
+        <div className="relative">
           <img
-            src={heroImages[heroIndex]}
-            alt="Hero"
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+            src="/images/hero1.jpg"
+            alt="Guruji Shrawan"
+            className="w-full h-[420px] object-cover"
           />
-          {/* subtle dark overlay so text stays readable */}
-          <div className="absolute inset-0 bg-black/30" />
         </div>
       </section>
 
-      {/* ================= SHORTS ================= */}
-      <section id="shorts" className="py-20 bg-white">
+      {/* ================= JOURNEY / IMPACT ================= */}
+      <section className="bg-[#fff] py-24 border-t border-black/10">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-2">YouTube Shorts</h2>
-          <p className="text-gray-600 mb-8">
-            Tap thumbnail to open YouTube Shorts
+          <h2 className="text-3xl font-bold mb-6">
+            The Journey So Far
+          </h2>
+
+          <p className="text-[#5f5f5f] max-w-3xl mb-16">
+            Through consistent dialogue, short videos, and written reflections,
+            Guruji Shrawan’s work has reached thousands of seekers across
+            platforms, encouraging clarity over belief.
           </p>
 
-          <Swiper
-            modules={[Navigation]}
-            navigation
-            spaceBetween={20}
-            slidesPerView={1.2}
-            breakpoints={{
-              640: { slidesPerView: 2.2 },
-              1024: { slidesPerView: 3.2 },
-            }}
-          >
-            {shorts.map((id) => (
-              <SwiperSlide key={id}>
-                <a
-                  href={`https://www.youtube.com/shorts/${id}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block relative rounded-xl overflow-hidden"
-                >
-                  <img
-                    src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
-                    className="w-full h-[420px] object-cover"
-                    alt="short"
-                  />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+            <div>
+              <h3 className="text-4xl font-bold">100+</h3>
+              <p className="text-sm text-[#5f5f5f] mt-2">
+                YouTube Subscribers
+              </p>
+            </div>
 
-                  {/* Play Button */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-black/80 flex items-center justify-center">
-                      <div className="w-0 h-0 border-l-[14px] border-l-white border-y-[10px] border-y-transparent ml-1" />
-                    </div>
-                  </div>
-                </a>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </section>
+            <div>
+              <h3 className="text-4xl font-bold">700+</h3>
+              <p className="text-sm text-[#5f5f5f] mt-2">
+                Instagram Followers
+              </p>
+            </div>
 
-      {/* ================= BIO ================= */}
-      <section id="biography" className="py-20 bg-white border-t border-black/10">
-        <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-8 items-center">
-          <img
-            src="images/guruji.jpg"
-            alt="Guruji"
-            className="w-full max-w-sm rounded-full mx-auto"
-          />
+            <div>
+              <h3 className="text-4xl font-bold">500+</h3>
+              <p className="text-sm text-[#5f5f5f] mt-2">
+                Facebook Community
+              </p>
+            </div>
 
-          <div>
-            <h3 className="text-2xl font-semibold mb-4">
-              About Guruji Shrawan
-            </h3>
-            <p className="text-gray-600">
-              A teacher dedicated to clarity, deep understanding and practical guidance.
-              Focused on removing confusion and helping people live consciously.
-            </p>
+            <div>
+              <h3 className="text-4xl font-bold">Daily</h3>
+              <p className="text-sm text-[#5f5f5f] mt-2">
+                Short-form Teachings
+              </p>
+            </div>
           </div>
         </div>
       </section>
-      {/* ================= FOOTER ================= */}
-<footer className="bg-gray-50 border-t border-black/10 py-12">
-  <div className="max-w-7xl mx-auto px-6 text-center">
-    <h4 className="text-xl font-bold mb-2">Guruji Shrawan</h4>
-    <p className="text-gray-600 mb-6">
-      Clarity. Awareness. Freedom.
-    </p>
 
-    {/* Social Links */}
-    <div className="flex justify-center gap-6 text-2xl">
-      <a
-        href="https://www.youtube.com/@gurujishrawan"
-        target="_blank"
-        rel="noreferrer"
-        className="text-gray-600 hover:text-red-600 transition"
-      >
-        <FaYoutube />
-      </a>
+{/* ================= FEATURED ARTICLE ================= */}
+<section className="bg-white py-24 border-t border-black/10">
+  <div className="max-w-7xl mx-auto px-6">
+    <h2 className="text-3xl font-bold mb-12">
+      Trending Now
+    </h2>
 
-      <a
-        href="https://www.instagram.com/gurujishrawan/"
-        target="_blank"
-        rel="noreferrer"
-        className="text-gray-600 hover:text-pink-500 transition"
-      >
-        <FaInstagram />
-      </a>
+    <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h3 className="text-2xl font-semibold mb-4">
+          Living with Clarity in Modern Times
+        </h3>
 
-      <a
-        href="https://www.facebook.com/gurujishrawan"
-        target="_blank"
-        rel="noreferrer"
-        className="text-gray-600 hover:text-blue-600 transition"
-      >
-        <FaFacebook />
-      </a>
+        <p className="text-[#5f5f5f] mb-6 leading-relaxed">
+          In a world driven by noise, ambition, and constant comparison,
+          clarity becomes not a luxury but a necessity. This article explores
+          what it truly means to live with awareness rather than belief.
+        </p>
+
+        <div className="flex items-center gap-6 text-sm text-gray-500 mb-8">
+          <span>⏱ 6 min read</span>
+          <span>📖 Article</span>
+        </div>
+
+        <button
+          onClick={() => router.push("/articles")}
+          className="border border-black px-6 py-3 text-sm"
+        >
+          Know More →
+        </button>
+      </div>
+
+      <div>
+        <img
+          src="/images/hero1.jpg"
+          alt="Featured article"
+          className="w-full h-[320px] object-cover"
+        />
+      </div>
     </div>
-
-    <p className="text-xs text-gray-500 mt-8">
-      © {new Date().getFullYear()} Guruji Shrawan. All rights reserved.
-    </p>
   </div>
-</footer>
-{/* ================= SCROLL TO TOP BUTTON ================= */}
-{showTop && (
-  <button
-    onClick={scrollToTop}
-    className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-black text-white flex items-center justify-center shadow-lg hover:bg-gray-800 transition transform hover:-translate-y-1"
-    aria-label="Scroll to top"
-  >
-    ↑
-  </button>
-)}
+</section>
 
+      {/* ================= VIDEOS ================= */}
+      <VideoGallery title="Podcasts & Video Conversations" />
+
+      <Footer />
     </main>
   );
 }
