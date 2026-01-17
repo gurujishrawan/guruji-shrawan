@@ -2,7 +2,6 @@ import "./globals.css";
 import { Poppins } from "next/font/google";
 import { LanguageProvider } from "./context/LanguageContext";
 import type { ReactNode } from "react";
-import Navbar from "./components/Navbar";
 
 
 
