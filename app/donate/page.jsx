@@ -6,7 +6,7 @@ export default function DonatePage() {
         <p className="mb-6">This is not charity. This is participation.</p>
         <div className="border p-4 rounded-lg mb-6">
           <p className="text-sm">Donate via UPI</p>
-          <p className="font-bold">guruji@upi</p>
+          <p className="font-bold">9999793389@ybi</p>
         </div>
       </div>
     </section>
