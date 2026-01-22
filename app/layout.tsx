@@ -3,7 +3,10 @@ import { Poppins } from "next/font/google";
 import { LanguageProvider } from "./context/LanguageContext";
 import type { ReactNode } from "react";
 
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
+import ClientLayout from "./layoutclient";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -54,8 +57,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
 
-      <body className={`${poppins.className} bg-black text-white`}>
-        <LanguageProvider>{children}</LanguageProvider>
+      <body className={`${poppins.className} bg-[#f7f5f2] text-[#1c1c1c]`}>
+        <LanguageProvider>
+          <ClientLayout>
+            {children}
+          </ClientLayout>
+        </LanguageProvider>
       </body>
     </html>
   );
