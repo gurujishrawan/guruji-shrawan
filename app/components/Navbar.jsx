@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "../context/LanguageContext";
 import { siteContent } from "../content/siteContent";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
+import { useTheme } from "../context/useTheme";
 
 function NavLink({ href, label, onClick }) {
   const router = useRouter();
@@ -31,11 +32,12 @@ function NavLink({ href, label, onClick }) {
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const { lang, setLang } = useLanguage();
+  const { lang, setLang, languages } = useLanguage();
   const t = siteContent[lang];
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 bg-[#f7f5f2]/90 backdrop-blur border-b border-black/10">
+    <header className="sticky top-0 z-50 bg-[var(--surface-muted)]/90 backdrop-blur border-b border-black/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <div className="font-extrabold tracking-wide text-lg">
           GURUJI SHRAWAN
@@ -43,23 +45,43 @@ export default function Navbar() {
 
         {/* Desktop */}
         <nav className="hidden md:flex gap-8 items-center">
-          <NavLink href="/" label="Home" />
+          <NavLink href="/" label={t.nav.home} />
           <NavLink href="/articles" label={t.nav.articles} />
           <NavLink href="/biography" label={t.nav.biography} />
 
           <button
             onClick={() => router.push("/donate")}
-            className="bg-[#e4572e] text-white px-4 py-1.5 text-sm"
+            className="bg-[var(--brand)] text-white px-4 py-1.5 text-sm rounded-sm hover:bg-[var(--brand-dark)] transition"
           >
             {t.nav.donate}
           </button>
 
           <button
-            onClick={() => setLang(lang === "en" ? "hi" : "en")}
-            className="text-xs border px-2 py-1"
+            onClick={toggleTheme}
+            className="flex items-center gap-2 text-xs border px-2.5 py-1 rounded-full bg-white/70 hover:bg-white transition"
           >
-            {lang === "en" ? "हिंदी" : "EN"}
+            {theme === "light" ? (
+              <FaMoon className="text-gray-700" />
+            ) : (
+              <FaSun className="text-yellow-400" />
+            )}
+            {theme === "light" ? "Dark" : "Light"}
           </button>
+
+          <label className="text-xs border px-2.5 py-1 rounded-full bg-white/70">
+            <span className="sr-only">{t.languageLabel}</span>
+            <select
+              value={lang}
+              onChange={event => setLang(event.target.value)}
+              className="bg-transparent text-xs font-medium"
+            >
+              {languages.map(option => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </nav>
 
         {/* Mobile */}
@@ -72,17 +94,50 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="md:hidden bg-[#f7f5f2] border-t px-6 py-6 flex flex-col gap-4">
-          <NavLink href="/" label="Home" onClick={() => setOpen(false)} />
+        <div className="md:hidden bg-[var(--surface-muted)] border-t px-6 py-6 flex flex-col gap-4">
+          <NavLink href="/" label={t.nav.home} onClick={() => setOpen(false)} />
           <NavLink href="/articles" label={t.nav.articles} onClick={() => setOpen(false)} />
           <NavLink href="/biography" label={t.nav.biography} onClick={() => setOpen(false)} />
 
           <button
             onClick={() => router.push("/donate")}
-            className="bg-[#e4572e] text-white px-4 py-2 text-sm"
+            className="bg-[var(--brand)] text-white px-4 py-2 text-sm rounded-sm"
           >
             {t.nav.donate}
           </button>
+
+          <button
+            onClick={() => {
+              toggleTheme();
+              setOpen(false);
+            }}
+            className="flex items-center gap-2 text-xs border px-3 py-2 w-fit rounded-full bg-white/70"
+          >
+            {theme === "light" ? (
+              <FaMoon className="text-gray-700" />
+            ) : (
+              <FaSun className="text-yellow-400" />
+            )}
+            {theme === "light" ? "Dark" : "Light"}
+          </button>
+
+          <label className="text-xs border px-3 py-2 w-fit rounded-full bg-white/70">
+            <span className="sr-only">{t.languageLabel}</span>
+            <select
+              value={lang}
+              onChange={event => {
+                setLang(event.target.value);
+                setOpen(false);
+              }}
+              className="bg-transparent text-xs font-medium"
+            >
+              {languages.map(option => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       )}
     </header>
