@@ -21,7 +21,7 @@ function NavLink({ href, label, onClick }) {
       className={`text-sm font-medium ${
         active
           ? "text-[#e4572e] border-b-2 border-[#e4572e]"
-          : "text-[#1c1c1c] hover:text-[#e4572e]"
+          : "text-[var(--foreground)]/80 hover:text-[#e4572e]"
       }`}
     >
       {label}
@@ -58,7 +58,7 @@ export default function Navbar() {
 
           <button
             onClick={toggleTheme}
-            className="flex items-center gap-2 text-xs border px-2.5 py-1 rounded-full bg-white/70 hover:bg-white transition"
+            className="flex items-center gap-2 text-xs border border-black/10 px-2.5 py-1 rounded-full bg-white/70 text-[var(--foreground)] hover:bg-white transition"
           >
             {theme === "light" ? (
               <FaMoon className="text-gray-700" />
@@ -68,12 +68,12 @@ export default function Navbar() {
             {theme === "light" ? "Dark" : "Light"}
           </button>
 
-          <label className="text-xs border px-2.5 py-1 rounded-full bg-white/70">
+          <label className="text-xs border border-black/10 px-2.5 py-1 rounded-full bg-white/70 text-[var(--foreground)]">
             <span className="sr-only">{t.languageLabel}</span>
             <select
               value={lang}
               onChange={event => setLang(event.target.value)}
-              className="bg-transparent text-xs font-medium"
+              className="bg-transparent text-xs font-medium text-[var(--foreground)]"
             >
               {languages.map(option => (
                 <option key={option.code} value={option.code}>
@@ -111,7 +111,7 @@ export default function Navbar() {
               toggleTheme();
               setOpen(false);
             }}
-            className="flex items-center gap-2 text-xs border px-3 py-2 w-fit rounded-full bg-white/70"
+            className="flex items-center gap-2 text-xs border border-black/10 px-3 py-2 w-fit rounded-full bg-white/70 text-[var(--foreground)]"
           >
             {theme === "light" ? (
               <FaMoon className="text-gray-700" />
@@ -121,7 +121,7 @@ export default function Navbar() {
             {theme === "light" ? "Dark" : "Light"}
           </button>
 
-          <label className="text-xs border px-3 py-2 w-fit rounded-full bg-white/70">
+          <label className="text-xs border border-black/10 px-3 py-2 w-fit rounded-full bg-white/70 text-[var(--foreground)]">
             <span className="sr-only">{t.languageLabel}</span>
             <select
               value={lang}
@@ -129,7 +129,7 @@ export default function Navbar() {
                 setLang(event.target.value);
                 setOpen(false);
               }}
-              className="bg-transparent text-xs font-medium"
+              className="bg-transparent text-xs font-medium text-[var(--foreground)]"
             >
               {languages.map(option => (
                 <option key={option.code} value={option.code}>

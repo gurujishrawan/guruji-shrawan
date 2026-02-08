@@ -23,7 +23,7 @@ function NavLink({ href, label, onClick }) {
       className={`text-sm font-medium transition text-left ${
         isActive
           ? "text-[#e4572e] border-b-2 border-[#e4572e]"
-          : "text-[#1c1c1c] hover:text-[#e4572e]"
+          : "text-[var(--foreground)]/80 hover:text-[#e4572e]"
       }`}
     >
       {label}
@@ -117,7 +117,7 @@ export default function HomePage() {
 
             <button
               onClick={toggleTheme}
-              className="flex items-center gap-2 text-xs border px-2.5 py-1 rounded-full bg-white/70 hover:bg-white transition"
+              className="flex items-center gap-2 text-xs border border-black/10 px-2.5 py-1 rounded-full bg-white/70 text-[var(--foreground)] hover:bg-white transition"
             >
               {theme === "light" ? (
                 <FaMoon className="text-gray-700" />
@@ -127,12 +127,12 @@ export default function HomePage() {
               {theme === "light" ? "Dark" : "Light"}
             </button>
 
-            <label className="text-xs border px-2.5 py-1 rounded-full bg-white/70">
+            <label className="text-xs border border-black/10 px-2.5 py-1 rounded-full bg-white/70 text-[var(--foreground)]">
               <span className="sr-only">{t.languageLabel}</span>
               <select
                 value={lang}
                 onChange={event => setLang(event.target.value)}
-                className="bg-transparent text-xs font-medium"
+                className="bg-transparent text-xs font-medium text-[var(--foreground)]"
               >
                 {languages.map(option => (
                   <option key={option.code} value={option.code}>
@@ -182,7 +182,7 @@ export default function HomePage() {
                 toggleTheme();
                 setOpen(false);
               }}
-              className="flex items-center gap-2 text-xs border px-3 py-2 w-fit rounded-full bg-white/70"
+              className="flex items-center gap-2 text-xs border border-black/10 px-3 py-2 w-fit rounded-full bg-white/70 text-[var(--foreground)]"
             >
               {theme === "light" ? (
                 <FaMoon className="text-gray-700" />
@@ -192,7 +192,7 @@ export default function HomePage() {
               {theme === "light" ? "Dark" : "Light"}
             </button>
 
-            <label className="text-xs border px-3 py-2 w-fit rounded-full bg-white/70">
+            <label className="text-xs border border-black/10 px-3 py-2 w-fit rounded-full bg-white/70 text-[var(--foreground)]">
               <span className="sr-only">{t.languageLabel}</span>
               <select
                 value={lang}
@@ -200,7 +200,7 @@ export default function HomePage() {
                   setLang(event.target.value);
                   setOpen(false);
                 }}
-                className="bg-transparent text-xs font-medium"
+                className="bg-transparent text-xs font-medium text-[var(--foreground)]"
               >
                 {languages.map(option => (
                   <option key={option.code} value={option.code}>
@@ -215,43 +215,45 @@ export default function HomePage() {
 
       {/* ================= HERO ================= */}
       <section className="bg-[var(--surface-muted)]">
-        <div className="max-w-5xl mx-auto px-6 py-12 sm:py-16 space-y-8">
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[260px] sm:h-[360px]">
-            <img
-              key={heroImages[heroIndex]}
-              src={heroImages[heroIndex]}
-              alt="Guruji Shrawan"
-              className="h-full w-full object-cover animate-fade-in"
-            />
-          </div>
+        <div className="max-w-6xl mx-auto px-6 py-12 sm:py-16">
+          <div className="grid gap-10 lg:grid-cols-[1.1fr,0.9fr] items-center">
+            <div className="rounded-3xl bg-[#1b1b1b] text-white p-8 shadow-xl space-y-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-white/60">
+                Guruji Shrawan
+              </p>
+              <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight">
+                {t.hero.title}
+              </h1>
+              <p className="text-white/80 text-base sm:text-lg">
+                {t.hero.desc}
+              </p>
+              <p className="text-lg font-semibold text-white">
+                {t.hero.quote}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={() => router.push("/biography")}
+                  className="border border-white/60 px-6 py-3 text-sm text-white"
+                >
+                  {t.hero.primaryCTA} →
+                </button>
 
-          <div className="rounded-3xl bg-[#1b1b1b] text-white p-8 shadow-xl space-y-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-white/60">
-              Guruji Shrawan
-            </p>
-            <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight">
-              {t.hero.title}
-            </h1>
-            <p className="text-white/80 text-base sm:text-lg">
-              {t.hero.desc}
-            </p>
-            <p className="text-lg font-semibold text-white">
-              {t.hero.quote}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                onClick={() => router.push("/biography")}
-                className="border border-white/60 px-6 py-3 text-sm text-white"
-              >
-                {t.hero.primaryCTA} →
-              </button>
+                <button
+                  onClick={() => router.push("/articles")}
+                  className="bg-white text-black px-6 py-3 text-sm"
+                >
+                  {t.hero.secondaryCTA}
+                </button>
+              </div>
+            </div>
 
-              <button
-                onClick={() => router.push("/articles")}
-                className="bg-white text-black px-6 py-3 text-sm"
-              >
-                {t.hero.secondaryCTA}
-              </button>
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[280px] sm:h-[360px]">
+              <img
+                key={heroImages[heroIndex]}
+                src={heroImages[heroIndex]}
+                alt="Guruji Shrawan"
+                className="h-full w-full object-cover animate-fade-in"
+              />
             </div>
           </div>
         </div>
