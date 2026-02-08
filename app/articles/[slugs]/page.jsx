@@ -17,6 +17,13 @@ export default async function ArticlePage({ params }) {
           <p className="text-sm text-gray-500">{article.publishedAt}</p>
         )}
       </div>
+      {article.featuredImage && (
+        <img
+          src={article.featuredImage}
+          alt={article.title.en}
+          className="w-full rounded-lg mb-8"
+        />
+      )}
       <div dangerouslySetInnerHTML={{ __html: article.content.en }} />
     </article>
   );

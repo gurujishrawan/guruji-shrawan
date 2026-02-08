@@ -16,6 +16,7 @@ const fallbackArticles = [
       hi: "<p>स्पष्टता वहीं शुरू होती है जहाँ विश्वास समाप्त होता है।</p>",
     },
     publishedAt: "2024-01-10",
+    featuredImage: "/images/hero1.jpg",
   },
 ];
 
@@ -61,6 +62,7 @@ export async function addOrUpdateArticle(input: {
   excerpt: { en: string; hi: string };
   content: { en: string; hi: string };
   publishedAt?: string;
+  featuredImage?: string;
 }) {
   const articles = await readArticlesFile();
   const slug = normalizeSlug(input.slug || input.title.en || "");
@@ -76,6 +78,7 @@ export async function addOrUpdateArticle(input: {
     ...input,
     slug,
     publishedAt,
+    featuredImage: input.featuredImage || "",
   };
 
   const existingIndex = articles.findIndex(
@@ -90,6 +93,13 @@ export async function addOrUpdateArticle(input: {
 
   await writeArticlesFile(articles);
   return payload;
+}
+
+export async function deleteArticle(slug: string) {
+  const articles = await readArticlesFile();
+  const nextArticles = articles.filter(article => article.slug !== slug);
+  await writeArticlesFile(nextArticles);
+  return nextArticles;
 }
 
 export { normalizeSlug };

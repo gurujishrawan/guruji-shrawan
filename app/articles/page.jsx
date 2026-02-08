@@ -8,15 +8,7 @@ export default async function ArticlesPage() {
 
   return (
     <section className="max-w-5xl mx-auto px-6 py-24">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-        <h1 className="text-4xl font-extrabold">Articles</h1>
-        <Link
-          href="/admin"
-          className="text-sm font-semibold text-[#e4572e] underline"
-        >
-          Open CMS →
-        </Link>
-      </div>
+      <h1 className="text-4xl font-extrabold mb-10">Articles</h1>
 
       {articles.map(article => (
         <Link key={article.slug} href={`/articles/${article.slug}`}>
@@ -30,6 +22,13 @@ export default async function ArticlesPage() {
               )}
             </div>
             <p className="text-gray-600">{article.excerpt.en}</p>
+            {article.featuredImage && (
+              <img
+                src={article.featuredImage}
+                alt={article.title.en}
+                className="mt-4 h-40 w-full rounded object-cover"
+              />
+            )}
           </div>
         </Link>
       ))}
