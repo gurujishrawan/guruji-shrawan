@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "./context/LanguageContext";
 import { siteContent } from "./content/siteContent";
 import VideoGallery from "./components/VideoGallery";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
 
 /* ---------------- NAV LINK ---------------- */
 function NavLink({ href, label, onClick }) {
@@ -139,17 +139,22 @@ export default function HomePage() {
               onClick={() =>
                 setTheme(theme === "light" ? "dark" : "light")
               }
-              className="text-xs border px-2 py-1 rounded-sm"
+              className="flex items-center gap-2 text-xs border px-2.5 py-1 rounded-full bg-white/70 hover:bg-white transition"
             >
-              {theme === "light" ? "Dark" : "Light"} Mode
+              {theme === "light" ? (
+                <FaMoon className="text-gray-700" />
+              ) : (
+                <FaSun className="text-yellow-400" />
+              )}
+              {theme === "light" ? "Dark" : "Light"}
             </button>
 
-            <label className="text-xs border px-2 py-1 rounded-sm">
+            <label className="text-xs border px-2.5 py-1 rounded-full bg-white/70">
               <span className="sr-only">{t.languageLabel}</span>
               <select
                 value={lang}
                 onChange={event => setLang(event.target.value)}
-                className="bg-transparent text-xs"
+                className="bg-transparent text-xs font-medium"
               >
                 {languages.map(option => (
                   <option key={option.code} value={option.code}>
@@ -199,12 +204,17 @@ export default function HomePage() {
                 setTheme(theme === "light" ? "dark" : "light");
                 setOpen(false);
               }}
-              className="text-xs border px-2 py-2 w-fit rounded-sm"
+              className="flex items-center gap-2 text-xs border px-3 py-2 w-fit rounded-full bg-white/70"
             >
-              {theme === "light" ? "Dark" : "Light"} Mode
+              {theme === "light" ? (
+                <FaMoon className="text-gray-700" />
+              ) : (
+                <FaSun className="text-yellow-400" />
+              )}
+              {theme === "light" ? "Dark" : "Light"}
             </button>
 
-            <label className="text-xs border px-2 py-2 w-fit rounded-sm">
+            <label className="text-xs border px-3 py-2 w-fit rounded-full bg-white/70">
               <span className="sr-only">{t.languageLabel}</span>
               <select
                 value={lang}
@@ -212,7 +222,7 @@ export default function HomePage() {
                   setLang(event.target.value);
                   setOpen(false);
                 }}
-                className="bg-transparent text-xs"
+                className="bg-transparent text-xs font-medium"
               >
                 {languages.map(option => (
                   <option key={option.code} value={option.code}>

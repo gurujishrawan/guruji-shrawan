@@ -9,20 +9,20 @@ import {
   type ReactNode,
 } from "react";
 
-type LanguageCode = "en" | "hi" | "es" | "fr";
+const availableLanguages = [
+  { code: "en", label: "English" },
+  { code: "hi", label: "हिंदी" },
+  { code: "es", label: "Español" },
+  { code: "fr", label: "Français" },
+] as const;
+
+type LanguageCode = (typeof availableLanguages)[number]["code"];
 
 const LanguageContext = createContext<{
   lang: LanguageCode;
   setLang: (lang: LanguageCode) => void;
   languages: { code: LanguageCode; label: string }[];
 } | null>(null);
-
-const availableLanguages = [
-  { code: "en", label: "English" },
-  { code: "hi", label: "हिंदी" },
-  { code: "es", label: "Español" },
-  { code: "fr", label: "Français" },
-];
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<LanguageCode>("en");
@@ -48,7 +48,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     () => ({
       lang,
       setLang,
-      languages: availableLanguages,
+      languages: [...availableLanguages],
     }),
     [lang],
   );
