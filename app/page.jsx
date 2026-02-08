@@ -1,18 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "./context/LanguageContext";
 import { siteContent } from "./content/siteContent";
 import VideoGallery from "./components/VideoGallery";
-import Footer from "./components/Footer";
-import {
-  FaBars,
-  FaTimes,
-  FaYoutube,
-  FaInstagram,
-  FaFacebook,
-} from "react-icons/fa";
+import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
+import { useTheme } from "./context/useTheme";
 
 /* ---------------- NAV LINK ---------------- */
 function NavLink({ href, label, onClick }) {
@@ -41,7 +35,7 @@ function NavLink({ href, label, onClick }) {
 function DonationStrip() {
   const router = useRouter();
   const { lang } = useLanguage();
-  const t = siteContent[lang];
+  const t = siteContent[lang] ?? siteContent.en;
 
   return (
     <div className="bg-[#111] text-white text-xs sm:text-sm py-2 text-center px-4">
@@ -59,17 +53,50 @@ function DonationStrip() {
 /* ---------------- HOME PAGE ---------------- */
 export default function HomePage() {
   const router = useRouter();
-  const { lang, setLang } = useLanguage();
-  const t = siteContent[lang];
+  const { lang, setLang, languages } = useLanguage();
+  const t = siteContent[lang] ?? siteContent.en;
   const [open, setOpen] = useState(false);
+  const [socialStats, setSocialStats] = useState(null);
+  const { theme, toggleTheme } = useTheme();
+  const heroImages = [
+    "/images/hero1.jpg",
+    "/images/hero2.jpg",
+    "/images/hero3.jpg",
+  ];
+  const [heroIndex, setHeroIndex] = useState(0);
 
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/social")
+      .then(res => res.json())
+      .then(data => {
+        if (isMounted) {
+          setSocialStats(data);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setSocialStats(null);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroIndex(current => (current + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
   return (
-    <main className="bg-[#f7f5f2] text-[#1c1c1c] overflow-x-hidden">
-      {/* Donation Strip */}
+    <main className="bg-[var(--surface-muted)] text-[var(--foreground)] overflow-x-hidden">
       <DonationStrip />
 
       {/* ================= HEADER ================= */}
-      <header className="sticky top-0 z-50 bg-[#f7f5f2]/90 backdrop-blur border-b border-black/10">
+      <header className="sticky top-0 z-50 bg-[var(--surface-muted)]/90 backdrop-blur border-b border-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="font-extrabold tracking-wide text-lg">
             GURUJI SHRAWAN
@@ -77,23 +104,43 @@ export default function HomePage() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            <NavLink href="/" label="Home" />
+            <NavLink href="/" label={t.nav.home} />
             <NavLink href="/articles" label={t.nav.articles} />
             <NavLink href="/biography" label={t.nav.biography} />
 
             <button
               onClick={() => router.push("/donate")}
-              className="bg-[#e4572e] text-white px-4 py-1.5 rounded-sm text-sm font-medium"
+              className="bg-[var(--brand)] text-white px-4 py-1.5 rounded-sm text-sm font-medium hover:bg-[var(--brand-dark)] transition"
             >
               {t.nav.donate}
             </button>
 
             <button
-              onClick={() => setLang(lang === "en" ? "hi" : "en")}
-              className="text-xs border px-2 py-1"
+              onClick={toggleTheme}
+              className="flex items-center gap-2 text-xs border px-2.5 py-1 rounded-full bg-white/70 hover:bg-white transition"
             >
-              {lang === "en" ? "हिंदी" : "EN"}
+              {theme === "light" ? (
+                <FaMoon className="text-gray-700" />
+              ) : (
+                <FaSun className="text-yellow-400" />
+              )}
+              {theme === "light" ? "Dark" : "Light"}
             </button>
+
+            <label className="text-xs border px-2.5 py-1 rounded-full bg-white/70">
+              <span className="sr-only">{t.languageLabel}</span>
+              <select
+                value={lang}
+                onChange={event => setLang(event.target.value)}
+                className="bg-transparent text-xs font-medium"
+              >
+                {languages.map(option => (
+                  <option key={option.code} value={option.code}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -107,8 +154,8 @@ export default function HomePage() {
 
         {/* Mobile Menu */}
         {open && (
-          <div className="md:hidden bg-[#f7f5f2] border-t px-6 py-6 flex flex-col gap-5">
-            <NavLink href="/" label="Home" onClick={() => setOpen(false)} />
+          <div className="md:hidden bg-[var(--surface-muted)] border-t px-6 py-6 flex flex-col gap-5">
+            <NavLink href="/" label={t.nav.home} onClick={() => setOpen(false)} />
             <NavLink
               href="/articles"
               label={t.nav.articles}
@@ -125,95 +172,129 @@ export default function HomePage() {
                 router.push("/donate");
                 setOpen(false);
               }}
-              className="bg-[#e4572e] text-white px-4 py-2 text-sm"
+              className="bg-[var(--brand)] text-white px-4 py-2 text-sm hover:bg-[var(--brand-dark)] transition"
             >
               {t.nav.donate}
             </button>
 
             <button
-              onClick={() => setLang(lang === "en" ? "hi" : "en")}
-              className="text-xs border px-2 py-2 w-fit"
+              onClick={() => {
+                toggleTheme();
+                setOpen(false);
+              }}
+              className="flex items-center gap-2 text-xs border px-3 py-2 w-fit rounded-full bg-white/70"
             >
-              {lang === "en" ? "हिंदी" : "EN"}
+              {theme === "light" ? (
+                <FaMoon className="text-gray-700" />
+              ) : (
+                <FaSun className="text-yellow-400" />
+              )}
+              {theme === "light" ? "Dark" : "Light"}
             </button>
+
+            <label className="text-xs border px-3 py-2 w-fit rounded-full bg-white/70">
+              <span className="sr-only">{t.languageLabel}</span>
+              <select
+                value={lang}
+                onChange={event => {
+                  setLang(event.target.value);
+                  setOpen(false);
+                }}
+                className="bg-transparent text-xs font-medium"
+              >
+                {languages.map(option => (
+                  <option key={option.code} value={option.code}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         )}
       </header>
 
       {/* ================= HERO ================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-28 grid md:grid-cols-2 gap-12 items-center">
-        <div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-6">
-            A Voice for Clarity <br /> in a Noisy World
-          </h1>
-
-          <p className="text-[#5f5f5f] text-base sm:text-lg max-w-xl">
-            Guruji Shrawan shares direct, honest insights on life,
-            conditioning, fear, ambition, and self-understanding through
-            digital platforms.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 mt-10">
-            <button
-              onClick={() => router.push("/biography")}
-              className="border border-black px-6 py-3 text-sm"
-            >
-              Read Biography →
-            </button>
-
-            <button
-              onClick={() => router.push("/articles")}
-              className="bg-black text-white px-6 py-3 text-sm"
-            >
-              Explore Articles
-            </button>
+      <section className="bg-[var(--surface-muted)]">
+        <div className="max-w-5xl mx-auto px-6 py-12 sm:py-16 space-y-8">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[260px] sm:h-[360px]">
+            <img
+              key={heroImages[heroIndex]}
+              src={heroImages[heroIndex]}
+              alt="Guruji Shrawan"
+              className="h-full w-full object-cover animate-fade-in"
+            />
           </div>
-        </div>
 
-        <div>
-          <img
-            src="/images/hero1.jpg"
-            alt="Guruji Shrawan"
-            className="w-full h-[260px] sm:h-[420px] object-cover"
-          />
+          <div className="rounded-3xl bg-[#1b1b1b] text-white p-8 shadow-xl space-y-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-white/60">
+              Guruji Shrawan
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight">
+              {t.hero.title}
+            </h1>
+            <p className="text-white/80 text-base sm:text-lg">
+              {t.hero.desc}
+            </p>
+            <p className="text-lg font-semibold text-white">
+              {t.hero.quote}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => router.push("/biography")}
+                className="border border-white/60 px-6 py-3 text-sm text-white"
+              >
+                {t.hero.primaryCTA} →
+              </button>
+
+              <button
+                onClick={() => router.push("/articles")}
+                className="bg-white text-black px-6 py-3 text-sm"
+              >
+                {t.hero.secondaryCTA}
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ================= JOURNEY ================= */}
-      <section className="bg-white py-20 sm:py-24 border-t border-black/10">
+      <section className="bg-[var(--surface)] py-20 sm:py-24 border-t border-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl font-bold mb-6">
-            The Journey So Far
-          </h2>
+          <div className="grid gap-8 lg:grid-cols-[1.1fr,0.9fr] items-center">
+            <div>
+              <h2 className="text-3xl font-bold mb-6">{t.journey.title}</h2>
 
-          <p className="text-[#5f5f5f] max-w-3xl mb-16">
-            Through consistent dialogue, short videos, and written reflections,
-            Guruji Shrawan’s work has reached thousands of seekers.
-          </p>
+              <p className="text-[#5f5f5f] max-w-3xl mb-10">
+                {t.journey.desc}
+              </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-            <div>
-              <h3 className="text-4xl font-bold">100+</h3>
-              <p className="text-sm text-[#5f5f5f] mt-2">
-                YouTube Subscribers
-              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {t.stats.map(stat => (
+                  <div
+                    key={stat.key}
+                    className="rounded-2xl border border-gray-200 bg-[var(--surface)] p-5 shadow-sm"
+                  >
+                    <h3 className="text-2xl font-bold">
+                      {socialStats?.counts?.[stat.key] ?? "—"}
+                    </h3>
+                    <p className="text-xs text-[#5f5f5f] mt-2">
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div>
-              <h3 className="text-4xl font-bold">700+</h3>
-              <p className="text-sm text-[#5f5f5f] mt-2">
-                Instagram Followers
+
+            <div className="rounded-3xl bg-[#111] text-white p-8 space-y-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-white/60">
+                Daily focus
               </p>
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold">500+</h3>
-              <p className="text-sm text-[#5f5f5f] mt-2">
-                Facebook Community
-              </p>
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold">Daily</h3>
-              <p className="text-sm text-[#5f5f5f] mt-2">
-                Short-form Teachings
+              <h3 className="text-2xl font-semibold">
+                Short-form teachings, long-term impact.
+              </h3>
+              <p className="text-sm text-white/70">
+                Curated wisdom delivered through modern platforms for seekers who
+                want clarity without noise.
               </p>
             </div>
           </div>
@@ -221,28 +302,31 @@ export default function HomePage() {
       </section>
 
       {/* ================= FEATURED ================= */}
-      <section className="bg-white py-20 sm:py-24 border-t border-black/10">
+      <section className="bg-[var(--surface)] py-20 sm:py-24 border-t border-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl font-bold mb-12">
-            Trending Now
-          </h2>
+          <div className="flex items-center justify-between mb-12">
+            <h2 className="text-3xl font-bold">{t.featured.title}</h2>
+            <button
+              onClick={() => router.push("/articles")}
+              className="text-sm underline"
+            >
+              {t.featured.cta}
+            </button>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h3 className="text-2xl font-semibold mb-4">
-                Living with Clarity in Modern Times
+                {t.featured.headline}
               </h3>
 
-              <p className="text-[#5f5f5f] mb-6">
-                In a world driven by noise and comparison,
-                clarity becomes a necessity rather than luxury.
-              </p>
+              <p className="text-[#5f5f5f] mb-6">{t.featured.desc}</p>
 
               <button
                 onClick={() => router.push("/articles")}
                 className="border border-black px-6 py-3 text-sm"
               >
-                Know More →
+                {t.featured.cta}
               </button>
             </div>
 
@@ -250,7 +334,7 @@ export default function HomePage() {
               <img
                 src="/images/hero1.jpg"
                 alt="Featured article"
-                className="w-full h-[260px] sm:h-[320px] object-cover"
+                className="w-full h-[260px] sm:h-[320px] object-cover rounded-3xl"
               />
             </div>
           </div>
@@ -258,9 +342,7 @@ export default function HomePage() {
       </section>
 
       {/* ================= VIDEOS ================= */}
-      <VideoGallery title="Podcasts & Video Conversations" />
-
-      <Footer />
+      <VideoGallery title={t.videoTitle} />
     </main>
   );
 }
