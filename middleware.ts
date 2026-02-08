@@ -8,10 +8,11 @@ export function middleware(request: Request) {
     return NextResponse.next();
   }
 
+  const username = process.env.ADMIN_USERNAME;
   const password = process.env.ADMIN_PASSWORD;
-  if (!password) {
+  if (!username || !password) {
     return new NextResponse(
-      "Missing ADMIN_PASSWORD. Set it to protect /admin.",
+      "Missing ADMIN_USERNAME or ADMIN_PASSWORD. Set them to protect /admin.",
       { status: 500 },
     );
   }
@@ -28,9 +29,9 @@ export function middleware(request: Request) {
 
   const base64Credentials = authHeader.split(" ")[1] || "";
   const decoded = atob(base64Credentials);
-  const [, passwordValue] = decoded.split(":");
+  const [inputUser, inputPass] = decoded.split(":");
 
-  if (passwordValue !== password) {
+  if (inputUser !== username || inputPass !== password) {
     return new NextResponse("Invalid credentials", {
       status: 401,
       headers: {
