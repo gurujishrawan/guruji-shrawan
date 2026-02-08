@@ -98,6 +98,32 @@ export default function HomePage() {
     x: socialStats?.links?.x || "https://x.com/gurujishrawan",
   };
 
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/social")
+      .then(res => res.json())
+      .then(data => {
+        if (isMounted) {
+          setSocialStats(data);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setSocialStats(null);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroIndex(current => (current + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
   return (
     <main className="bg-[var(--surface-muted)] text-[var(--foreground)] overflow-x-hidden">
       <DonationStrip />
