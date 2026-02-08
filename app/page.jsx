@@ -98,6 +98,32 @@ export default function HomePage() {
     x: socialStats?.links?.x || "https://x.com/gurujishrawan",
   };
 
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/social")
+      .then(res => res.json())
+      .then(data => {
+        if (isMounted) {
+          setSocialStats(data);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setSocialStats(null);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroIndex(current => (current + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
   return (
     <main className="bg-[var(--surface-muted)] text-[var(--foreground)] overflow-x-hidden">
       <DonationStrip />
@@ -290,25 +316,12 @@ export default function HomePage() {
                 {t.stats.map(stat => (
                   <div
                     key={stat.key}
-                    className="rounded-2xl border border-black/5 bg-[var(--surface)] p-5 shadow-sm flex flex-col gap-3"
+                    className="rounded-2xl border border-gray-200 bg-[var(--surface)] p-5 shadow-sm"
                   >
-                    <div className="flex items-start justify-between">
-                      <h3 className="text-2xl font-bold">
-                        {socialStats?.counts?.[stat.key] ?? "—"}
-                      </h3>
-                      {socialLinks[stat.key] && (
-                        <a
-                          href={socialLinks[stat.key]}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 text-[var(--foreground)]/70 hover:bg-[var(--surface-muted)]"
-                          aria-label={`Visit ${stat.label}`}
-                        >
-                          <FaArrowRight className="text-xs" />
-                        </a>
-                      )}
-                    </div>
-                    <p className="text-xs text-[var(--foreground)]/60">
+                    <h3 className="text-2xl font-bold">
+                      {socialStats?.counts?.[stat.key] ?? "—"}
+                    </h3>
+                    <p className="text-xs text-[#5f5f5f] mt-2">
                       {stat.label}
                     </p>
                   </div>
@@ -316,22 +329,20 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="relative overflow-hidden shadow-xl min-h-[260px]">
-                <img
-                  src="/images/hero2.jpg"
-                  alt="Daily focus"
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              </div>
-              <div className="bg-[var(--surface-muted)] px-6 py-5 shadow-md">
-                <p className="text-xs uppercase tracking-[0.2em] text-[var(--foreground)]/60">
+            <div className="relative overflow-hidden shadow-xl min-h-[260px] flex items-end">
+              <img
+                src="/images/hero2.jpg"
+                alt="Daily focus"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="relative bg-black/50 text-white p-6 w-full">
+                <p className="text-xs uppercase tracking-[0.2em] text-white/70">
                   Daily focus
                 </p>
-                <h3 className="text-2xl font-semibold text-[var(--foreground)]">
+                <h3 className="text-2xl font-semibold">
                   Short-form teachings, long-term impact.
                 </h3>
-                <p className="text-sm text-[var(--foreground)]/70">
+                <p className="text-sm text-white/80">
                   Curated wisdom delivered through modern platforms for seekers who
                   want clarity without noise.
                 </p>
@@ -348,7 +359,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-bold">{t.featured.title}</h2>
             <button
               onClick={() => router.push("/articles")}
-              className="text-sm uppercase tracking-[0.2em] text-[var(--brand)] hover:text-[var(--brand-dark)]"
+              className="text-sm underline"
             >
               {t.featured.cta}
             </button>
@@ -364,14 +375,11 @@ export default function HomePage() {
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[var(--foreground)]/60">
-                Featured
-              </p>
-              <h3 className="text-2xl font-semibold mb-4 mt-3">
+              <h3 className="text-2xl font-semibold mb-4">
                 {t.featured.headline}
               </h3>
 
-              <p className="text-[var(--foreground)]/70 mb-6">{t.featured.desc}</p>
+              <p className="text-[#5f5f5f] mb-6">{t.featured.desc}</p>
 
               <button
                 onClick={() => router.push("/articles")}
@@ -379,6 +387,14 @@ export default function HomePage() {
               >
                 {t.featured.cta}
               </button>
+            </div>
+
+            <div className="order-first md:order-last">
+              <img
+                src="/images/hero1.jpg"
+                alt="Featured article"
+                className="w-full h-[260px] sm:h-[320px] object-cover rounded-3xl"
+              />
             </div>
           </div>
         </div>
