@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --surface: #ffffff;
+  --surface-muted: #f7f5f2;
 }
 
 @theme inline {
@@ -23,4 +25,43 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+:root[data-theme="dark"] {
+  --background: #0b0b0b;
+  --foreground: #f5f5f5;
+  --surface: #111111;
+  --surface-muted: #141414;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.8s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out both;
 }
