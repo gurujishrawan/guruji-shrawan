@@ -215,46 +215,58 @@ export default function HomePage() {
 
       {/* ================= HERO ================= */}
       <section className="bg-[var(--surface-muted)]">
-        <div className="max-w-6xl mx-auto px-6 py-12 sm:py-16">
-          <div className="grid gap-10 lg:grid-cols-[1.1fr,0.9fr] items-center">
-            <div className="rounded-3xl bg-[#1b1b1b] text-white p-8 shadow-xl space-y-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-white/60">
+        <div className="max-w-6xl mx-auto px-6 py-10 sm:py-14">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr,1.05fr] items-stretch">
+            <div className="relative overflow-hidden shadow-2xl h-[260px] sm:h-[360px] animate-fade-in animate-float">
+              <img
+                key={heroImages[heroIndex]}
+                src={heroImages[heroIndex]}
+                alt="Guruji Shrawan"
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+            <div className="bg-[var(--surface)] text-[var(--foreground)] p-8 shadow-xl space-y-5 animate-fade-up">
+              <p className="text-xs uppercase tracking-[0.2em] text-[var(--foreground)]/60">
                 Guruji Shrawan
               </p>
               <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight">
                 {t.hero.title}
               </h1>
-              <p className="text-white/80 text-base sm:text-lg">
+              <p className="text-[var(--foreground)]/80 text-base sm:text-lg">
                 {t.hero.desc}
               </p>
-              <p className="text-lg font-semibold text-white">
+              <p className="text-lg font-semibold text-[var(--foreground)]">
                 {t.hero.quote}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => router.push("/biography")}
-                  className="border border-white/60 px-6 py-3 text-sm text-white"
+                  className="rounded-full border border-[var(--foreground)]/40 px-6 py-3 text-sm text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--surface)] transition"
                 >
                   {t.hero.primaryCTA} →
                 </button>
 
                 <button
                   onClick={() => router.push("/articles")}
-                  className="bg-white text-black px-6 py-3 text-sm"
+                  className="rounded-full bg-[var(--brand)] text-white px-6 py-3 text-sm font-semibold hover:bg-[var(--brand-dark)] transition"
                 >
                   {t.hero.secondaryCTA}
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[280px] sm:h-[360px]">
-              <img
-                key={heroImages[heroIndex]}
-                src={heroImages[heroIndex]}
-                alt="Guruji Shrawan"
-                className="h-full w-full object-cover animate-fade-in"
-              />
-            </div>
+      {/* ================= QUOTE ================= */}
+      <section className="bg-[var(--surface)] border-t border-black/10">
+        <div className="max-w-6xl mx-auto px-6 py-14">
+          <div className="bg-[var(--surface-muted)] px-6 py-10 sm:px-10 sm:py-12 text-center">
+            <div className="text-4xl text-[var(--brand)] leading-none">“</div>
+            <p className="text-xl sm:text-2xl font-medium text-[var(--foreground)]">
+              Observe your own life, and you will know the Truth.
+            </p>
           </div>
         </div>
       </section>
@@ -287,17 +299,24 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="rounded-3xl bg-[#111] text-white p-8 space-y-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-white/60">
-                Daily focus
-              </p>
-              <h3 className="text-2xl font-semibold">
-                Short-form teachings, long-term impact.
-              </h3>
-              <p className="text-sm text-white/70">
-                Curated wisdom delivered through modern platforms for seekers who
-                want clarity without noise.
-              </p>
+            <div className="relative overflow-hidden shadow-xl min-h-[260px] flex items-end">
+              <img
+                src="/images/hero2.jpg"
+                alt="Daily focus"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="relative bg-black/50 text-white p-6 w-full">
+                <p className="text-xs uppercase tracking-[0.2em] text-white/70">
+                  Daily focus
+                </p>
+                <h3 className="text-2xl font-semibold">
+                  Short-form teachings, long-term impact.
+                </h3>
+                <p className="text-sm text-white/80">
+                  Curated wisdom delivered through modern platforms for seekers who
+                  want clarity without noise.
+                </p>
+              </div>
             </div>
           </div>
         </div>

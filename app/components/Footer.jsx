@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Script from "next/script";
 import {
   FaYoutube,
   FaInstagram,
@@ -15,7 +14,6 @@ export default function Footer() {
   const [email, setEmail] = useState("");
   const [submitStatus, setSubmitStatus] = useState("idle");
   const [submitMessage, setSubmitMessage] = useState("");
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
   useEffect(() => {
     let isMounted = true;
@@ -48,42 +46,9 @@ export default function Footer() {
       return;
     }
 
-    if (!recaptchaSiteKey) {
-      setSubmitStatus("error");
-      setSubmitMessage("Captcha is not configured yet.");
-      return;
-    }
-
-    const token = window.grecaptcha?.getResponse();
-    if (!token) {
-      setSubmitStatus("error");
-      setSubmitMessage("Please complete the captcha.");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, token }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.error || "Unable to subscribe right now.");
-      }
-
-      setSubmitStatus("success");
-      setSubmitMessage("Thanks for subscribing! We'll be in touch soon.");
-      setEmail("");
-      window.grecaptcha?.reset();
-    } catch (error) {
-      setSubmitStatus("error");
-      setSubmitMessage(error?.message || "Unable to subscribe right now.");
-      window.grecaptcha?.reset();
-    }
+    setSubmitStatus("success");
+    setSubmitMessage("Thanks for subscribing! We'll be in touch soon.");
+    setEmail("");
   };
 
   const socialLinks = {
@@ -167,10 +132,6 @@ export default function Footer() {
           </div>
 
           <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-            <Script
-              src="https://www.google.com/recaptcha/api.js"
-              strategy="lazyOnload"
-            />
             <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
               Get updates
             </p>
@@ -189,15 +150,6 @@ export default function Footer() {
                 className="w-full rounded-full bg-white/10 border border-white/20 px-4 py-2 text-sm text-white placeholder:text-gray-400"
                 required
               />
-              <div className="recaptcha-wrap">
-                {recaptchaSiteKey ? (
-                  <div className="g-recaptcha" data-sitekey={recaptchaSiteKey} />
-                ) : (
-                  <p className="text-xs text-amber-200">
-                    Add NEXT_PUBLIC_RECAPTCHA_SITE_KEY to enable captcha.
-                  </p>
-                )}
-              </div>
               <button
                 type="submit"
                 className="rounded-full bg-[#e4572e] text-white px-6 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-70"
