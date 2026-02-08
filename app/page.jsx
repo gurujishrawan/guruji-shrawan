@@ -5,8 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "./context/LanguageContext";
 import { siteContent } from "./content/siteContent";
 import VideoGallery from "./components/VideoGallery";
-import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
-import { FaArrowUpRight } from "react-icons/fa6";
+import { FaArrowRight, FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
 import { useTheme } from "./context/useTheme";
 
 /* ---------------- NAV LINK ---------------- */
@@ -305,7 +304,7 @@ export default function HomePage() {
                           className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 text-[var(--foreground)]/70 hover:bg-[var(--surface-muted)]"
                           aria-label={`Visit ${stat.label}`}
                         >
-                          <FaArrowUpRight className="text-xs" />
+                          <FaArrowRight className="text-xs" />
                         </a>
                       )}
                     </div>
