@@ -8,6 +8,7 @@ import {
   FaEnvelope,
   FaTwitter,
 } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
   const [socialStats, setSocialStats] = useState(null);
@@ -123,7 +124,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 hover:text-white"
                   >
-                    <FaTwitter className="text-white" />
+                    <FaXTwitter className="text-white" />
                     <span>X: {socialCounts.x} followers</span>
                   </a>
                 </li>
@@ -266,7 +267,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-white"
               >
-                <FaTwitter />
+                <FaXTwitter />
               </a>
             </div>
           </div>
