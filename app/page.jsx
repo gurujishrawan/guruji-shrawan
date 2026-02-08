@@ -6,6 +6,7 @@ import { useLanguage } from "./context/LanguageContext";
 import { siteContent } from "./content/siteContent";
 import VideoGallery from "./components/VideoGallery";
 import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
+import { useTheme } from "./context/useTheme";
 
 /* ---------------- NAV LINK ---------------- */
 function NavLink({ href, label, onClick }) {
@@ -56,34 +57,13 @@ export default function HomePage() {
   const t = siteContent[lang] ?? siteContent.en;
   const [open, setOpen] = useState(false);
   const [socialStats, setSocialStats] = useState(null);
-  const [theme, setTheme] = useState("light");
+  const { theme, toggleTheme } = useTheme();
   const heroImages = [
     "/images/hero1.jpg",
     "/images/hero2.jpg",
     "/images/hero3.jpg",
   ];
   const [heroIndex, setHeroIndex] = useState(0);
-
-  useEffect(() => {
-    const stored =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem("site-theme")
-        : null;
-    const initial = stored || "light";
-    setTheme(initial);
-    if (typeof document !== "undefined") {
-      document.documentElement.setAttribute("data-theme", initial);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.setAttribute("data-theme", theme);
-    }
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("site-theme", theme);
-    }
-  }, [theme]);
 
   useEffect(() => {
     let isMounted = true;
@@ -112,7 +92,7 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [heroImages.length]);
   return (
-    <main className="bg-[#f7f5f2] text-[#1c1c1c] overflow-x-hidden">
+    <main className="bg-[var(--surface-muted)] text-[var(--foreground)] overflow-x-hidden">
       <DonationStrip />
 
       {/* ================= HEADER ================= */}
@@ -130,15 +110,13 @@ export default function HomePage() {
 
             <button
               onClick={() => router.push("/donate")}
-              className="bg-[#e4572e] text-white px-4 py-1.5 rounded-sm text-sm font-medium"
+              className="bg-[var(--brand)] text-white px-4 py-1.5 rounded-sm text-sm font-medium hover:bg-[var(--brand-dark)] transition"
             >
               {t.nav.donate}
             </button>
 
             <button
-              onClick={() =>
-                setTheme(theme === "light" ? "dark" : "light")
-              }
+              onClick={toggleTheme}
               className="flex items-center gap-2 text-xs border px-2.5 py-1 rounded-full bg-white/70 hover:bg-white transition"
             >
               {theme === "light" ? (
@@ -194,14 +172,14 @@ export default function HomePage() {
                 router.push("/donate");
                 setOpen(false);
               }}
-              className="bg-[#e4572e] text-white px-4 py-2 text-sm"
+              className="bg-[var(--brand)] text-white px-4 py-2 text-sm hover:bg-[var(--brand-dark)] transition"
             >
               {t.nav.donate}
             </button>
 
             <button
               onClick={() => {
-                setTheme(theme === "light" ? "dark" : "light");
+                toggleTheme();
                 setOpen(false);
               }}
               className="flex items-center gap-2 text-xs border px-3 py-2 w-fit rounded-full bg-white/70"
@@ -237,54 +215,50 @@ export default function HomePage() {
 
       {/* ================= HERO ================= */}
       <section className="bg-[var(--surface-muted)]">
-        <div className="max-w-7xl mx-auto px-6 py-16 sm:py-24">
-          <div className="grid lg:grid-cols-[1.1fr,1fr] gap-10 items-stretch">
-            <div className="rounded-3xl bg-[#1b1b1b] text-white p-10 shadow-2xl flex flex-col justify-between">
-              <div className="space-y-6">
-                <p className="text-xs uppercase tracking-[0.2em] text-white/60">
-                  Guruji Shrawan
-                </p>
-                <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight">
-                  {t.hero.title}
-                </h1>
-                <p className="text-white/80 text-base sm:text-lg">
-                  {t.hero.desc}
-                </p>
-                <p className="text-lg font-semibold text-white">
-                  {t.hero.quote}
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 mt-10">
-                <button
-                  onClick={() => router.push("/biography")}
-                  className="border border-white/60 px-6 py-3 text-sm text-white"
-                >
-                  {t.hero.primaryCTA} →
-                </button>
+        <div className="max-w-5xl mx-auto px-6 py-12 sm:py-16 space-y-8">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[260px] sm:h-[360px]">
+            <img
+              key={heroImages[heroIndex]}
+              src={heroImages[heroIndex]}
+              alt="Guruji Shrawan"
+              className="h-full w-full object-cover animate-fade-in"
+            />
+          </div>
 
-                <button
-                  onClick={() => router.push("/articles")}
-                  className="bg-white text-black px-6 py-3 text-sm"
-                >
-                  {t.hero.secondaryCTA}
-                </button>
-              </div>
-            </div>
+          <div className="rounded-3xl bg-[#1b1b1b] text-white p-8 shadow-xl space-y-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-white/60">
+              Guruji Shrawan
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight">
+              {t.hero.title}
+            </h1>
+            <p className="text-white/80 text-base sm:text-lg">
+              {t.hero.desc}
+            </p>
+            <p className="text-lg font-semibold text-white">
+              {t.hero.quote}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => router.push("/biography")}
+                className="border border-white/60 px-6 py-3 text-sm text-white"
+              >
+                {t.hero.primaryCTA} →
+              </button>
 
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-              <img
-                key={heroImages[heroIndex]}
-                src={heroImages[heroIndex]}
-                alt="Guruji Shrawan"
-                className="h-full w-full object-cover animate-fade-in"
-              />
+              <button
+                onClick={() => router.push("/articles")}
+                className="bg-white text-black px-6 py-3 text-sm"
+              >
+                {t.hero.secondaryCTA}
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* ================= JOURNEY ================= */}
-      <section className="bg-white py-20 sm:py-24 border-t border-black/10">
+      <section className="bg-[var(--surface)] py-20 sm:py-24 border-t border-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[1.1fr,0.9fr] items-center">
             <div>
@@ -298,7 +272,7 @@ export default function HomePage() {
                 {t.stats.map(stat => (
                   <div
                     key={stat.key}
-                    className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                    className="rounded-2xl border border-gray-200 bg-[var(--surface)] p-5 shadow-sm"
                   >
                     <h3 className="text-2xl font-bold">
                       {socialStats?.counts?.[stat.key] ?? "—"}
@@ -328,7 +302,7 @@ export default function HomePage() {
       </section>
 
       {/* ================= FEATURED ================= */}
-      <section className="bg-white py-20 sm:py-24 border-t border-black/10">
+      <section className="bg-[var(--surface)] py-20 sm:py-24 border-t border-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between mb-12">
             <h2 className="text-3xl font-bold">{t.featured.title}</h2>

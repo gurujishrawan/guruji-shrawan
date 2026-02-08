@@ -1,13 +1,51 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   FaYoutube,
   FaInstagram,
   FaFacebook,
   FaEnvelope,
+  FaXTwitter,
 } from "react-icons/fa";
 
 export default function Footer() {
+  const [socialStats, setSocialStats] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/social")
+      .then(res => res.json())
+      .then(data => {
+        if (isMounted) {
+          setSocialStats(data);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setSocialStats(null);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const socialLinks = {
+    youtube: socialStats?.links?.youtube || "https://youtube.com/@gurujishrawan",
+    facebook: socialStats?.links?.facebook || "https://facebook.com/gurujishrawan",
+    instagram: socialStats?.links?.instagram || "https://instagram.com/gurujishrawan",
+    x: socialStats?.links?.x || "https://x.com/gurujishrawan",
+  };
+
+  const socialCounts = {
+    youtube: socialStats?.counts?.youtube || "—",
+    facebook: socialStats?.counts?.facebook || "—",
+    instagram: socialStats?.counts?.instagram || "—",
+    x: socialStats?.counts?.x || "—",
+  };
+
   return (
     <footer className="bg-[#0f0f0f] text-gray-300">
       <div className="max-w-7xl mx-auto px-6 py-20 space-y-16">
@@ -25,18 +63,50 @@ export default function Footer() {
               <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
                 Social media
               </p>
-              <ul className="space-y-2 text-gray-300">
-                <li className="flex items-center gap-2">
-                  <FaYoutube className="text-red-500" />
-                  <span>YouTube</span>
+              <ul className="space-y-2 text-gray-300 text-sm">
+                <li>
+                  <a
+                    href={socialLinks.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-white"
+                  >
+                    <FaYoutube className="text-red-500" />
+                    <span>YouTube: {socialCounts.youtube} subscribers</span>
+                  </a>
                 </li>
-                <li className="flex items-center gap-2">
-                  <FaFacebook className="text-blue-500" />
-                  <span>Facebook</span>
+                <li>
+                  <a
+                    href={socialLinks.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-white"
+                  >
+                    <FaFacebook className="text-blue-500" />
+                    <span>Facebook: {socialCounts.facebook} followers</span>
+                  </a>
                 </li>
-                <li className="flex items-center gap-2">
-                  <FaInstagram className="text-pink-500" />
-                  <span>Instagram</span>
+                <li>
+                  <a
+                    href={socialLinks.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-white"
+                  >
+                    <FaInstagram className="text-pink-500" />
+                    <span>Instagram: {socialCounts.instagram} followers</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={socialLinks.x}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-white"
+                  >
+                    <FaXTwitter className="text-white" />
+                    <span>X: {socialCounts.x} followers</span>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -154,6 +224,14 @@ export default function Footer() {
                 className="hover:text-white"
               >
                 <FaFacebook />
+              </a>
+              <a
+                href="https://x.com/gurujishrawan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white"
+              >
+                <FaXTwitter />
               </a>
             </div>
           </div>
