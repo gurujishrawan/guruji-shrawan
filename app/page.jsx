@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useLanguage } from "./context/LanguageContext";
 import { siteContent } from "./content/siteContent";
 import VideoGallery from "./components/VideoGallery";
-import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
+import { FaArrowRight, FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
 import { useTheme } from "./context/useTheme";
 
 /* ---------------- NAV LINK ---------------- */
@@ -91,6 +91,39 @@ export default function HomePage() {
     }, 5000);
     return () => clearInterval(interval);
   }, [heroImages.length]);
+  const socialLinks = {
+    youtube: socialStats?.links?.youtube || "https://youtube.com/@gurujishrawan",
+    facebook: socialStats?.links?.facebook || "https://facebook.com/gurujishrawan",
+    instagram: socialStats?.links?.instagram || "https://instagram.com/gurujishrawan",
+    x: socialStats?.links?.x || "https://x.com/gurujishrawan",
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/social")
+      .then(res => res.json())
+      .then(data => {
+        if (isMounted) {
+          setSocialStats(data);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setSocialStats(null);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroIndex(current => (current + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
   return (
     <main className="bg-[var(--surface-muted)] text-[var(--foreground)] overflow-x-hidden">
       <DonationStrip />
@@ -110,7 +143,7 @@ export default function HomePage() {
 
             <button
               onClick={() => router.push("/donate")}
-              className="bg-[var(--brand)] text-white px-4 py-1.5 rounded-sm text-sm font-medium hover:bg-[var(--brand-dark)] transition"
+              className="bg-[var(--accent)] text-[#1b1b1f] px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-[var(--brand)] hover:text-white transition"
             >
               {t.nav.donate}
             </button>
@@ -172,7 +205,7 @@ export default function HomePage() {
                 router.push("/donate");
                 setOpen(false);
               }}
-              className="bg-[var(--brand)] text-white px-4 py-2 text-sm hover:bg-[var(--brand-dark)] transition"
+              className="bg-[var(--accent)] text-[#1b1b1f] px-4 py-2 text-sm font-semibold rounded-full hover:bg-[var(--brand)] hover:text-white transition"
             >
               {t.nav.donate}
             </button>
@@ -214,47 +247,44 @@ export default function HomePage() {
       </header>
 
       {/* ================= HERO ================= */}
-      <section className="bg-[var(--surface-muted)]">
-        <div className="max-w-6xl mx-auto px-6 py-10 sm:py-14">
-          <div className="grid gap-8 lg:grid-cols-[0.95fr,1.05fr] items-stretch">
-            <div className="relative overflow-hidden shadow-2xl h-[260px] sm:h-[360px] animate-fade-in animate-float">
-              <img
-                key={heroImages[heroIndex]}
-                src={heroImages[heroIndex]}
-                alt="Guruji Shrawan"
-                className="h-full w-full object-cover"
-              />
+      <section className="bg-[#141414]">
+        <div className="grid lg:grid-cols-[0.9fr,1.1fr] min-h-[520px]">
+          <div className="text-white px-8 py-12 sm:px-14 sm:py-16 flex flex-col justify-center space-y-6">
+            <p className="text-xs uppercase tracking-[0.35em] text-white/60">
+              Guruji
+            </p>
+            <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight">
+              {t.hero.title}
+            </h1>
+            <p className="text-white/80 text-base sm:text-lg max-w-xl">
+              {t.hero.desc}
+            </p>
+            <p className="text-lg font-semibold text-white/90">
+              {t.hero.quote}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => router.push("/biography")}
+                className="rounded-full border border-white/50 px-6 py-3 text-sm text-white hover:bg-white hover:text-[#1b1b1f] transition"
+              >
+                {t.hero.primaryCTA} →
+              </button>
+              <button
+                onClick={() => router.push("/articles")}
+                className="rounded-full bg-[var(--accent)] text-[#1b1b1f] px-6 py-3 text-sm font-semibold hover:bg-[var(--brand)] hover:text-white transition"
+              >
+                {t.hero.secondaryCTA}
+              </button>
             </div>
+          </div>
 
-            <div className="bg-[var(--surface)] text-[var(--foreground)] p-8 shadow-xl space-y-5 animate-fade-up">
-              <p className="text-xs uppercase tracking-[0.2em] text-[var(--foreground)]/60">
-                Guruji Shrawan
-              </p>
-              <h1 className="text-3xl sm:text-4xl font-extrabold leading-tight">
-                {t.hero.title}
-              </h1>
-              <p className="text-[var(--foreground)]/80 text-base sm:text-lg">
-                {t.hero.desc}
-              </p>
-              <p className="text-lg font-semibold text-[var(--foreground)]">
-                {t.hero.quote}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => router.push("/biography")}
-                  className="rounded-full border border-[var(--foreground)]/40 px-6 py-3 text-sm text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--surface)] transition"
-                >
-                  {t.hero.primaryCTA} →
-                </button>
-
-                <button
-                  onClick={() => router.push("/articles")}
-                  className="rounded-full bg-[var(--brand)] text-white px-6 py-3 text-sm font-semibold hover:bg-[var(--brand-dark)] transition"
-                >
-                  {t.hero.secondaryCTA}
-                </button>
-              </div>
-            </div>
+          <div className="relative min-h-[320px] sm:min-h-[520px] overflow-hidden">
+            <img
+              key={heroImages[heroIndex]}
+              src={heroImages[heroIndex]}
+              alt="Guruji Shrawan"
+              className="h-full w-full object-cover animate-fade-in animate-float"
+            />
           </div>
         </div>
       </section>
@@ -262,9 +292,9 @@ export default function HomePage() {
       {/* ================= QUOTE ================= */}
       <section className="bg-[var(--surface)] border-t border-black/10">
         <div className="max-w-6xl mx-auto px-6 py-14">
-          <div className="bg-[var(--surface-muted)] px-6 py-10 sm:px-10 sm:py-12 text-center">
-            <div className="text-4xl text-[var(--brand)] leading-none">“</div>
-            <p className="text-xl sm:text-2xl font-medium text-[var(--foreground)]">
+          <div className="bg-[var(--surface-muted)] px-6 py-10 sm:px-12 sm:py-12 text-center">
+            <div className="text-5xl text-[var(--accent)] leading-none">“</div>
+            <p className="text-xl sm:text-2xl font-medium text-[var(--foreground)] tracking-wide">
               Observe your own life, and you will know the Truth.
             </p>
           </div>
@@ -278,7 +308,7 @@ export default function HomePage() {
             <div>
               <h2 className="text-3xl font-bold mb-6">{t.journey.title}</h2>
 
-              <p className="text-[#5f5f5f] max-w-3xl mb-10">
+              <p className="text-[var(--foreground)]/70 max-w-3xl mb-10">
                 {t.journey.desc}
               </p>
 
@@ -336,6 +366,14 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-last md:order-first">
+              <img
+                src="/images/hero1.jpg"
+                alt="Featured article"
+                className="w-full h-[260px] sm:h-[340px] object-cover shadow-xl"
+              />
+            </div>
+
             <div>
               <h3 className="text-2xl font-semibold mb-4">
                 {t.featured.headline}
@@ -345,7 +383,7 @@ export default function HomePage() {
 
               <button
                 onClick={() => router.push("/articles")}
-                className="border border-black px-6 py-3 text-sm"
+                className="rounded-full border border-[var(--foreground)]/40 px-6 py-3 text-sm text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--surface)] transition"
               >
                 {t.featured.cta}
               </button>

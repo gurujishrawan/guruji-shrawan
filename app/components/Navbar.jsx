@@ -51,7 +51,7 @@ export default function Navbar() {
 
           <button
             onClick={() => router.push("/donate")}
-            className="bg-[var(--brand)] text-white px-4 py-1.5 text-sm rounded-sm hover:bg-[var(--brand-dark)] transition"
+            className="bg-[var(--accent)] text-[#1b1b1f] px-4 py-1.5 text-sm rounded-full font-semibold hover:bg-[var(--brand)] hover:text-white transition"
           >
             {t.nav.donate}
           </button>
@@ -101,7 +101,7 @@ export default function Navbar() {
 
           <button
             onClick={() => router.push("/donate")}
-            className="bg-[var(--brand)] text-white px-4 py-2 text-sm rounded-sm"
+            className="bg-[var(--accent)] text-[#1b1b1f] px-4 py-2 text-sm rounded-full font-semibold hover:bg-[var(--brand)] hover:text-white transition"
           >
             {t.nav.donate}
           </button>
