@@ -11,12 +11,13 @@ export default function ClientLayout({
 }) {
   const pathname = usePathname();
   const hideNavbar = pathname === "/" || pathname === "/biography";
+  const hideFooter = pathname === "/biography";
 
   return (
     <>
       {!hideNavbar && <Navbar />}
       <main className="min-h-screen">{children}</main>
-      <Footer />
+      {!hideFooter && <Footer />}
     </>
   );
 }
