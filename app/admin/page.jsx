@@ -42,6 +42,8 @@ async function createArticle(formData) {
   const contentHi = String(formData.get("contentHi") || "").trim();
   const publishedAt = String(formData.get("publishedAt") || "").trim();
   const featuredImage = String(formData.get("featuredImage") || "").trim();
+  const category = String(formData.get("category") || "").trim();
+  const readTime = String(formData.get("readTime") || "").trim();
   const existingImage = String(formData.get("existingImage") || "").trim();
   const coverImage = formData.get("coverImage");
 
@@ -72,6 +74,8 @@ async function createArticle(formData) {
     },
     publishedAt: publishedAt || undefined,
     featuredImage: uploadedImage || featuredImage || existingImage || undefined,
+    category: category || undefined,
+    readTime: readTime || undefined,
   });
 
   redirect(`/admin?status=saved&slug=${slug}`);
@@ -164,11 +168,32 @@ export default async function AdminPage({ searchParams }) {
                   />
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium">
+                  Category (optional)
+                  <input
+                    name="category"
+                    defaultValue={editArticle?.category}
+                    placeholder="Mind"
+                    className="rounded border px-3 py-2 text-sm"
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <label className="flex flex-col gap-2 text-sm font-medium">
                   Publish date (YYYY-MM-DD)
                   <input
                     name="publishedAt"
                     defaultValue={editArticle?.publishedAt}
                     placeholder="2024-01-10"
+                    className="rounded border px-3 py-2 text-sm"
+                  />
+                </label>
+                <label className="flex flex-col gap-2 text-sm font-medium">
+                  Read time (optional)
+                  <input
+                    name="readTime"
+                    defaultValue={editArticle?.readTime}
+                    placeholder="6 min"
                     className="rounded border px-3 py-2 text-sm"
                   />
                 </label>
