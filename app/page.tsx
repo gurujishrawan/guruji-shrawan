@@ -24,6 +24,14 @@ import {
 type Stat = { label: string; value: number; suffix: string; icon: ReactElement };
 type NewsletterStatus = "idle" | "loading" | "success";
 
+type HomeArticle = {
+  slug: string;
+  category?: string;
+  title: { en: string };
+  readTime?: string;
+  featuredImage?: string;
+};
+
 const homeNavItems = [
   { label: "Home", href: "#home" },
   { label: "In Media", href: "#trending" },
@@ -85,15 +93,6 @@ const videos = [
   { id: "Uy0vnC-8sOc", title: "YouTube Teaching Session 5" },
 ];
 
-const articles = [
-  { category: "Spirituality", title: "Inquiry Is the Fire of Real Transformation", readTime: "6 min read" },
-  { category: "Mind", title: "Attention vs. Distraction in the Digital Age", readTime: "5 min read" },
-  { category: "Relationships", title: "Possession Is Not Love", readTime: "7 min read" },
-  { category: "Society", title: "Belief, Fear and Collective Confusion", readTime: "8 min read" },
-  { category: "Self Inquiry", title: "Who Is the One That Suffers?", readTime: "6 min read" },
-  { category: "Youth", title: "A Conscious Direction for Young Minds", readTime: "4 min read" },
-];
-
 const socialLinks = [
   { name: "YouTube", count: "2.2K+", icon: <FaYoutube />, href: "https://youtube.com/@gurujishrawan" },
   { name: "Instagram", count: "1K+", icon: <FaInstagram />, href: "https://instagram.com/gurujishrawan" },
@@ -145,12 +144,30 @@ export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   const [lang, setLang] = useState<"Hindi" | "English">("English");
   const [videoSwiper, setVideoSwiper] = useState<{ slidePrev: () => void; slideNext: () => void } | null>(null);
+  const [latestArticles, setLatestArticles] = useState<HomeArticle[]>([]);
   const content = homeContent[lang];
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/articles")
+      .then(res => res.json())
+      .then(data => {
+        if (!active || !Array.isArray(data?.articles)) return;
+        setLatestArticles(data.articles.slice(0, 6));
+      })
+      .catch(() => {
+        setLatestArticles([]);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleNewsletterSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -333,15 +350,15 @@ export default function HomePage() {
       <section id="articles" className="mx-auto w-[min(1200px,92%)] py-12">
         <h2 className="text-3xl font-semibold">Latest Articles</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article, i) => (
-            <article key={article.title} className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
+          {latestArticles.map((article, i) => (
+            <article key={article.slug} className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
               <div className="relative h-44 overflow-hidden rounded-xl">
-                <Image src={`/images/hero${(i % 3) + 1}.jpg`} alt={article.title} fill className="object-cover" />
+                <Image src={article.featuredImage || `/images/hero${(i % 3) + 1}.jpg`} alt={article.title.en} fill className="object-cover" />
               </div>
-              <p className="mt-4 text-xs uppercase tracking-wide text-[#ff6a00]">{article.category}</p>
-              <h3 className="mt-2 text-xl font-semibold">{article.title}</h3>
-              <p className="mt-2 text-sm text-black/70">{article.readTime} · Explore practical inquiry for a clear and intelligent life.</p>
-              <Link href="/articles" className="mt-4 inline-block text-sm font-semibold text-[#ff6a00]">Read article</Link>
+              <p className="mt-4 text-xs uppercase tracking-wide text-[#ff6a00]">{article.category || "Wisdom"}</p>
+              <h3 className="mt-2 text-xl font-semibold">{article.title.en}</h3>
+              <p className="mt-2 text-sm text-black/70">{article.readTime || "4 min"} · Explore practical inquiry for a clear and intelligent life.</p>
+              <Link href={`/articles/${article.slug}`} className="mt-4 inline-block text-sm font-semibold text-[#ff6a00]">Read article</Link>
             </article>
           ))}
         </div>
