@@ -10,11 +10,11 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  const hideNavbar = pathname === "/" || pathname === "/biography";
 
   return (
     <>
-      {!isHome && <Navbar />}
+      {!hideNavbar && <Navbar />}
       <main className="min-h-screen">{children}</main>
       <Footer />
     </>
