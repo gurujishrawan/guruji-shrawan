@@ -3,9 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import {
   FaArrowRight,
+  FaAngleLeft,
+  FaAngleRight,
   FaBars,
   FaBookOpen,
   FaFacebook,
@@ -13,11 +17,9 @@ import {
   FaInstagram,
   FaPlay,
   FaTimes,
-  FaUsers,
   FaVideo,
   FaYoutube,
 } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
 
 type Stat = { label: string; value: number; suffix: string; icon: ReactElement };
 type NewsletterStatus = "idle" | "loading" | "success";
@@ -34,13 +36,37 @@ const homeNavItems = [
   { label: "Contact", href: "#contact" },
 ];
 
+const homeContent = {
+  English: {
+    heroTitle: "Awakening Inner Clarity and True Understanding",
+    heroDesc:
+      "Guruji Shrawan shares deep insights on life, spirituality, relationships, society, and modern confusion through fearless inquiry and timeless wisdom. The teachings encourage freedom from blind belief, self-deception, and unconscious living.",
+    watchTeachings: "Watch Teachings",
+    exploreArticles: "Explore Articles",
+    booksTitle: "Books by Guruji Shrawan",
+    booksDesc:
+      "A growing library of powerful books exploring Vedanta, self-inquiry, freedom from psychological suffering, relationships, youth awakening, and conscious living.",
+    videosTitle: "Videos",
+  },
+  Hindi: {
+    heroTitle: "आंतरिक स्पष्टता और सच्ची समझ की ओर",
+    heroDesc:
+      "गुरुजी श्रावण जीवन, अध्यात्म, संबंध, समाज और आधुनिक भ्रम पर निडर और गहरी दृष्टि साझा करते हैं। ये शिक्षाएँ अंधविश्वास, आत्म-छल और अचेतन जीवन से मुक्ति की दिशा दिखाती हैं।",
+    watchTeachings: "वीडियो देखें",
+    exploreArticles: "लेख पढ़ें",
+    booksTitle: "गुरुजी श्रावण की पुस्तकें",
+    booksDesc:
+      "वेदांत, आत्म-परीक्षण, मानसिक संघर्ष से मुक्ति, संबंध, युवा जागरण और सजग जीवन पर आधारित पुस्तकों का समृद्ध संग्रह।",
+    videosTitle: "वीडियो",
+  },
+} as const;
+
 const stats: Stat[] = [
-  { label: "Students Benefited", value: 1, suffix: "M+", icon: <FaUsers /> },
-  { label: "Books and Teachings", value: 50, suffix: "+", icon: <FaBookOpen /> },
-  { label: "Followers", value: 2, suffix: "M+", icon: <FaGlobe /> },
-  { label: "YouTube Views", value: 100, suffix: "M+", icon: <FaYoutube /> },
-  { label: "Articles Published", value: 500, suffix: "+", icon: <FaBookOpen /> },
-  { label: "Video Sessions", value: 1200, suffix: "+", icon: <FaVideo /> },
+  { label: "Books", value: 2, suffix: "+", icon: <FaBookOpen /> },
+  { label: "Total Followers", value: 6200, suffix: "+", icon: <FaGlobe /> },
+  { label: "YouTube Views", value: 100, suffix: "K+", icon: <FaYoutube /> },
+  { label: "Articles Published", value: 10, suffix: "+", icon: <FaBookOpen /> },
+  { label: "Videos", value: 120, suffix: "+", icon: <FaVideo /> },
 ];
 
 const books = [
@@ -52,11 +78,11 @@ const books = [
 ];
 
 const videos = [
-  "What Is True Spirituality in Modern Times?",
-  "Why the Mind Escapes Silence",
-  "Love, Dependency and Intelligence",
-  "Freedom from Social Conditioning",
-  "Can Inquiry End Suffering?",
+  { id: "Hs90ewhPAww", title: "YouTube Teaching Session 1" },
+  { id: "LsfnbDBhxjM", title: "YouTube Teaching Session 2" },
+  { id: "9QVnaoOZLe4", title: "YouTube Teaching Session 3" },
+  { id: "f2ZrDTv8u5A", title: "YouTube Teaching Session 4" },
+  { id: "Uy0vnC-8sOc", title: "YouTube Teaching Session 5" },
 ];
 
 const articles = [
@@ -69,10 +95,10 @@ const articles = [
 ];
 
 const socialLinks = [
-  { name: "YouTube", count: "2M+", icon: <FaYoutube />, href: "https://youtube.com/@gurujishrawan" },
-  { name: "Instagram", count: "1.2M+", icon: <FaInstagram />, href: "https://instagram.com/gurujishrawan" },
-  { name: "Facebook", count: "800K+", icon: <FaFacebook />, href: "https://facebook.com/gurujishrawan" },
-  { name: "Twitter", count: "350K+", icon: <FaXTwitter />, href: "https://x.com/gurujishrawan" },
+  { name: "YouTube", count: "2.2K+", icon: <FaYoutube />, href: "https://youtube.com/@gurujishrawan" },
+  { name: "Instagram", count: "1K+", icon: <FaInstagram />, href: "https://instagram.com/gurujishrawan" },
+  { name: "Facebook", count: "3K", icon: <FaFacebook />, href: "https://facebook.com/gurujishrawan" },
+  { name: "Total", count: "6.2K+", icon: <FaGlobe />, href: "https://youtube.com/@gurujishrawan" },
 ];
 
 function CounterCard({ item }: { item: Stat }) {
@@ -118,6 +144,8 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [lang, setLang] = useState<"Hindi" | "English">("English");
+  const [videoSwiper, setVideoSwiper] = useState<{ slidePrev: () => void; slideNext: () => void } | null>(null);
+  const content = homeContent[lang];
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 30);
@@ -150,7 +178,17 @@ export default function HomePage() {
             ))}
           </nav>
           <div className="hidden md:flex items-center gap-3">
-            <button onClick={() => setLang(v => (v === "English" ? "Hindi" : "English"))} type="button" className="rounded-full border border-black/20 px-3 py-2 text-xs">Hindi / English · {lang}</button>
+            <label className="rounded-full border border-black/20 bg-white px-3 py-2 text-xs">
+              <span className="sr-only">Choose language</span>
+              <select
+                value={lang}
+                onChange={event => setLang(event.target.value as "Hindi" | "English")}
+                className="bg-transparent text-xs"
+              >
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+              </select>
+            </label>
             <Link href="/donate" className="rounded-full bg-[#ff6a00] px-5 py-2 text-sm font-semibold text-white">Donate</Link>
           </div>
           <button onClick={() => setMenuOpen(v => !v)} type="button" className="md:hidden"><FaBars /></button>
@@ -166,6 +204,17 @@ export default function HomePage() {
                   <a key={item.label} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</a>
                 )
               ))}
+              <label className="rounded-full border border-black/20 bg-white px-4 py-2 text-xs">
+                <span className="sr-only">Choose language</span>
+                <select
+                  value={lang}
+                  onChange={event => setLang(event.target.value as "Hindi" | "English")}
+                  className="w-full bg-transparent"
+                >
+                  <option value="English">English</option>
+                  <option value="Hindi">Hindi</option>
+                </select>
+              </label>
               <Link href="/donate" onClick={() => setMenuOpen(false)} className="rounded-full bg-[#ff6a00] px-4 py-2 text-center font-semibold text-white">Donate</Link>
             </div>
           </div>
@@ -175,11 +224,11 @@ export default function HomePage() {
       <section id="teachings" className="mx-auto grid w-[min(1200px,92%)] gap-12 py-14 lg:grid-cols-2 lg:py-20">
         <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
           <p className="text-sm uppercase tracking-[0.2em] text-[#ff6a00]">Guruji Shrawan</p>
-          <h1 className="mt-3 text-4xl font-semibold leading-tight md:text-6xl">Awakening Inner Clarity and True Understanding</h1>
-          <p className="mt-6 max-w-xl text-lg text-black/70">Guruji Shrawan shares deep insights on life, spirituality, relationships, society, and modern confusion through fearless inquiry and timeless wisdom. The teachings encourage freedom from blind belief, self-deception, and unconscious living.</p>
+          <h1 className="mt-3 text-4xl font-semibold leading-tight md:text-6xl">{content.heroTitle}</h1>
+          <p className="mt-6 max-w-xl text-lg text-black/70">{content.heroDesc}</p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <a href="#videos" className="rounded-full bg-[#ff6a00] px-6 py-3 text-sm font-semibold text-white">Watch Teachings</a>
-            <Link href="/articles" className="rounded-full border border-black/15 bg-white px-6 py-3 text-sm font-semibold">Explore Articles</Link>
+            <a href="#videos" className="rounded-full bg-[#ff6a00] px-6 py-3 text-sm font-semibold text-white">{content.watchTeachings}</a>
+            <Link href="/articles" className="rounded-full border border-black/15 bg-white px-6 py-3 text-sm font-semibold">{content.exploreArticles}</Link>
           </div>
         </motion.div>
         <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="relative">
@@ -196,8 +245,8 @@ export default function HomePage() {
       </section>
 
       <section id="books" className="mx-auto w-[min(1200px,92%)] py-16">
-        <h2 className="text-3xl font-semibold">Books by Guruji Shrawan</h2>
-        <p className="mt-3 max-w-3xl text-black/70">A growing library of powerful books exploring Vedanta, self-inquiry, freedom from psychological suffering, relationships, youth awakening, and conscious living.</p>
+        <h2 className="text-3xl font-semibold">{content.booksTitle}</h2>
+        <p className="mt-3 max-w-3xl text-black/70">{content.booksDesc}</p>
         <div className="mt-8 flex snap-x gap-5 overflow-x-auto pb-3">
           {books.map((book, i) => (
             <motion.article key={book} whileHover={{ y: -6 }} className="min-w-[280px] snap-start rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
@@ -213,19 +262,63 @@ export default function HomePage() {
       </section>
 
       <section id="videos" className="mx-auto w-[min(1200px,92%)] py-10">
-        <h2 className="text-3xl font-semibold">Podcasts & Conversations</h2>
-        <div className="mt-8 flex gap-6 overflow-x-auto pb-2">
-          {videos.map((video, i) => (
-            <a key={video} href="https://youtube.com/@gurujishrawan" target="_blank" rel="noopener noreferrer" className="min-w-[320px] rounded-2xl border border-black/10 bg-white p-3 shadow-sm">
-              <div className="relative h-48 overflow-hidden rounded-xl">
-                <Image src={`/images/hero${(i % 3) + 1}.jpg`} alt={video} fill className="object-cover" />
-                <div className="absolute inset-0 grid place-items-center bg-black/25"><span className="rounded-full bg-white/90 p-3 text-[#ff6a00]"><FaPlay /></span></div>
-              </div>
-              <h3 className="mt-4 font-semibold">{video}</h3>
-              <p className="mt-1 text-sm text-black/70">A direct conversation on awareness, confusion, and practical wisdom.</p>
-            </a>
-          ))}
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <h2 className="text-3xl font-semibold">{content.videosTitle}</h2>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => videoSwiper?.slidePrev()}
+              type="button"
+              className="grid h-10 w-10 place-items-center rounded-full border border-[#ff6a00]/60 bg-white text-[#ff6a00]"
+              aria-label="Previous videos"
+            >
+              <FaAngleLeft />
+            </button>
+            <button
+              onClick={() => videoSwiper?.slideNext()}
+              type="button"
+              className="grid h-10 w-10 place-items-center rounded-full border border-[#ff6a00]/60 bg-white text-[#ff6a00]"
+              aria-label="Next videos"
+            >
+              <FaAngleRight />
+            </button>
+          </div>
         </div>
+
+        <Swiper
+          onSwiper={setVideoSwiper}
+          spaceBetween={20}
+          slidesPerView={1.2}
+          breakpoints={{
+            640: { slidesPerView: 2.2 },
+            900: { slidesPerView: 3.2 },
+            1200: { slidesPerView: 4.2 },
+          }}
+        >
+          {videos.map(video => (
+            <SwiperSlide key={video.id}>
+              <a
+                href={`https://www.youtube.com/watch?v=${video.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block"
+              >
+                <div className="relative h-44 overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
+                  <Image
+                    src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
+                    alt={video.title}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 grid place-items-center bg-black/20">
+                    <span className="rounded-full bg-white/90 p-3 text-[#ff6a00]">
+                      <FaPlay />
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </section>
 
       <section id="trending" className="mx-auto w-[min(1200px,92%)] py-12">
