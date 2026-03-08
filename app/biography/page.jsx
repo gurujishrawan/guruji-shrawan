@@ -4,245 +4,221 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { Playfair_Display, Inter } from "next/font/google";
-import { FaArrowDown } from "react-icons/fa";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Playfair_Display, Inter, Poppins } from "next/font/google";
+import { FaArrowDown, FaBars, FaTimes } from "react-icons/fa";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["500", "600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500"] });
+const poppins = Poppins({ subsets: ["latin"], weight: ["400", "500", "600"] });
 
 const chapters = [
-  "Introduction",
-  "Young Guruji",
-  "The Speaker",
-  "Inner Profile",
-  "Red Dawn",
-  "Composition",
-  "Poetic Opening",
+  { id: "chapter-1", title: "Early Life", text: "Born into ordinary circumstances, Guruji Shrawan’s early years were marked by sharp observation and an unusual inner sensitivity." },
+  { id: "chapter-2", title: "First Questions", text: "Instead of accepting inherited beliefs, he began questioning the roots of fear, identity, and social conditioning." },
+  { id: "chapter-3", title: "Turning Inward", text: "Through sustained inquiry, silence, and direct seeing, his work evolved from personal search into a shared dialogue." },
+  { id: "chapter-4", title: "Public Dialogues", text: "His talks brought rational spirituality to contemporary audiences — youth, professionals, and seekers of clarity." },
+  { id: "chapter-5", title: "Living Inquiry", text: "The core invitation remains simple: don’t follow blindly, look deeply; don’t believe quickly, understand directly." },
 ];
 
 export default function BiographyPage() {
-  const [stage, setStage] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeChapter, setActiveChapter] = useState(chapters[0].id);
+  const [showRail, setShowRail] = useState(false);
 
-  const bgRef = useRef(null);
-  const grainRef = useRef(null);
-  const smokeRef = useRef(null);
-
+  const coverRef = useRef(null);
+  const birdsRef = useRef(null);
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
   const arrowRef = useRef(null);
 
-  const youngRef = useRef(null);
-  const speakingRef = useRef(null);
-  const profileRef = useRef(null);
-  const birdsRef = useRef(null);
-  const compositionRef = useRef(null);
-  const poemRef = useRef(null);
+  const chapterRefs = useRef({});
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1800);
-    return () => clearTimeout(timer);
+    const ctx = gsap.context(() => {
+      gsap.fromTo(titleRef.current, { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
+      gsap.fromTo(subtitleRef.current, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.9, delay: 0.12, ease: "power2.out" });
+      gsap.fromTo(arrowRef.current, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.25, ease: "power2.out" });
+
+      gsap.to(birdsRef.current, {
+        y: -12,
+        repeat: -1,
+        yoyo: true,
+        duration: 2.1,
+        ease: "sine.inOut",
+      });
+
+      chapters.forEach(chapter => {
+        const el = chapterRefs.current[chapter.id];
+        if (!el) return;
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 28, scale: 0.98 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 80%",
+              end: "top 35%",
+              toggleActions: "play none none reverse",
+              onEnter: () => setActiveChapter(chapter.id),
+              onEnterBack: () => setActiveChapter(chapter.id),
+            },
+          }
+        );
+      });
+    });
+
+    return () => ctx.revert();
   }, []);
 
-  useEffect(() => {
-    if (loading) return;
-    const auto = setInterval(() => {
-      setStage(current => (current + 1) % chapters.length);
-    }, 4500);
-    return () => clearInterval(auto);
-  }, [loading]);
-
-  useEffect(() => {
-    if (loading) return;
-
-    const transition = { duration: 1, ease: "power3.out", overwrite: true };
-
-    // base reset for every stage
-    gsap.to(bgRef.current, { background: "#000000", ...transition });
-    gsap.to(smokeRef.current, { opacity: 0, ...transition });
-    gsap.to(grainRef.current, { opacity: 0.04, ...transition });
-
-    gsap.to(titleRef.current, { opacity: 1, y: 0, ...transition });
-    gsap.to(subtitleRef.current, { opacity: 1, y: 0, ...transition });
-    gsap.to(arrowRef.current, { opacity: 0, y: 14, ...transition });
-
-    gsap.to(profileRef.current, { opacity: 0, scale: 1.12, ...transition });
-    gsap.to(speakingRef.current, { opacity: 0, y: 100, x: 38, scale: 0.95, ...transition });
-    gsap.to(youngRef.current, { opacity: 0, y: 90, scale: 0.9, ...transition });
-    gsap.to(birdsRef.current, { opacity: 0, y: 0, ...transition });
-    gsap.to(compositionRef.current, { opacity: 1, y: 0, ...transition });
-    gsap.to(poemRef.current, { opacity: 0, y: 65, ...transition });
-
-    if (stage >= 1) {
-      gsap.to(youngRef.current, { opacity: 1, y: 0, scale: 1, ...transition });
-    }
-
-    if (stage >= 2) {
-      gsap.to(speakingRef.current, { opacity: 1, y: 0, x: 0, scale: 1, ...transition });
-    }
-
-    if (stage >= 3) {
-      gsap.to(profileRef.current, { opacity: 0.7, scale: 1, ...transition });
-    }
-
-    if (stage >= 4) {
-      gsap.to(bgRef.current, {
-        background: "radial-gradient(120% 120% at 50% 10%, #7b1d1f 0%, #321112 45%, #090909 100%)",
-        ...transition,
-      });
-      gsap.to(smokeRef.current, { opacity: 0.45, ...transition });
-      gsap.to(grainRef.current, { opacity: 0.2, ...transition });
-      gsap.to(birdsRef.current, { opacity: 0.9, ...transition });
-    }
-
-    if (stage >= 5) {
-      gsap.to(arrowRef.current, { opacity: 1, y: 0, ...transition });
-      gsap.to(compositionRef.current, { y: -16, ...transition });
-    }
-
-    if (stage === 6) {
-      gsap.to([compositionRef.current, titleRef.current, subtitleRef.current, birdsRef.current, arrowRef.current], {
-        opacity: 0,
-        y: 60,
-        duration: 1,
-        ease: "power3.out",
-        overwrite: true,
-      });
-      gsap.to(poemRef.current, { opacity: 1, y: 0, duration: 1.2, ease: "power3.out", overwrite: true });
-    }
-  }, [stage, loading]);
-
-  useEffect(() => {
-    if (loading) return;
-    const floatBirds = gsap.to(birdsRef.current, {
-      y: -20,
-      repeat: -1,
-      yoyo: true,
-      duration: 2.8,
-      ease: "sine.inOut",
-    });
-    const floatSmoke = gsap.to(smokeRef.current, {
-      xPercent: 6,
-      repeat: -1,
-      yoyo: true,
-      duration: 5,
-      ease: "sine.inOut",
-    });
-
-    return () => {
-      floatBirds.kill();
-      floatSmoke.kill();
-    };
-  }, [loading]);
+  const jumpToChapter = (id) => {
+    const el = chapterRefs.current[id];
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setMenuOpen(false);
+  };
 
   return (
-    <section className="relative h-[calc(100vh-4rem)] overflow-hidden bg-black">
-      <div ref={bgRef} className="absolute inset-0 bg-black" />
+    <main className="bg-black text-white">
+      {/* COVER INTRO */}
+      <section ref={coverRef} className="relative h-screen overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_0%,#8a2a2d_0%,#4a1619_45%,#0a0a0a_100%)]" />
+        <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)", backgroundSize: "3px 3px" }} />
 
-      <div
-        ref={smokeRef}
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(circle at 20% 25%, rgba(120,47,33,0.32), transparent 45%), radial-gradient(circle at 75% 55%, rgba(95,36,25,0.28), transparent 42%)",
-          filter: "blur(12px)",
-        }}
-      />
+        <Link href="/" className={`${inter.className} absolute left-4 top-4 z-50 rounded-full border border-[#f4d9bf]/40 bg-black/35 px-4 py-2 text-sm text-[#f5e7d4] backdrop-blur hover:bg-black/60 md:left-6 md:top-6`}>
+          ← Back
+        </Link>
 
-      <div
-        ref={grainRef}
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage: "radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)",
-          backgroundSize: "3px 3px",
-        }}
-      />
+        <button
+          type="button"
+          onClick={() => document.getElementById("biography-content")?.scrollIntoView({ behavior: "smooth" })}
+          className={`${poppins.className} absolute right-3 top-1/2 z-50 hidden -translate-y-1/2 rounded-l-full border border-[#f4d9bf]/30 bg-black/40 px-4 py-3 text-xs tracking-[0.18em] text-[#f4d9bf] backdrop-blur transition hover:bg-black/60 lg:block`}
+          aria-label="Open biography details"
+        >
+          NEXT →
+        </button>
 
-      <Link
-        href="/"
-        className={`${inter.className} absolute left-4 top-4 z-50 rounded-full border border-[#f4d9bf]/40 bg-black/45 px-4 py-2 text-sm text-[#f5e7d4] backdrop-blur hover:bg-black/60 md:left-6 md:top-6`}
-      >
-        ← Back
-      </Link>
+        <div className="absolute inset-0">
+          <div className="absolute -left-8 bottom-0 h-[88%] w-[76%] max-w-[780px] overflow-hidden rounded-tr-[42px] md:left-0 md:w-[58%]">
+            <Image src="/images/hero3.jpg" alt="Profile portrait" fill className="object-cover" priority />
+            <div className="absolute inset-0 bg-black/35" />
+          </div>
 
-      <aside className="absolute right-3 top-1/2 z-50 hidden -translate-y-1/2 md:block">
-        <div className="relative pr-4">
-          <div className="absolute right-0 top-1 h-[92%] w-[3px] bg-white/30" />
-          <div className="absolute right-0 top-1 w-[3px] bg-white transition-all duration-500" style={{ height: `${((stage + 1) / chapters.length) * 92}%` }} />
-          <ul className="space-y-5 text-right">
-            {chapters.map((chapter, index) => (
-              <li key={chapter} className="relative">
-                <button
-                  type="button"
-                  onClick={() => setStage(index)}
-                  className={`${playfair.className} pr-5 text-lg leading-none transition ${index === stage ? "text-[#f5e7d4]" : "text-[#d2b79a]/70 hover:text-[#f5e7d4]"}`}
-                >
-                  {chapter}
-                </button>
-                <span className={`absolute -right-[5px] top-1/2 h-[9px] w-[9px] -translate-y-1/2 rounded-sm ${index <= stage ? "bg-white" : "bg-white/35"}`} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+          <div className="absolute bottom-12 right-[7%] h-[50%] w-[38%] min-w-[170px] max-w-[360px] overflow-hidden rounded-2xl border border-[#f4d9bf]/25 shadow-2xl">
+            <Image src="/images/hero2.jpg" alt="Guruji speaking" fill className="object-cover" />
+          </div>
 
-      <div ref={compositionRef} className="absolute inset-0">
-        <div ref={profileRef} className="absolute -left-8 bottom-0 h-[92%] w-[78%] max-w-[760px] overflow-hidden rounded-tr-[44px] opacity-0 md:left-0 md:w-[60%]">
-          <Image src="/images/hero3.jpg" alt="Guruji Shrawan side profile" fill className="object-cover object-center" priority />
-          <div className="absolute inset-0 bg-black/35" />
-        </div>
-
-        <div ref={speakingRef} className="absolute bottom-10 right-[7%] h-[52%] w-[40%] min-w-[180px] max-w-[350px] overflow-hidden rounded-2xl border border-[#f4d9bf]/25 opacity-0 shadow-2xl">
-          <Image src="/images/hero2.jpg" alt="Guruji speaking" fill className="object-cover" />
-        </div>
-
-        <div ref={youngRef} className="absolute bottom-0 left-1/2 h-[72%] w-[46%] min-w-[230px] max-w-[430px] -translate-x-1/2 overflow-hidden rounded-t-[38px] border border-[#f4d9bf]/25 opacity-0 shadow-2xl">
-          <Image src="/images/guruji.jpg" alt="Young Guruji Shrawan portrait" fill className="object-cover" />
-        </div>
-      </div>
-
-      <div ref={birdsRef} className="absolute right-[12%] top-[15%] flex gap-4 text-[#f3d8bb]/85 opacity-0">
-        <span className="text-xl">🕊</span>
-        <span className="mt-4 text-lg">🕊</span>
-        <span className="text-2xl">🕊</span>
-      </div>
-
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-        <h1 ref={titleRef} className={`${playfair.className} text-5xl tracking-wide text-[#f5e7d4] md:text-7xl`}>
-          Guruji Shrawan
-        </h1>
-        <p ref={subtitleRef} className={`${playfair.className} mt-3 text-2xl text-[#dfc3a3] md:text-3xl`}>
-          Biography
-        </p>
-
-        <div ref={arrowRef} className="mt-8 text-[#d8b493] opacity-0">
-          <FaArrowDown />
-        </div>
-
-        <div ref={poemRef} className="mx-auto mt-10 max-w-4xl px-4 opacity-0">
-          <p className={`${playfair.className} text-3xl leading-tight text-[#f7e8d6] md:text-5xl`}>
-            Ek kahani shuru hoti hai
-            <br />
-            jab suraj dhal chuka hota hai...
-          </p>
-          <p className={`${inter.className} mt-6 text-sm text-[#f1ddc7]/85 md:text-lg`}>
-            A story begins when the sun has already set — and the search for
-            inner clarity becomes the only light left to follow.
-          </p>
-        </div>
-      </div>
-
-      {loading && (
-        <div className="absolute inset-0 z-[60] grid place-items-center bg-black">
-          <div className="text-center">
-            <p className={`${playfair.className} text-2xl text-[#f5e7d4] md:text-4xl`}>Guruji Shrawan</p>
-            <p className={`${inter.className} mt-2 text-sm text-[#d4b79b]`}>Loading biography timeline...</p>
-            <div className="mx-auto mt-6 h-[2px] w-44 overflow-hidden bg-white/25">
-              <div className="h-full w-24 animate-[loader_1.8s_ease-in-out_infinite] bg-white" />
-            </div>
+          <div className="absolute bottom-0 left-1/2 h-[70%] w-[45%] min-w-[220px] max-w-[420px] -translate-x-1/2 overflow-hidden rounded-t-[36px] border border-[#f4d9bf]/25 shadow-2xl">
+            <Image src="/images/guruji.jpg" alt="Young portrait" fill className="object-cover" />
           </div>
         </div>
-      )}
-    </section>
+
+        <div ref={birdsRef} className="absolute right-[14%] top-[16%] flex gap-3 text-[#f3d8bb]/90">
+          <span className="text-xl">🕊</span>
+          <span className="mt-3 text-lg">🕊</span>
+          <span className="text-2xl">🕊</span>
+        </div>
+
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+          <h1 ref={titleRef} className={`${playfair.className} text-5xl text-[#f7e9d8] md:text-7xl`}>Guruji Shrawan</h1>
+          <p ref={subtitleRef} className={`${playfair.className} mt-3 text-2xl text-[#e0c4a6] md:text-4xl`}>Biography</p>
+          <button
+            ref={arrowRef}
+            type="button"
+            onClick={() => document.getElementById("biography-content")?.scrollIntoView({ behavior: "smooth" })}
+            className="mt-8 text-[#efd8bf] transition hover:scale-110"
+            aria-label="Scroll to biography chapters"
+          >
+            <FaArrowDown className="animate-bounce" />
+          </button>
+        </div>
+      </section>
+
+      {/* BIOGRAPHY CHAPTERS */}
+      <section id="biography-content" className="relative bg-[#0d0d0f] py-14 md:py-20">
+        <div className="mx-auto w-[min(920px,92%)] space-y-6">
+          {chapters.map((chapter, idx) => (
+            <article
+              key={chapter.id}
+              id={chapter.id}
+              ref={(el) => {
+                chapterRefs.current[chapter.id] = el;
+              }}
+              className="rounded-2xl border border-white/10 bg-[linear-gradient(145deg,#1a1a1d,#111114)] p-6 shadow-xl md:p-8"
+            >
+              <p className={`${poppins.className} text-xs tracking-[0.22em] text-[#d9b998]`}>CHAPTER {String(idx + 1).padStart(2, "0")}</p>
+              <h2 className={`${playfair.className} mt-3 text-3xl text-[#f6e6d4] md:text-4xl`}>{chapter.title}</h2>
+              <p className={`${inter.className} mt-4 text-sm leading-relaxed text-white/80 md:text-lg`}>{chapter.text}</p>
+            </article>
+          ))}
+        </div>
+
+        {/* Desktop hover rail */}
+        <div
+          className="absolute right-0 top-0 hidden h-full w-24 md:block"
+          onMouseEnter={() => setShowRail(true)}
+          onMouseLeave={() => setShowRail(false)}
+        >
+          <aside className={`fixed right-3 top-1/2 z-40 -translate-y-1/2 transition-all duration-300 ${showRail ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+            <div className="relative pr-4">
+              <div className="absolute right-0 top-1 h-[92%] w-[3px] bg-white/30" />
+              <ul className="space-y-5 text-right">
+                {chapters.map((chapter, index) => (
+                  <li key={chapter.id} className="relative">
+                    <button
+                      type="button"
+                      onClick={() => jumpToChapter(chapter.id)}
+                      className={`${poppins.className} pr-5 text-xs ${activeChapter === chapter.id ? "text-[#f5e7d4]" : "text-[#d2b79a]/70 hover:text-[#f5e7d4]"}`}
+                    >
+                      {chapter.title}
+                    </button>
+                    <span className={`absolute -right-[5px] top-1/2 h-[9px] w-[9px] -translate-y-1/2 rounded-sm ${index <= chapters.findIndex(item => item.id === activeChapter) ? "bg-white" : "bg-white/35"}`} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
+        </div>
+
+        {/* Mobile hamburger index */}
+        <div className="fixed bottom-4 right-4 z-50 md:hidden">
+          <button
+            type="button"
+            onClick={() => setMenuOpen(value => !value)}
+            className="rounded-full border border-white/20 bg-black/70 p-3 text-white backdrop-blur"
+            aria-label="Toggle biography chapter index"
+          >
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        </div>
+
+        {menuOpen && (
+          <div className="fixed inset-0 z-40 bg-black/70 md:hidden" onClick={() => setMenuOpen(false)}>
+            <div className="absolute right-0 top-0 h-full w-72 bg-[#111114] p-6" onClick={event => event.stopPropagation()}>
+              <p className={`${poppins.className} text-xs tracking-[0.2em] text-[#d9b998]`}>BIOGRAPHY INDEX</p>
+              <ul className="mt-5 space-y-4">
+                {chapters.map(chapter => (
+                  <li key={chapter.id}>
+                    <button
+                      type="button"
+                      onClick={() => jumpToChapter(chapter.id)}
+                      className={`${poppins.className} text-left text-sm ${activeChapter === chapter.id ? "text-white" : "text-white/75"}`}
+                    >
+                      {chapter.title}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+      </section>
+    </main>
   );
 }
