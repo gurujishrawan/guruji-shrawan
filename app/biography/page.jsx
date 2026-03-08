@@ -1,138 +1,102 @@
 "use client";
 
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { useLayoutEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { FaArrowDown } from "react-icons/fa";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function BiographyPage() {
+  const sectionRef = useRef(null);
+  const bgRef = useRef(null);
+  const grainRef = useRef(null);
+  const titleRef = useRef(null);
+  const subTitleRef = useRef(null);
+  const youngRef = useRef(null);
+  const speechRef = useRef(null);
+  const profileRef = useRef(null);
+  const birdsRef = useRef(null);
+  const arrowRef = useRef(null);
+  const poemRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.set([youngRef.current, speechRef.current, profileRef.current, birdsRef.current, arrowRef.current, poemRef.current], { opacity: 0 });
+      gsap.set(youngRef.current, { y: 70, scale: 0.9 });
+      gsap.set(speechRef.current, { y: 80, x: 40 });
+      gsap.set(profileRef.current, { scale: 1.1 });
+      gsap.set(poemRef.current, { y: 70 });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1.3,
+        },
+      });
+
+      tl.fromTo(titleRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7 })
+        .fromTo(subTitleRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "<0.15")
+        .to(youngRef.current, { opacity: 1, y: 0, scale: 1, duration: 0.9 }, ">0.2")
+        .to(speechRef.current, { opacity: 1, y: 0, x: 0, duration: 0.8 }, ">0.1")
+        .to(profileRef.current, { opacity: 0.7, scale: 1, duration: 0.9 }, "<0.1")
+        .to(bgRef.current, { background: "radial-gradient(circle at 50% 18%, #642122 0%, #1a0a0a 40%, #040404 100%)", duration: 1.2 }, "<")
+        .to(grainRef.current, { opacity: 0.3, duration: 1 }, "<")
+        .to(birdsRef.current, { opacity: 0.8, duration: 0.8 }, "<0.2")
+        .to(arrowRef.current, { opacity: 1, y: 0, duration: 0.6 }, "<0.2")
+        .to([youngRef.current, speechRef.current, profileRef.current, titleRef.current, subTitleRef.current, birdsRef.current, arrowRef.current], { opacity: 0, y: 40, duration: 1.1 }, ">0.7")
+        .to(poemRef.current, { opacity: 1, y: 0, duration: 1.2 }, "<0.2");
+
+      gsap.to(birdsRef.current, {
+        y: -28,
+        repeat: -1,
+        yoyo: true,
+        duration: 2.5,
+        ease: "sine.inOut",
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <main className="bg-[#f7f5f2] text-[#1c1c1c]">
-      {/* ================= HERO ================= */}
-      <section className="max-w-5xl mx-auto px-6 pt-32 pb-24">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-5xl font-extrabold leading-tight mb-8"
-        >
-          Guruji Shrawan
-        </motion.h1>
+    <section ref={sectionRef} className="relative h-[450vh] bg-black">
+      <div ref={bgRef} className="sticky top-16 h-[calc(100vh-4rem)] overflow-hidden bg-black md:top-16 md:h-[calc(100vh-4rem)]">
+        <div ref={grainRef} className="pointer-events-none absolute inset-0 opacity-0" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)", backgroundSize: "3px 3px" }} />
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-lg text-[#5f5f5f] max-w-3xl leading-relaxed"
-        >
-          Guruji Shrawan is a contemporary voice focused on clarity,
-          self-inquiry, and honest observation of life — beyond belief,
-          ritual, or borrowed ideas.
-        </motion.p>
-      </section>
-
-      {/* ================= WHO ================= */}
-      <section className="bg-white py-24 border-t border-black/10">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-6">
-            Who is Guruji Shrawan
-          </h2>
-
-          <p className="text-[#5f5f5f] leading-relaxed text-lg mb-6">
-            Guruji Shrawan engages with questions that most people avoid —
-            fear, ambition, suffering, success, attachment, and identity.
-            His work does not offer comfort through belief, but clarity
-            through understanding.
-          </p>
-
-          <p className="text-[#5f5f5f] leading-relaxed text-lg">
-            Rather than positioning himself as a preacher or a motivational
-            speaker, he approaches dialogue as a shared inquiry — one that
-            invites the listener to look directly at their own life.
-          </p>
+        <div ref={profileRef} className="absolute -left-10 bottom-0 h-[86%] w-[75%] max-w-[760px] overflow-hidden rounded-tr-[40px] opacity-0 md:left-0 md:w-[58%]">
+          <Image src="/images/hero3.jpg" alt="Guruji side profile" fill className="object-cover object-center" priority />
+          <div className="absolute inset-0 bg-black/35" />
         </div>
-      </section>
 
-      {/* ================= JOURNEY ================= */}
-      <section className="py-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-6">
-            The Journey
-          </h2>
-
-          <p className="text-[#5f5f5f] leading-relaxed text-lg mb-6">
-            The journey behind this work is not about personal achievement
-            or spiritual identity. It is rooted in careful observation,
-            questioning inherited ideas, and seeing how conditioning shapes
-            everyday choices.
-          </p>
-
-          <p className="text-[#5f5f5f] leading-relaxed text-lg">
-            Over time, this inquiry found expression through digital
-            platforms — short videos, written reflections, and open
-            conversations — making these ideas accessible to a wider
-            audience.
-          </p>
+        <div ref={speechRef} className="absolute bottom-10 right-[6%] h-[50%] w-[38%] min-w-[180px] max-w-[340px] overflow-hidden rounded-2xl border border-white/20 opacity-0 shadow-2xl">
+          <Image src="/images/hero2.jpg" alt="Guruji speaking" fill className="object-cover" />
         </div>
-      </section>
 
-      {/* ================= PHILOSOPHY ================= */}
-      <section className="bg-white py-24 border-t border-black/10">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-6">
-            Approach & Philosophy
-          </h2>
-
-          <ul className="space-y-6 text-lg text-[#5f5f5f]">
-            <li>
-              • Clarity is valued over comfort.
-            </li>
-            <li>
-              • Questions matter more than conclusions.
-            </li>
-            <li>
-              • Awareness begins with seeing facts as they are.
-            </li>
-            <li>
-              • Truth is not personal, cultural, or negotiable.
-            </li>
-          </ul>
+        <div ref={youngRef} className="absolute bottom-0 left-1/2 h-[68%] w-[44%] min-w-[240px] max-w-[420px] -translate-x-1/2 overflow-hidden rounded-t-[36px] border border-white/20 opacity-0 shadow-2xl">
+          <Image src="/images/guruji.jpg" alt="Young Guruji Shrawan" fill className="object-cover" />
         </div>
-      </section>
 
-      {/* ================= DIGITAL PRESENCE ================= */}
-      <section className="py-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-6">
-            Digital Presence
-          </h2>
-
-          <p className="text-[#5f5f5f] leading-relaxed text-lg mb-6">
-            Through platforms such as YouTube, Instagram, and Facebook,
-            Guruji Shrawan shares concise reflections and longer discussions
-            aimed at provoking thoughtful self-examination rather than
-            passive consumption.
-          </p>
-
-          <p className="text-[#5f5f5f] leading-relaxed text-lg">
-            The emphasis remains on quality of inquiry, not scale or
-            popularity — encouraging individuals to think independently
-            and live consciously.
-          </p>
+        <div ref={birdsRef} className="absolute right-[12%] top-[16%] flex gap-4 text-white/80 opacity-0">
+          <span className="text-xl">🕊</span>
+          <span className="mt-4 text-lg">🕊</span>
+          <span className="text-2xl">🕊</span>
         </div>
-      </section>
 
-      {/* ================= CLOSING ================= */}
-      <section className="bg-[#111] text-white py-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-6">
-            A Closing Note
-          </h2>
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+          <h1 ref={titleRef} className="font-serif text-5xl tracking-wide text-[#f5e9d8] md:text-7xl">Guruji Shrawan</h1>
+          <p ref={subTitleRef} className="mt-3 font-serif text-2xl text-[#dac1a4] md:text-3xl">Biography</p>
+          <div ref={arrowRef} className="mt-8 translate-y-4 text-[#d8b39a] opacity-0"><FaArrowDown /></div>
 
-          <p className="text-gray-300 leading-relaxed text-lg">
-            This work is not an invitation to follow a person, ideology, or
-            belief system. It is an invitation to look honestly at oneself
-            and one’s life — without fear, without escape.
-          </p>
+          <div ref={poemRef} className="mx-auto mt-8 max-w-3xl px-4 opacity-0">
+            <p className="font-serif text-3xl leading-tight text-[#f5e9d8] md:text-5xl">Ek kahani shuru hoti hai<br />jab suraj dhal chuka hota hai...</p>
+            <p className="mt-5 text-sm text-[#f1dfcc]/80 md:text-lg">A story begins when the sun has already set — and the search for inner light truly starts.</p>
+          </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
   );
 }
