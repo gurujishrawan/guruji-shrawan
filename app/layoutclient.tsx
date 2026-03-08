@@ -16,7 +16,7 @@ export default function ClientLayout({
     <>
       {!isHome && <Navbar />}
       <main className="min-h-screen">{children}</main>
-      {!isHome && <Footer />}
+      <Footer />
     </>
   );
 }
