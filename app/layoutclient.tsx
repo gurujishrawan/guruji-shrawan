@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { SessionProvider } from "./session-provider";
 
 export default function ClientLayout({
   children,
@@ -14,10 +15,10 @@ export default function ClientLayout({
   const hideFooter = pathname === "/biography";
 
   return (
-    <>
+    <SessionProvider>
       {!hideNavbar && <Navbar />}
       <main className="min-h-screen">{children}</main>
       {!hideFooter && <Footer />}
-    </>
+    </SessionProvider>
   );
 }
