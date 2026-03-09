@@ -1,147 +1,245 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useSession } from "../session-provider";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useLanguage } from "../context/LanguageContext";
-import { siteContent } from "../content/siteContent";
-import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
-import { useTheme } from "../context/useTheme";
+import Link from "next/link"
+import { useState, useEffect } from "react"
+import { useRouter, usePathname } from "next/navigation"
+import { siteContent } from "../content/siteContent"
+import { useLanguage } from "../context/LanguageContext"
+import { FaSearch } from "react-icons/fa"
+import { getArticles } from "../articles/data"
+import Image from "next/image"
 
-function NavLink({ href, label, onClick }) {
-  const pathname = usePathname();
-  const active = pathname === href;
+export default function Navbar(){
 
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className={`text-sm font-medium transition ${
-        active
-          ? "text-[#ff6a00]"
-          : "text-[var(--foreground)]/80 hover:text-[#ff6a00]"
-      }`}
-    >
-      {label}
-    </Link>
-  );
+const router = useRouter()
+const pathname = usePathname()
+
+const { language, setLanguage } = useLanguage()
+
+const t = siteContent[language] || siteContent.en
+
+const [search,setSearch] = useState("")
+const [suggestions,setSuggestions] = useState([])
+const [articles,setArticles] = useState([])
+const [scrolled,setScrolled] = useState(false)
+
+useEffect(()=>{
+
+setArticles(getArticles())
+
+function handleScroll(){
+setScrolled(window.scrollY > 5)
 }
 
-export default function Navbar() {
-  const [open, setOpen] = useState(false);
-  const { lang, setLang, languages } = useLanguage();
-  const t = siteContent[lang];
-  const { theme, toggleTheme } = useTheme();
-  const { data: session } = useSession();
+window.addEventListener("scroll",handleScroll)
 
-  const handleSignOut = async () => {
-    await fetch("/api/auth/signout", { method: "GET", cache: "no-store" });
-    window.location.href = "/";
-  };
+return ()=>window.removeEventListener("scroll",handleScroll)
 
-  return (
-    <header className="sticky top-0 z-50 border-b border-black/10 bg-[var(--surface-muted)]/90 backdrop-blur">
-      <div className="mx-auto flex h-16 w-[min(1200px,92%)] items-center justify-between">
-        <Link href="/" className="text-base font-extrabold tracking-wide sm:text-lg">
-          GURUJI SHRAWAN
-        </Link>
+},[])
 
-        <nav className="hidden items-center gap-7 md:flex">
-          <NavLink href="/" label={t.nav.home} />
-          <NavLink href="/articles" label={t.nav.articles} />
-          <NavLink href="/biography" label={t.nav.biography} />
-          <Link href="/donate" className="rounded-full bg-[#ff6a00] px-4 py-1.5 text-sm font-semibold text-white">
-            {t.nav.donate}
-          </Link>
-          <button
-            onClick={toggleTheme}
-            className="flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-2.5 py-1 text-xs text-[var(--foreground)]"
-          >
-            {theme === "light" ? <FaMoon className="text-gray-700" /> : <FaSun className="text-yellow-400" />}
-            {theme === "light" ? "Dark" : "Light"}
-          </button>
-          {session?.user ? (
-            <div className="flex items-center gap-2">
-              <span className="rounded-full border border-black/10 bg-white/70 px-2.5 py-1 text-xs text-[var(--foreground)]">
-                Hi, {session.user.name}
-              </span>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="rounded-full border border-black/10 bg-white/70 px-2.5 py-1 text-xs text-[var(--foreground)]"
-              >
-                Sign out
-              </button>
-            </div>
-          ) : (
-            <Link href="/signin" className="text-sm font-medium text-[var(--foreground)]/80 hover:text-[#ff6a00]">
-              Sign in
-            </Link>
-          )}
-          <label className="rounded-full border border-black/10 bg-white/70 px-2.5 py-1 text-xs text-[var(--foreground)]">
-            <span className="sr-only">{t.languageLabel}</span>
-            <select
-              value={lang}
-              onChange={event => setLang(event.target.value)}
-              className="bg-transparent text-xs font-medium text-[var(--foreground)]"
-            >
-              {languages.map(option => (
-                <option key={option.code} value={option.code}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </nav>
+/* SMART SEARCH */
 
-        <button className="text-xl md:hidden" onClick={() => setOpen(!open)} type="button">
-          {open ? <FaTimes /> : <FaBars />}
-        </button>
-      </div>
+function handleChange(e){
 
-      {open && (
-        <div className="border-t bg-[var(--surface-muted)] px-5 py-5 md:hidden">
-          <div className="flex flex-col gap-4">
-            <NavLink href="/" label={t.nav.home} onClick={() => setOpen(false)} />
-            <NavLink href="/articles" label={t.nav.articles} onClick={() => setOpen(false)} />
-            <NavLink href="/biography" label={t.nav.biography} onClick={() => setOpen(false)} />
-            <Link href="/donate" onClick={() => setOpen(false)} className="rounded-full bg-[#ff6a00] px-4 py-2 text-center text-sm font-semibold text-white">
-              {t.nav.donate}
-            </Link>
-            {session?.user ? (
-              <button
-                type="button"
-                onClick={async () => {
-                  await handleSignOut();
-                  setOpen(false);
-                }}
-                className="w-fit rounded-full border border-black/10 bg-white/70 px-3 py-2 text-xs text-[var(--foreground)]"
-              >
-                Sign out ({session.user.name})
-              </button>
-            ) : (
-              <Link
-                href="/signin"
-                onClick={() => setOpen(false)}
-                className="w-fit rounded-full border border-black/10 bg-white/70 px-3 py-2 text-xs text-[var(--foreground)]"
-              >
-                Sign in
-              </Link>
-            )}
-            <button
-              onClick={() => {
-                toggleTheme();
-                setOpen(false);
-              }}
-              className="flex w-fit items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-2 text-xs text-[var(--foreground)]"
-            >
-              {theme === "light" ? <FaMoon className="text-gray-700" /> : <FaSun className="text-yellow-400" />}
-              {theme === "light" ? "Dark" : "Light"}
-            </button>
-          </div>
-        </div>
-      )}
-    </header>
-  );
+const value = e.target.value
+setSearch(value)
+
+if(!value){
+setSuggestions([])
+return
+}
+
+const filtered = articles.filter(article => {
+
+const text = `
+${article.title}
+${article.excerpt}
+${article.category}
+${article.tags || ""}
+`.toLowerCase()
+
+return text.includes(value.toLowerCase())
+
+})
+
+setSuggestions(filtered.slice(0,6))
+
+}
+
+/* ENTER SEARCH */
+
+function handleEnter(e){
+
+if(e.key==="Enter"){
+router.push(`/articles?search=${search}`)
+setSuggestions([])
+}
+
+}
+
+function goToArticle(slug){
+
+router.push(`/articles/${slug}`)
+setSearch("")
+setSuggestions([])
+
+}
+
+return(
+
+<header
+className={`sticky top-0 z-50 transition-all duration-300 ${
+scrolled ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-white"
+}`}
+>
+
+<div className="mx-auto w-[min(1280px,95%)] flex items-center justify-between py-4">
+
+{/* LOGO */}
+
+<Link
+href="/"
+className="text-lg font-semibold tracking-tight"
+>
+Guruji Shrawan
+</Link>
+
+{/* NAV */}
+
+<nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+
+<Link
+href="/"
+className={`transition ${
+pathname === "/" ? "text-black font-semibold" : "text-gray-600 hover:text-black"
+}`}
+>
+{t?.nav?.home}
+</Link>
+
+<Link
+href="/articles"
+className={`transition ${
+pathname.startsWith("/articles")
+? "text-black font-semibold"
+: "text-gray-600 hover:text-black"
+}`}
+>
+{t?.nav?.articles}
+</Link>
+
+<Link
+href="/biography"
+className={`transition ${
+pathname === "/biography"
+? "text-black font-semibold"
+: "text-gray-600 hover:text-black"
+}`}
+>
+{t?.nav?.biography}
+</Link>
+
+</nav>
+
+{/* SEARCH */}
+
+<div className="relative hidden md:block">
+
+<div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-[280px]">
+
+<FaSearch className="text-gray-400 text-sm mr-2"/>
+
+<input
+value={search}
+onChange={handleChange}
+onKeyDown={handleEnter}
+placeholder="Search articles..."
+className="bg-transparent outline-none text-sm text-gray-700 w-full placeholder-gray-400"
+/>
+
+</div>
+
+{/* SUGGESTIONS */}
+
+{suggestions.length > 0 && (
+
+<div className="absolute mt-2 w-full bg-white shadow-xl rounded-xl border overflow-hidden">
+
+{suggestions.map(article => (
+
+<button
+key={article.slug}
+onClick={()=>goToArticle(article.slug)}
+className="flex items-center gap-3 w-full text-left px-4 py-3 hover:bg-gray-50"
+>
+
+<Image
+src={article.featuredImage || "/images/mood.jpg"}
+alt={article.title}
+width={40}
+height={40}
+className="rounded-md object-cover"
+/>
+
+<div>
+
+<p className="text-sm font-medium">
+{article.title}
+</p>
+
+<p className="text-xs text-gray-500">
+{article.category}
+</p>
+
+</div>
+
+</button>
+
+))}
+
+</div>
+
+)}
+
+</div>
+
+{/* LOGIN / SIGNUP */}
+
+<div className="hidden md:flex items-center gap-3">
+
+<Link
+href="/signin"
+className="px-4 py-1.5 text-sm rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+>
+Login
+</Link>
+
+<Link
+href="/signup"
+className="px-4 py-1.5 text-sm rounded-full bg-blue-500 text-white hover:bg-blue-600 transition"
+>
+Signup
+</Link>
+
+</div>
+
+{/* LANGUAGE */}
+
+<select
+value={language}
+onChange={(e)=>setLanguage(e.target.value)}
+className="ml-4 border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600 bg-white"
+>
+
+<option value="en">EN</option>
+<option value="hi">HI</option>
+
+</select>
+
+</div>
+
+</header>
+
+)
+
 }

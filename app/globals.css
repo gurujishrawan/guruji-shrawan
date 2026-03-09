@@ -9,7 +9,31 @@
   --brand-dark: #143845;
   --accent: #c8a15a;
 }
+.prose h2{
+font-size:28px;
+margin-top:40px;
+}
 
+.prose p{
+line-height:1.8;
+font-size:18px;
+}
+.prose h2{
+font-size:28px;
+margin-top:40px;
+font-weight:700;
+}
+
+.prose h3{
+font-size:22px;
+margin-top:24px;
+font-weight:600;
+}
+
+.prose p{
+font-size:18px;
+line-height:1.8;
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -94,4 +118,30 @@ html {
   100% {
     transform: translateX(220%);
   }
+}
+.prose h2{
+font-size:28px;
+margin-top:40px;
+font-weight:700;
+}
+
+.prose h3{
+font-size:22px;
+margin-top:24px;
+font-weight:600;
+}
+
+.prose p{
+font-size:18px;
+line-height:1.8;
+color:#333;
+}
+
+.mag-card{
+transition:all .25s ease;
+}
+
+.mag-card:hover{
+transform:translateY(-3px);
+box-shadow:0 12px 30px rgba(0,0,0,.08);
 }

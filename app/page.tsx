@@ -38,7 +38,7 @@ const homeNavItems = [
   { label: "YouTube", href: "https://youtube.com/@gurujishrawan", external: true },
   { label: "Teachings", href: "#teachings" },
   { label: "Live Sessions", href: "#videos" },
-  { label: "Articles", href: "#articles" },
+  { label: "Articles", href: "/articles" },
   { label: "Books", href: "#books" },
   { label: "Video Series", href: "#videos" },
   { label: "Contact", href: "#contact" },

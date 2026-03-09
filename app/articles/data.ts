@@ -1,163 +1,160 @@
-import { promises as fs } from "fs";
-import path from "path";
-
-const dataPath = path.join(process.cwd(), "data", "articles.json");
-
-type LocalizedText = { en: string; hi: string };
-
-type Article = {
-  slug: string;
-  title: LocalizedText;
-  excerpt: LocalizedText;
-  content: LocalizedText;
-  publishedAt: string;
-  featuredImage: string;
-  category?: string;
-  readTime?: string;
-  metaDescription?: string;
-  keywords?: string[];
-  imagePrompt?: string;
-};
-
-const fallbackArticles: Article[] = [
-  {
-    slug: "what-is-clarity",
-    title: { en: "What Is Clarity?", hi: "स्पष्टता क्या है?" },
-    excerpt: {
-      en: "Clarity is not comfort. It is the end of confusion.",
-      hi: "स्पष्टता आराम नहीं है, यह भ्रम का अंत है।",
-    },
-    content: {
-      en: "<p>Clarity begins where belief ends.</p>",
-      hi: "<p>स्पष्टता वहीं शुरू होती है जहाँ विश्वास समाप्त होता है।</p>",
-    },
-    publishedAt: "2024-01-10",
-    featuredImage: "/images/hero1.jpg",
-    category: "Mind",
-    readTime: "4 min",
-  },
-];
-
-async function readArticlesFile() {
-  try {
-    const file = await fs.readFile(dataPath, "utf-8");
-    const parsed = JSON.parse(file);
-    if (!Array.isArray(parsed)) {
-      return fallbackArticles;
-    }
-    return parsed.map(normalizeArticle);
-  } catch (error) {
-    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
-      return fallbackArticles;
-    }
-    throw error;
-  }
+export type Article = {
+  slug: string
+  category: string
+  title: string
+  excerpt: string
+  featuredImage?: string
+  readTime: string
+  views: number
+  likes: number
+  publishedAt: string
+  content: string
+  tags: string[]
 }
 
-async function writeArticlesFile(articles: Article[]) {
-  await fs.mkdir(path.dirname(dataPath), { recursive: true });
-  await fs.writeFile(dataPath, JSON.stringify(articles, null, 2));
+export const articles: Article[] = [
+{
+slug: "who-controls-your-mood",
+category: "Mind",
+title: "Who Controls Your Mood?",
+excerpt:
+"Our mood often depends on situations and people. But can we reclaim emotional independence?",
+featuredImage: "/images/mood.jpg",
+readTime: "4 min",
+views: 7400,
+likes: 320,
+publishedAt: "2026-03-08",
+tags:["mind"],
+content: `
+<h2>Why Mood Depends on Others</h2>
+<p>Most people think happiness depends on situations. Praise makes us happy, criticism makes us miserable.</p>
+
+<h2>The Problem of Dependency</h2>
+<p>When emotions depend on others we lose inner stability.</p>
+
+<h3>Observe Yourself</h3>
+<p>Notice how your emotional state constantly shifts depending on others.</p>
+
+<h2>Real Freedom</h2>
+<p>Freedom begins when your inner state stops reacting automatically.</p>
+`
+},
+
+{
+slug: "modern-life-creates-anxiety",
+category: "Society",
+title: "Why Modern Life Creates Anxiety",
+excerpt:
+"Despite technological progress anxiety keeps increasing in modern civilization.",
+featuredImage: "/images/social.jpg",
+readTime: "5 min",
+views: 5200,
+likes: 210,
+publishedAt: "2026-03-06",
+tags:["society"],
+content: `
+<h2>The Speed of Modern Life</h2>
+<p>Technology accelerates life but also increases pressure.</p>
+
+<h2>Comparison Culture</h2>
+<p>Social media constantly compares lives.</p>
+
+<h3>The Result</h3>
+<p>Anxiety becomes normal.</p>
+
+<h2>Returning to Clarity</h2>
+<p>Real peace requires psychological independence.</p>
+`
+},
+
+{
+slug:"freedom-from-fear",
+category:"Freedom",
+title:"Freedom From Fear",
+excerpt:"Fear shapes most human decisions but rarely solves problems.",
+featuredImage:"/images/fear.jpg",
+readTime:"6 min",
+views:4300,
+likes:190,
+publishedAt:"2026-03-04",
+tags:["freedom"],
+content:`
+<h2>The Psychology of Fear</h2>
+<p>Fear appears whenever security feels threatened.</p>
+
+<h2>False Protection</h2>
+<p>Fear promises safety but creates limitation.</p>
+
+<h2>Seeing Fear Clearly</h2>
+<p>Observation dissolves psychological fear.</p>
+`
+},
+
+{
+slug:"understanding-the-mind",
+category:"Mind",
+title:"Understanding The Mind",
+excerpt:"The human mind constantly reacts to memory, conditioning and desire.",
+featuredImage:"/images/mind-control.jpg",
+readTime:"7 min",
+views:3900,
+likes:150,
+publishedAt:"2026-03-02",
+tags:["mind"],
+content:`
+<h2>The Nature of Thought</h2>
+<p>Thought is memory in motion.</p>
+
+<h2>Conditioning</h2>
+<p>Society shapes how we think.</p>
+
+<h2>Awareness</h2>
+<p>Observation reveals the movement of thought.</p>
+`
+},
+
+{
+slug:"the-meaning-of-freedom",
+category:"Freedom",
+title:"The Meaning Of Freedom",
+excerpt:"Freedom is not doing whatever you want but understanding yourself deeply.",
+featuredImage:"/images/freedom.jpg",
+readTime:"5 min",
+views:3100,
+likes:120,
+publishedAt:"2026-03-01",
+tags:["freedom"],
+content:`
+<h2>Freedom Misunderstood</h2>
+<p>People think freedom means unlimited choice.</p>
+
+<h2>Psychological Freedom</h2>
+<p>True freedom appears when conditioning ends.</p>
+
+<h2>Inner Clarity</h2>
+<p>Freedom begins with understanding the mind.</p>
+`
 }
 
-function normalizeSlug(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+]
+
+export function getArticles(): Article[] {
+return articles
 }
 
-function estimateReadTime(content: string) {
-  const words = content.replace(/<[^>]+>/g, " ").trim().split(/\s+/).filter(Boolean).length;
-  const minutes = Math.max(2, Math.round(words / 200));
-  return `${minutes} min`;
+export function getArticleBySlug(
+slug: string | string[] | undefined
+): Article | undefined {
+
+if (!slug) return undefined
+
+const cleanSlug =
+Array.isArray(slug)
+? slug[0].trim().toLowerCase()
+: slug.trim().toLowerCase()
+
+return articles.find(
+(article) => article.slug.trim().toLowerCase() === cleanSlug
+)
+
 }
-
-function normalizeArticle(article: Partial<Article>): Article {
-  const category = typeof article.category === "string" && article.category.trim() ? article.category.trim() : "Wisdom";
-  const contentEn = article.content?.en || "";
-
-  return {
-    slug: article.slug || "",
-    title: {
-      en: article.title?.en || "Untitled",
-      hi: article.title?.hi || article.title?.en || "Untitled",
-    },
-    excerpt: {
-      en: article.excerpt?.en || "",
-      hi: article.excerpt?.hi || article.excerpt?.en || "",
-    },
-    content: {
-      en: contentEn,
-      hi: article.content?.hi || contentEn,
-    },
-    publishedAt: article.publishedAt || new Date().toISOString().slice(0, 10),
-    featuredImage: article.featuredImage || "",
-    category,
-    readTime: article.readTime || estimateReadTime(contentEn),
-    metaDescription: article.metaDescription || article.excerpt?.en || "",
-    keywords: Array.isArray(article.keywords) ? article.keywords : [],
-    imagePrompt: article.imagePrompt || "",
-  };
-}
-
-export async function getArticles() {
-  const articles = await readArticlesFile();
-  return articles.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
-}
-
-export async function getArticleBySlug(slug: string) {
-  const articles = await readArticlesFile();
-  return articles.find(article => article.slug === slug);
-}
-
-export async function addOrUpdateArticle(input: {
-  slug: string;
-  title: { en: string; hi: string };
-  excerpt: { en: string; hi: string };
-  content: { en: string; hi: string };
-  publishedAt?: string;
-  featuredImage?: string;
-  category?: string;
-  readTime?: string;
-  metaDescription?: string;
-  keywords?: string[];
-  imagePrompt?: string;
-}) {
-  const articles = await readArticlesFile();
-  const slug = normalizeSlug(input.slug || input.title.en || "");
-  if (!slug) {
-    throw new Error("Slug or title is required.");
-  }
-
-  const now = new Date();
-  const publishedAt = input.publishedAt || now.toISOString().slice(0, 10);
-
-  const payload = normalizeArticle({
-    ...input,
-    slug,
-    publishedAt,
-    featuredImage: input.featuredImage || "",
-  });
-
-  const existingIndex = articles.findIndex(article => article.slug === slug);
-
-  if (existingIndex >= 0) {
-    articles[existingIndex] = payload;
-  } else {
-    articles.unshift(payload);
-  }
-
-  await writeArticlesFile(articles);
-  return payload;
-}
-
-export async function deleteArticle(slug: string) {
-  const articles = await readArticlesFile();
-  const nextArticles = articles.filter(article => article.slug !== slug);
-  await writeArticlesFile(nextArticles);
-  return nextArticles;
-}
-
-export { normalizeSlug };
