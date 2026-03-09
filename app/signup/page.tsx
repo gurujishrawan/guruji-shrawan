@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { registerUser, signIn } from "../auth";
+import { registerUser, signIn } from "../lib/auth";
 
 type SignUpPageProps = {
   searchParams?: Promise<{
