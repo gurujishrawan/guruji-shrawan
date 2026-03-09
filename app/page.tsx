@@ -353,7 +353,11 @@ export default function HomePage() {
           {latestArticles.map((article, i) => (
             <article key={article.slug} className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
               <div className="relative h-44 overflow-hidden rounded-xl">
-                <Image src={article.featuredImage || `/images/hero${(i % 3) + 1}.jpg`} alt={article.title.en} fill className="object-cover" />
+                <Image
+  src={article.featuredImage || `/images/hero${(i % 3) + 1}.jpg`}
+  alt={article.title?.en || "Article image"}
+  fill
+/>
               </div>
               <p className="mt-4 text-xs uppercase tracking-wide text-[#ff6a00]">{article.category || "Wisdom"}</p>
               <h3 className="mt-2 text-xl font-semibold">{article.title.en}</h3>

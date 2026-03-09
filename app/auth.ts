@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials"
+import { redirect } from "next/navigation"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
 
@@ -41,3 +42,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   }
 
 })
+
+/* -----------------------------
+   REGISTER USER (for signup)
+--------------------------------*/
+
+export async function registerUser({
+  name,
+  username,
+  password,
+  redirectTo,
+}: {
+  name: string
+  username: string
+  password: string
+  redirectTo: string
+}) {
+
+  if (!name || !username || password.length < 6) {
+    redirect("/signup?error=InvalidInput")
+  }
+
+  // TODO: Save user to database
+  console.log("New user:", { name, username, password })
+
+  redirect(redirectTo)
+}
