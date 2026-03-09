@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { siteContent } from "../content/siteContent"
 import { useLanguage } from "../context/LanguageContext"
-import { FaSearch } from "react-icons/fa"
+import { FaSearch, FaBars, FaTimes } from "react-icons/fa"
 import { getArticles } from "../articles/data"
 import Image from "next/image"
 
@@ -22,6 +22,7 @@ const [search,setSearch] = useState("")
 const [suggestions,setSuggestions] = useState([])
 const [articles,setArticles] = useState([])
 const [scrolled,setScrolled] = useState(false)
+const [mobileOpen,setMobileOpen] = useState(false)
 
 useEffect(()=>{
 
@@ -37,7 +38,7 @@ return ()=>window.removeEventListener("scroll",handleScroll)
 
 },[])
 
-/* SMART SEARCH */
+/* SEARCH */
 
 function handleChange(e){
 
@@ -65,8 +66,6 @@ return text.includes(value.toLowerCase())
 setSuggestions(filtered.slice(0,6))
 
 }
-
-/* ENTER SEARCH */
 
 function handleEnter(e){
 
@@ -97,55 +96,42 @@ scrolled ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-white"
 
 {/* LOGO */}
 
-<Link
-href="/"
-className="text-lg font-semibold tracking-tight"
->
+<Link href="/" className="text-lg font-semibold tracking-tight">
 Guruji Shrawan
 </Link>
 
-{/* NAV */}
+{/* DESKTOP NAV */}
 
 <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
 
 <Link
 href="/"
-className={`transition ${
-pathname === "/" ? "text-black font-semibold" : "text-gray-600 hover:text-black"
-}`}
+className={`${pathname === "/" ? "text-black font-semibold" : "text-gray-600 hover:text-black"}`}
 >
 {t?.nav?.home}
 </Link>
 
 <Link
 href="/articles"
-className={`transition ${
-pathname.startsWith("/articles")
-? "text-black font-semibold"
-: "text-gray-600 hover:text-black"
-}`}
+className={`${pathname.startsWith("/articles") ? "text-black font-semibold" : "text-gray-600 hover:text-black"}`}
 >
 {t?.nav?.articles}
 </Link>
 
 <Link
 href="/biography"
-className={`transition ${
-pathname === "/biography"
-? "text-black font-semibold"
-: "text-gray-600 hover:text-black"
-}`}
+className={`${pathname === "/biography" ? "text-black font-semibold" : "text-gray-600 hover:text-black"}`}
 >
 {t?.nav?.biography}
 </Link>
 
 </nav>
 
-{/* SEARCH */}
+{/* DESKTOP SEARCH */}
 
 <div className="relative hidden md:block">
 
-<div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-[280px]">
+<div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-[260px]">
 
 <FaSearch className="text-gray-400 text-sm mr-2"/>
 
@@ -154,12 +140,12 @@ value={search}
 onChange={handleChange}
 onKeyDown={handleEnter}
 placeholder="Search articles..."
-className="bg-transparent outline-none text-sm text-gray-700 w-full placeholder-gray-400"
+className="bg-transparent outline-none text-sm text-gray-700 w-full"
 />
 
 </div>
 
-{/* SUGGESTIONS */}
+{/* SEARCH SUGGESTIONS */}
 
 {suggestions.length > 0 && (
 
@@ -203,7 +189,7 @@ className="rounded-md object-cover"
 
 </div>
 
-{/* LOGIN / SIGNUP */}
+{/* DESKTOP BUTTONS */}
 
 <div className="hidden md:flex items-center gap-3">
 
@@ -221,14 +207,10 @@ className="px-4 py-1.5 text-sm rounded-full bg-blue-500 text-white hover:bg-blue
 Signup
 </Link>
 
-</div>
-
-{/* LANGUAGE */}
-
 <select
 value={language}
 onChange={(e)=>setLanguage(e.target.value)}
-className="ml-4 border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600 bg-white"
+className="border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600 bg-white"
 >
 
 <option value="en">EN</option>
@@ -237,6 +219,60 @@ className="ml-4 border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-
 </select>
 
 </div>
+
+{/* MOBILE MENU BUTTON */}
+
+<button
+onClick={()=>setMobileOpen(!mobileOpen)}
+className="md:hidden text-gray-700 text-xl"
+>
+{mobileOpen ? <FaTimes/> : <FaBars/>}
+</button>
+
+</div>
+
+{/* MOBILE MENU */}
+
+{mobileOpen && (
+
+<div className="md:hidden border-t bg-white px-6 pb-6 space-y-4">
+
+<Link href="/" className="block py-2">Home</Link>
+<Link href="/articles" className="block py-2">Articles</Link>
+<Link href="/biography" className="block py-2">Biography</Link>
+
+<div className="flex items-center gap-3 pt-2">
+
+<Link
+href="/signin"
+className="px-4 py-1.5 text-sm rounded-full bg-blue-100 text-blue-700"
+>
+Login
+</Link>
+
+<Link
+href="/signup"
+className="px-4 py-1.5 text-sm rounded-full bg-blue-500 text-white"
+>
+Signup
+</Link>
+
+</div>
+
+<select
+value={language}
+onChange={(e)=>setLanguage(e.target.value)}
+className="border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-600 bg-white"
+>
+
+<option value="en">EN</option>
+<option value="hi">HI</option>
+
+</select>
+
+</div>
+
+)}
 
 </header>
 

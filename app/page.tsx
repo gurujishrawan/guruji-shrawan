@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import BookSection from "./components/BookSection";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import {
   FaArrowRight,
@@ -41,7 +42,7 @@ const homeNavItems = [
   { label: "Articles", href: "/articles" },
   { label: "Books", href: "#books" },
   { label: "Video Series", href: "#videos" },
-  { label: "Contact", href: "#contact" },
+  { label: "Biography", href: "/biography" },
 ];
 
 const homeContent = {
@@ -49,7 +50,7 @@ const homeContent = {
     heroTitle: "Awakening Inner Clarity and True Understanding",
     heroDesc:
       "Guruji Shrawan shares deep insights on life, spirituality, relationships, society, and modern confusion through fearless inquiry and timeless wisdom. The teachings encourage freedom from blind belief, self-deception, and unconscious living.",
-    watchTeachings: "Watch Teachings",
+    watchTeachings: "Watch Videos",
     exploreArticles: "Explore Articles",
     booksTitle: "Books by Guruji Shrawan",
     booksDesc:
@@ -75,14 +76,6 @@ const stats: Stat[] = [
   { label: "YouTube Views", value: 100, suffix: "K+", icon: <FaYoutube /> },
   { label: "Articles Published", value: 10, suffix: "+", icon: <FaBookOpen /> },
   { label: "Videos", value: 120, suffix: "+", icon: <FaVideo /> },
-];
-
-const books = [
-  "Vedanta for Modern Life",
-  "Freedom from Inner Conflict",
-  "Beyond Blind Belief",
-  "Relationships with Clarity",
-  "Awakening Youth Consciousness",
 ];
 
 const videos = [
@@ -144,6 +137,7 @@ export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   const [lang, setLang] = useState<"Hindi" | "English">("English");
   const [videoSwiper, setVideoSwiper] = useState<{ slidePrev: () => void; slideNext: () => void } | null>(null);
+  const [articleSwiper, setArticleSwiper] = useState<{ slidePrev: () => void; slideNext: () => void } | null>(null);
   const [latestArticles, setLatestArticles] = useState<HomeArticle[]>([]);
   const content = homeContent[lang];
 
@@ -159,7 +153,7 @@ export default function HomePage() {
       .then(res => res.json())
       .then(data => {
         if (!active || !Array.isArray(data?.articles)) return;
-        setLatestArticles(data.articles.slice(0, 6));
+        setLatestArticles(data.articles.slice(0, 12));
       })
       .catch(() => {
         setLatestArticles([]);
@@ -185,7 +179,7 @@ export default function HomePage() {
       <header className={`sticky top-0 z-50 border-b border-black/10 bg-white/80 backdrop-blur transition-all ${scrolled ? "py-2" : "py-4"}`}>
         <div className="mx-auto flex w-[min(1200px,92%)] items-center justify-between gap-8">
           <a href="#home" className="text-xl font-semibold">Guruji Shrawan</a>
-          <nav className="hidden xl:flex items-center gap-5 text-sm text-black/70">
+          <nav className="hidden lg:flex items-center gap-5 text-sm text-black/70">
             {homeNavItems.map(item => (
               item.external ? (
                 <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff6a00]">{item.label}</a>
@@ -251,7 +245,15 @@ export default function HomePage() {
         <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="relative">
           <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-[#ff6a00]/25 via-transparent to-[#161616]/15 blur-2xl" />
           <div className="relative overflow-hidden rounded-[2rem] border border-black/10 shadow-xl">
-            <Image src="/images/guruji.jpg" alt="Portrait of Guruji Shrawan" width={700} height={900} className="h-full w-full object-cover" priority />
+            <Image
+              src="/images/guruji.jpg"
+              alt="Portrait of Guruji Shrawan"
+              width={700}
+              height={900}
+              sizes="(max-width:768px) 100vw, 700px"
+              className="h-full w-full object-cover"
+              priority
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent" />
           </div>
         </motion.div>
@@ -261,22 +263,7 @@ export default function HomePage() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{stats.map(item => <CounterCard key={item.label} item={item} />)}</div>
       </section>
 
-      <section id="books" className="mx-auto w-[min(1200px,92%)] py-16">
-        <h2 className="text-3xl font-semibold">{content.booksTitle}</h2>
-        <p className="mt-3 max-w-3xl text-black/70">{content.booksDesc}</p>
-        <div className="mt-8 flex snap-x gap-5 overflow-x-auto pb-3">
-          {books.map((book, i) => (
-            <motion.article key={book} whileHover={{ y: -6 }} className="min-w-[280px] snap-start rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
-              <div className="relative mb-4 h-44 overflow-hidden rounded-xl bg-[#f1ebe2]">
-                <Image src={`/images/hero${(i % 3) + 1}.jpg`} alt={book} fill className="object-cover" />
-              </div>
-              <h3 className="text-lg font-semibold">{book}</h3>
-              <p className="mt-2 text-sm text-black/70">Concise explorations to bring clarity, intelligence, and freedom to daily life.</p>
-              <Link href="/articles" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#ff6a00]">Read <FaArrowRight /></Link>
-            </motion.article>
-          ))}
-        </div>
-      </section>
+      <BookSection/>
 
       <section id="videos" className="mx-auto w-[min(1200px,92%)] py-10">
         <div className="mb-6 flex items-center justify-between gap-4">
@@ -347,25 +334,81 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Articles - Swiper Carousel */}
       <section id="articles" className="mx-auto w-[min(1200px,92%)] py-12">
-        <h2 className="text-3xl font-semibold">Latest Articles</h2>
-        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {latestArticles.map((article, i) => (
-            <article key={article.slug} className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
-              <div className="relative h-44 overflow-hidden rounded-xl">
-                <Image
-  src={article.featuredImage || `/images/hero${(i % 3) + 1}.jpg`}
-  alt={article.title?.en || "Article image"}
-  fill
-/>
-              </div>
-              <p className="mt-4 text-xs uppercase tracking-wide text-[#ff6a00]">{article.category || "Wisdom"}</p>
-              <h3 className="mt-2 text-xl font-semibold">{article.title.en}</h3>
-              <p className="mt-2 text-sm text-black/70">{article.readTime || "4 min"} · Explore practical inquiry for a clear and intelligent life.</p>
-              <Link href={`/articles/${article.slug}`} className="mt-4 inline-block text-sm font-semibold text-[#ff6a00]">Read article</Link>
-            </article>
-          ))}
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-3xl font-semibold">Latest Articles</h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => articleSwiper?.slidePrev()}
+              className="grid h-10 w-10 place-items-center rounded-full border border-[#ff6a00]/60 bg-white text-[#ff6a00]"
+              aria-label="Previous articles"
+            >
+              <FaAngleLeft />
+            </button>
+            <button
+              onClick={() => articleSwiper?.slideNext()}
+              className="grid h-10 w-10 place-items-center rounded-full border border-[#ff6a00]/60 bg-white text-[#ff6a00]"
+              aria-label="Next articles"
+            >
+              <FaAngleRight />
+            </button>
+          </div>
         </div>
+
+        <Swiper
+          onSwiper={setArticleSwiper}
+          spaceBetween={20}
+          slidesPerView={1.1}
+          breakpoints={{
+            420: { slidesPerView: 1.25 },
+            640: { slidesPerView: 1.6 },
+            768: { slidesPerView: 2.2 },
+            1024: { slidesPerView: 3 },
+          }}
+        >
+          {latestArticles.length === 0 ? (
+            // Placeholder slides if no articles yet
+            [1, 2, 3].map(n => (
+              <SwiperSlide key={`empty-${n}`}>
+                <article className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm h-full">
+                  <div className="relative h-44 overflow-hidden rounded-xl bg-gray-100" />
+                  <p className="mt-4 text-xs uppercase tracking-wide text-[#ff6a00]">Wisdom</p>
+                  <h3 className="mt-2 text-xl font-semibold">No articles yet</h3>
+                  <p className="mt-2 text-sm text-black/70">We'll publish insights soon — stay tuned.</p>
+                </article>
+              </SwiperSlide>
+            ))
+          ) : (
+            latestArticles.map((article, i) => (
+              <SwiperSlide key={article.slug}>
+                <article className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm h-full flex flex-col">
+                  <div className="relative h-44 overflow-hidden rounded-xl">
+                    <Image
+                      src={article.featuredImage || `/images/hero${(i % 3) + 1}.jpg`}
+                      alt={article.title?.en || "Article image"}
+                      fill
+                      sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                  </div>
+
+                  <div className="mt-4 flex-1">
+                    <p className="text-xs uppercase tracking-wide text-[#ff6a00]">{article.category || "Wisdom"}</p>
+                    <h3 className="mt-2 text-xl font-semibold leading-snug">{article.title.en}</h3>
+                    <p className="mt-2 text-sm text-black/70">{article.readTime || "4 min"} · Explore practical inquiry for a clear and intelligent life.</p>
+                  </div>
+
+                  <div className="mt-4">
+                    <Link href={`/articles/${article.slug}`} className="inline-flex items-center gap-2 text-sm font-semibold text-[#ff6a00]">
+                      Read article <FaArrowRight />
+                    </Link>
+                  </div>
+                </article>
+              </SwiperSlide>
+            ))
+          )}
+        </Swiper>
       </section>
 
       <section className="mx-auto w-[min(1200px,92%)] py-14">
