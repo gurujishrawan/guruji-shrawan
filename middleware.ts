@@ -1,48 +1,53 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 const ADMIN_PATH_PREFIX = "/admin";
+const USER_PATH_PREFIX = "/profile";
 
-export function middleware(request: Request) {
-  const url = new URL(request.url);
-  if (!url.pathname.startsWith(ADMIN_PATH_PREFIX)) {
-    return NextResponse.next();
+function getSessionFromRequest(request: NextRequest) {
+  const token = request.cookies.get("site_session")?.value;
+  if (!token || !token.includes(".")) {
+    return null;
   }
 
-  const username = process.env.ADMIN_USERNAME;
-  const password = process.env.ADMIN_PASSWORD;
-  if (!username || !password) {
-    return new NextResponse(
-      "Missing ADMIN_USERNAME or ADMIN_PASSWORD. Set them to protect /admin.",
-      { status: 500 },
-    );
+  const [payload] = token.split(".");
+  try {
+    const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+    const user = JSON.parse(json) as { role?: "admin" | "user" };
+    if (!user.role) {
+      return null;
+    }
+    return { user };
+  } catch {
+    return null;
+  }
+}
+
+export default function middleware(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+  const session = getSessionFromRequest(request);
+
+  if (pathname.startsWith(ADMIN_PATH_PREFIX)) {
+    if (session?.user?.role === "admin") {
+      return NextResponse.next();
+    }
+
+    const callbackUrl = `${pathname}${search}`;
+    const signInUrl = new URL("/signin", request.nextUrl.origin);
+    signInUrl.searchParams.set("callbackUrl", callbackUrl);
+    return NextResponse.redirect(signInUrl);
   }
 
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Basic ")) {
-    return new NextResponse("Authentication required", {
-      status: 401,
-      headers: {
-        "WWW-Authenticate": "Basic realm=CMS",
-      },
-    });
-  }
-
-  const base64Credentials = authHeader.split(" ")[1] || "";
-  const decoded = atob(base64Credentials);
-  const [inputUser, inputPass] = decoded.split(":");
-
-  if (inputUser !== username || inputPass !== password) {
-    return new NextResponse("Invalid credentials", {
-      status: 401,
-      headers: {
-        "WWW-Authenticate": "Basic realm=CMS",
-      },
-    });
+  if (pathname.startsWith(USER_PATH_PREFIX) && !session?.user) {
+    const callbackUrl = `${pathname}${search}`;
+    const signInUrl = new URL("/signin", request.nextUrl.origin);
+    signInUrl.searchParams.set("callbackUrl", callbackUrl);
+    return NextResponse.redirect(signInUrl);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/profile/:path*"],
 };
