@@ -35,7 +35,7 @@
     "**/*.mts",
     "**/*.ts",
     "**/*.tsx"
-, "app/api/auth/[...Nextauth]/route.js"  ],
+, "app/api/auth/[...Nextauth]/route.js", "app/context/LanguageContext.jsx"  ],
 
   "exclude": ["node_modules"]
 }

@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+/* ═══════════════════════════════════════════════════
+   GURUJI SHRAWAN — ARTICLES PAGE
+   Palette: Warm Orange #d4621a  ·  Gold #c8941a
+   All styles strictly scoped to .articlesRoot
+═══════════════════════════════════════════════════ */
+
+.articlesRoot {
+  font-family: 'Poppins', system-ui, sans-serif;
+  background: #faf8f5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  color: #1a1008;
+}
+
+.articlesRoot .fontDisplay { font-family: 'Poppins', system-ui, sans-serif; }
+.articlesRoot .fontBody    { font-family: 'Poppins', system-ui, sans-serif; }
+
+/* ── ACCENT BAR ── */
+.articlesRoot .accentBar {
+  display: inline-block;
+  width: 4px; height: 20px;
+  background: linear-gradient(180deg,#d4621a,#c8941a);
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+
+/* ── CATEGORY BADGE ── */
+.articlesRoot .categoryBadge {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  padding: 3px 9px; border-radius: 4px;
+  background: #fff0e6; color: #d4621a;
+}
+
+/* ── CARD HOVER ── */
+.articlesRoot .magCard { transition: transform .22s ease,box-shadow .22s ease; }
+.articlesRoot .magCard:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(180,80,20,.10); }
+
+/* ── IMAGE ZOOM ── */
+.articlesRoot .imgZoomInner { transition: transform .55s ease; object-fit: cover; width:100%; height:100%; }
+.articlesRoot .magCard:hover .imgZoomInner { transform: scale(1.04); }
+
+/* ── PRIMARY BUTTON (orange) ── */
+.articlesRoot .btnBrand {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size:13px; font-weight:600;
+  background: linear-gradient(135deg,#d4621a,#c8521a);
+  color:#fff; border:none; border-radius:8px;
+  cursor:pointer; transition:all .18s;
+  display:inline-flex; align-items:center; gap:6px;
+  text-decoration:none; padding:9px 18px;
+  box-shadow:0 2px 10px rgba(212,98,26,.30);
+}
+.articlesRoot .btnBrand:hover {
+  background: linear-gradient(135deg,#b3511a,#a04510);
+  transform:translateY(-1px);
+  box-shadow:0 4px 18px rgba(212,98,26,.38);
+}
+
+/* ── GOLD BUTTON ── */
+.articlesRoot .btnGold {
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:13px; font-weight:700;
+  background: linear-gradient(135deg,#c8941a,#d4a020);
+  color:#fff; border:none; border-radius:8px;
+  cursor:pointer; transition:all .18s;
+  width:100%; display:block; text-align:center;
+  letter-spacing:.04em; padding:10px;
+  box-shadow:0 2px 10px rgba(200,148,26,.28);
+}
+.articlesRoot .btnGold:hover { background:linear-gradient(135deg,#b07a10,#c08a10); transform:translateY(-1px); }
+
+/* ── OUTLINE BUTTON ── */
+.articlesRoot .btnOutline {
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:12px; font-weight:500;
+  background:transparent; border:1.5px solid #e8dfd4;
+  border-radius:7px; color:#7a6a5a;
+  cursor:pointer; display:inline-flex; align-items:center; gap:5px;
+  padding:6px 12px; transition:all .15s;
+}
+.articlesRoot .btnOutline:hover { border-color:#d4621a; color:#d4621a; background:#fff0e6; }
+.articlesRoot .btnOutline.active { background:#fff0e6; border-color:#d4621a; color:#d4621a; }
+.articlesRoot .btnOutlineLiked { background:#fff5f5; border-color:#fca5a5; color:#ef4444; }
+
+/* ── TOPIC TABS ── */
+.articlesRoot .topicTab {
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:13px; font-weight:500;
+  padding:15px 14px; border-bottom:2px solid transparent;
+  border-top:none; border-left:none; border-right:none;
+  background:none; cursor:pointer; color:#9a8a7a;
+  white-space:nowrap; flex-shrink:0;
+  display:inline-flex; align-items:center; gap:4px;
+  transition:color .15s,border-color .15s;
+}
+.articlesRoot .topicTab:hover { color:#1a1008; border-bottom-color:#e8dfd4; }
+.articlesRoot .activeTab { color:#d4621a !important; border-bottom-color:#d4621a !important; font-weight:600; }
+
+/* ── LANG BUTTON ── */
+.articlesRoot .langBtn {
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:11px; font-weight:600;
+  padding:3px 9px; border-radius:4px;
+  border:1.5px solid #e8dfd4; background:transparent;
+  color:#9a8a7a; cursor:pointer; transition:all .15s;
+}
+.articlesRoot .langBtn:hover { border-color:#d4621a; color:#d4621a; }
+.articlesRoot .activeLang { background:#d4621a !important; color:#fff !important; border-color:#d4621a !important; }
+
+/* ── SEARCH INPUT ── */
+.articlesRoot .searchInput {
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:13px; flex:1; outline:none;
+  background:transparent; border:none; color:#1a1008;
+}
+.articlesRoot .searchInput::placeholder { color:#b0a090; }
+
+/* ── SIDEBAR INPUT ── */
+.articlesRoot .sideInput {
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:13px; width:100%;
+  border:1.5px solid #e8dfd4; border-radius:8px;
+  padding:9px 12px; outline:none;
+  background:#fff; color:#1a1008;
+  transition:border-color .2s; box-sizing:border-box;
+}
+.articlesRoot .sideInput:focus { border-color:#d4621a; }
+
+/* ── SCROLLBAR HIDE ── */
+.articlesRoot .scrollbarHide::-webkit-scrollbar { display:none; }
+.articlesRoot .scrollbarHide { -ms-overflow-style:none; scrollbar-width:none; }
+
+/* ── DROPDOWN ANIMATION ── */
+.articlesRoot .dropdownPanel { animation:articleSlideDown .18s ease-out both; }
+@keyframes articleSlideDown {
+  from { opacity:0; transform:translateY(-8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── FADE UP ── */
+.articlesRoot .fadeUp { animation:articleFadeUp .5s ease-out both; }
+@keyframes articleFadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── LIVE PULSE DOT ── */
+.articlesRoot .pulseDot {
+  width:7px; height:7px; border-radius:50%;
+  background:#ef4444; display:inline-block;
+  animation:pulseDot 1.6s ease-in-out infinite;
+}
+@keyframes pulseDot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.6; transform:scale(1.35); }
+}
+
+/* ── READING PROGRESS BAR ── */
+.articlesRoot .progressBar {
+  position:fixed; top:0; left:0; height:3px;
+  background:linear-gradient(90deg,#d4621a,#c8941a);
+  z-index:200; transition:width .1s linear;
+  border-radius:0 2px 2px 0;
+  pointer-events:none;
+}
+
+/* ── TRENDING RANK NUMBER ── */
+.articlesRoot .rankNum {
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:32px; font-weight:900; color:#f0e8de;
+  line-height:1; min-width:36px; user-select:none;
+}
+
+/* ── TAG PILL ── */
+.articlesRoot .tagPill {
+  font-family:'Poppins',system-ui,sans-serif;
+  font-size:11px; font-weight:500;
+  padding:3px 10px; border-radius:99px;
+  background:#fdf3d8; color:#c8941a;
+  border:1px solid #e8c97a; cursor:pointer;
+  transition:all .15s; display:inline-block;
+}
+.articlesRoot .tagPill:hover { background:#c8941a; color:#fff; }
+
+/* ── QUOTE CARD ── */
+.articlesRoot .quoteCard {
+  border-left:3px solid #d4621a;
+  background:#fff0e6;
+  border-radius:0 10px 10px 0;
+  padding:14px 16px;
+}
+
+/* ── SHIMMER SKELETON ── */
+.articlesRoot .shimmer {
+  background: linear-gradient(90deg,#f0e8de 25%,#f8f2ec 50%,#f0e8de 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:6px;
+}
+@keyframes shimmer {
+  0%   { background-position:200% 0; }
+  100% { background-position:-200% 0; }
+}

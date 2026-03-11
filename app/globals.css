@@ -145,3 +145,66 @@ transition:all .25s ease;
 transform:translateY(-3px);
 box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
+.loaderRoot{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background:#ffffff;
+  z-index:9999;
+}
+
+.loaderText{
+  margin-top:22px;
+  font-size:14px;
+  color:#5a4a3a;
+  font-weight:500;
+  letter-spacing:.02em;
+}
+
+.orbit{
+  position:relative;
+  width:120px;
+  height:120px;
+  animation:spinOrbit 8s linear infinite;
+}
+
+.centerGlow{
+  position:absolute;
+  inset:0;
+  margin:auto;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#ff7a18,#d4621a);
+  filter:blur(8px);
+  opacity:.8;
+}
+
+.orbitItem{
+  position:absolute;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+  color:#d4621a;
+}
+
+/* positions */
+
+.item1{ top:-10px; left:40px }
+.item2{ top:25px; right:-10px }
+.item3{ bottom:-10px; left:40px }
+.item4{ top:25px; left:-10px }
+.item5{ bottom:25px; right:-5px }
+
+@keyframes spinOrbit{
+  from{ transform:rotate(0deg) }
+  to{ transform:rotate(360deg) }
+}

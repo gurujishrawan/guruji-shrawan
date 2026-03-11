@@ -1,5 +1,5 @@
 "use client";
-
+import Navbar from "./components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
@@ -71,10 +71,10 @@ const homeContent = {
 } as const;
 
 const stats: Stat[] = [
-  { label: "Books", value: 2, suffix: "+", icon: <FaBookOpen /> },
+  { label: "Books", value: 1, suffix: "", icon: <FaBookOpen /> },
   { label: "Total Followers", value: 6200, suffix: "+", icon: <FaGlobe /> },
   { label: "YouTube Views", value: 100, suffix: "K+", icon: <FaYoutube /> },
-  { label: "Articles Published", value: 10, suffix: "+", icon: <FaBookOpen /> },
+  { label: "Articles Published", value: 30, suffix: "+", icon: <FaBookOpen /> },
   { label: "Videos", value: 120, suffix: "+", icon: <FaVideo /> },
 ];
 
@@ -176,61 +176,7 @@ export default function HomePage() {
 
   return (
     <div id="home" className="bg-[#f8f6f2] text-[#161616]">
-      <header className={`sticky top-0 z-50 border-b border-black/10 bg-white/80 backdrop-blur transition-all ${scrolled ? "py-2" : "py-4"}`}>
-        <div className="mx-auto flex w-[min(1200px,92%)] items-center justify-between gap-8">
-          <a href="#home" className="text-xl font-semibold">Guruji Shrawan</a>
-          <nav className="hidden lg:flex items-center gap-5 text-sm text-black/70">
-            {homeNavItems.map(item => (
-              item.external ? (
-                <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" className="hover:text-[#ff6a00]">{item.label}</a>
-              ) : (
-                <a key={item.label} href={item.href} className="hover:text-[#ff6a00]">{item.label}</a>
-              )
-            ))}
-          </nav>
-          <div className="hidden md:flex items-center gap-3">
-            <label className="rounded-full border border-black/20 bg-white px-3 py-2 text-xs">
-              <span className="sr-only">Choose language</span>
-              <select
-                value={lang}
-                onChange={event => setLang(event.target.value as "Hindi" | "English")}
-                className="bg-transparent text-xs"
-              >
-                <option value="English">English</option>
-                <option value="Hindi">Hindi</option>
-              </select>
-            </label>
-            <Link href="/donate" className="rounded-full bg-[#ff6a00] px-5 py-2 text-sm font-semibold text-white">Donate</Link>
-          </div>
-          <button onClick={() => setMenuOpen(v => !v)} type="button" className="md:hidden"><FaBars /></button>
-        </div>
-        {menuOpen && (
-          <div className="mt-3 border-t border-black/10 bg-white p-4 md:hidden">
-            <div className="flex justify-end"><button onClick={() => setMenuOpen(false)} type="button"><FaTimes /></button></div>
-            <div className="mt-2 grid gap-3 text-sm">
-              {homeNavItems.map(item => (
-                item.external ? (
-                  <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}>{item.label}</a>
-                ) : (
-                  <a key={item.label} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</a>
-                )
-              ))}
-              <label className="rounded-full border border-black/20 bg-white px-4 py-2 text-xs">
-                <span className="sr-only">Choose language</span>
-                <select
-                  value={lang}
-                  onChange={event => setLang(event.target.value as "Hindi" | "English")}
-                  className="w-full bg-transparent"
-                >
-                  <option value="English">English</option>
-                  <option value="Hindi">Hindi</option>
-                </select>
-              </label>
-              <Link href="/donate" onClick={() => setMenuOpen(false)} className="rounded-full bg-[#ff6a00] px-4 py-2 text-center font-semibold text-white">Donate</Link>
-            </div>
-          </div>
-        )}
-      </header>
+      <Navbar/>
 
       <section id="teachings" className="mx-auto grid w-[min(1200px,92%)] gap-12 py-14 lg:grid-cols-2 lg:py-20">
         <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
