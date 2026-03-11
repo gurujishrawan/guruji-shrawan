@@ -4,6 +4,9 @@ import { LanguageProvider } from "./context/LanguageContext";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 
+
+
+
 import ClientLayout from "./layoutclient";
 
 const poppins = Poppins({
@@ -62,3 +65,4 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     </html>
   );
 }
+

@@ -2,6 +2,8 @@
 
 import { getArticles } from "../data"
 import { notFound } from "next/navigation"
+import { supabase } from "../../lib/supabaseClient"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { useState, useEffect, useRef, use } from "react"
@@ -11,6 +13,7 @@ import {
 } from "lucide-react"
 import ShareButton from "../Sharebutton"
 
+
 /* ─── DESIGN TOKENS ─────────────────────────────────────── */
 const P      = "'Poppins', system-ui, sans-serif"
 const ORANGE = "#d4621a"
@@ -18,6 +21,18 @@ const GOLD   = "#c8941a"
 const BG     = "#f5f0ea"
 const CARD   = "#ffffff"
 const BORDER = "#e8ddd0"
+const inputStyle = {
+  width: "100%",
+  padding: "10px 12px",
+  borderRadius: 9,
+  border: `1.5px solid ${BORDER}`,
+  background: "#faf8f5",
+  fontFamily: P,
+  fontSize: 13,
+  color: "#1a1008",
+  outline: "none",
+  boxSizing: "border-box"
+}
 
 const RELATED_TOPICS = [
   "Truth","Liberation","Mind","Relationship",
@@ -25,6 +40,7 @@ const RELATED_TOPICS = [
 ]
 
 /* ─── READING PROGRESS ──────────────────────────────────── */
+
 function ReadingProgress() {
   const [pct, setPct] = useState(0)
   useEffect(() => {
@@ -47,195 +63,7 @@ function ReadingProgress() {
 }
 
 /* ─── LOGIN MODAL ───────────────────────────────────────── */
-function LoginModal({ reason, onClose }) {
-  const [tab,    setTab]    = useState("login")
-  const [showPw, setShowPw] = useState(false)
-  const [name,   setName]   = useState("")
-  const [email,  setEmail]  = useState("")
-  const [pw,     setPw]     = useState("")
-  const bgRef = useRef(null)
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden"
-    return () => { document.body.style.overflow = "" }
-  }, [])
-
-  const PROMPTS = {
-    like:    { icon: "♡", text: "Like this article" },
-    comment: { icon: "💬", text: "Join the discussion" },
-    save:    { icon: "🔖", text: "Save for later" },
-    reply:   { icon: "↩", text: "Reply to a comment" },
-  }
-  const prompt = PROMPTS[reason] || { icon: "👋", text: "Continue reading" }
-
-  return (
-    <div
-      ref={bgRef}
-      onClick={e => e.target === bgRef.current && onClose()}
-      style={{
-        position: "fixed", inset: 0, zIndex: 600,
-        background: "rgba(10,20,40,0.45)", backdropFilter: "blur(3px)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: 20, animation: "mFade .16s ease-out",
-      }}
-    >
-      <div style={{
-        background: "#fff", borderRadius: 20, width: "100%", maxWidth: 620,
-        boxShadow: "0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)",
-        animation: "mSlide .2s ease-out", overflow: "hidden",
-        display: "grid", gridTemplateColumns: "200px 1fr",
-      }}>
-
-        {/* ── LEFT PANEL — blue accent ── */}
-        <div style={{
-          background: "linear-gradient(160deg, #1e40af 0%, #1d4ed8 60%, #2563eb 100%)",
-          padding: "40px 24px", display: "flex", flexDirection: "column",
-          alignItems: "flex-start", justifyContent: "space-between",
-        }}>
-          <div>
-            {/* Site mark */}
-            <div style={{
-              width: 40, height: 40, borderRadius: 10,
-              background: "rgba(255,255,255,0.15)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 18, marginBottom: 32,
-            }}>🔥</div>
-
-            {/* Prompt */}
-            <p style={{ fontFamily: P, fontSize: 22, color: prompt.icon, marginBottom: 8, lineHeight: 1 }}>{prompt.icon}</p>
-            <h2 style={{ fontFamily: P, fontSize: 17, fontWeight: 700, color: "#fff", lineHeight: 1.35, marginBottom: 6 }}>
-              {prompt.text}
-            </h2>
-            <p style={{ fontFamily: P, fontSize: 12, color: "rgba(255,255,255,0.60)", lineHeight: 1.6 }}>
-              Sign in to your Guruji Shrawan account to continue.
-            </p>
-          </div>
-
-          {/* Bottom decoration */}
-          <div style={{ fontFamily: P, fontSize: 11, color: "rgba(255,255,255,0.35)", lineHeight: 1.6 }}>
-            Thousands of readers.<br/>One community.
-          </div>
-        </div>
-
-        {/* ── RIGHT PANEL — form ── */}
-        <div style={{ padding: "32px 32px 28px", position: "relative" }}>
-
-          {/* Close */}
-          <button onClick={onClose} style={{
-            position: "absolute", top: 16, right: 16,
-            width: 30, height: 30, borderRadius: "50%",
-            background: "#f1f5f9", border: "none",
-            color: "#64748b", cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}><X size={14} /></button>
-
-          {/* Tabs */}
-          <div style={{ display: "flex", gap: 0, marginBottom: 24, background: "#f1f5f9", borderRadius: 10, padding: 3 }}>
-            {[["login", "Sign In"], ["signup", "Sign Up"]].map(([k, l]) => (
-              <button key={k} onClick={() => setTab(k)} style={{
-                flex: 1, padding: "7px 0",
-                fontFamily: P, fontSize: 13, fontWeight: 600,
-                color: tab === k ? "#1e293b" : "#94a3b8",
-                background: tab === k ? "#fff" : "transparent",
-                border: "none", borderRadius: 8, cursor: "pointer",
-                boxShadow: tab === k ? "0 1px 4px rgba(0,0,0,0.10)" : "none",
-                transition: "all .15s",
-              }}>{l}</button>
-            ))}
-          </div>
-
-          {/* Heading */}
-          <h3 style={{ fontFamily: P, fontSize: 20, fontWeight: 700, color: "#0f172a", marginBottom: 4 }}>
-            {tab === "login" ? "Welcome back" : "Create account"}
-          </h3>
-          <p style={{ fontFamily: P, fontSize: 13, color: "#64748b", marginBottom: 20, lineHeight: 1.5 }}>
-            {tab === "login" ? "Enter your details to sign in." : "It's free and takes 30 seconds."}
-          </p>
-
-          {/* Fields */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {tab === "signup" && (
-              <input
-                value={name} onChange={e => setName(e.target.value)}
-                placeholder="Your name"
-                style={blueInputStyle}
-              />
-            )}
-            <input
-              value={email} onChange={e => setEmail(e.target.value)}
-              type="email" placeholder="Email address"
-              style={blueInputStyle}
-            />
-            <div style={{ position: "relative" }}>
-              <input
-                value={pw} onChange={e => setPw(e.target.value)}
-                type={showPw ? "text" : "password"} placeholder="Password"
-                style={{ ...blueInputStyle, paddingRight: 44 }}
-              />
-              <button onClick={() => setShowPw(!showPw)} style={{
-                position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
-                background: "none", border: "none", color: "#94a3b8", cursor: "pointer",
-              }}>
-                {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-              </button>
-            </div>
-          </div>
-
-          {tab === "login" && (
-            <div style={{ textAlign: "right", marginTop: 6, marginBottom: 0 }}>
-              <button style={{ fontFamily: P, fontSize: 12, color: "#3b82f6", background: "none", border: "none", cursor: "pointer" }}>
-                Forgot password?
-              </button>
-            </div>
-          )}
-
-          {/* Submit */}
-          <button
-            onClick={onClose}
-            style={{
-              width: "100%", marginTop: 18, padding: "12px",
-              borderRadius: 10, border: "none", cursor: "pointer",
-              background: "#1d4ed8", color: "#fff",
-              fontFamily: P, fontSize: 14, fontWeight: 600,
-              letterSpacing: "0.01em",
-              transition: "background .15s",
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = "#1e40af"}
-            onMouseLeave={e => e.currentTarget.style.background = "#1d4ed8"}
-          >
-            {tab === "login" ? "Sign In" : "Create Account"} →
-          </button>
-
-          {/* Switch tab */}
-          <p style={{ fontFamily: P, fontSize: 12, color: "#94a3b8", textAlign: "center", marginTop: 14 }}>
-            {tab === "login" ? "No account? " : "Already have one? "}
-            <button onClick={() => setTab(tab === "login" ? "signup" : "login")} style={{
-              fontFamily: P, fontSize: 12, fontWeight: 600, color: "#3b82f6",
-              background: "none", border: "none", cursor: "pointer",
-            }}>
-              {tab === "login" ? "Sign up free" : "Sign in"}
-            </button>
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const blueInputStyle = {
-  width: "100%", padding: "10px 13px", borderRadius: 9,
-  border: "1.5px solid #e2e8f0", background: "#f8fafc",
-  fontFamily: P, fontSize: 14, color: "#0f172a",
-  outline: "none", boxSizing: "border-box",
-  transition: "border-color .15s",
-}
-
-const inputStyle = {
-  width: "100%", padding: "12px 14px", borderRadius: 11,
-  border: `1.5px solid ${BORDER}`, background: "#faf8f5",
-  fontFamily: P, fontSize: 14, color: "#1a1008",
-  outline: "none", boxSizing: "border-box",
-}
 
 /* ─── ANIMATED EMAIL ILLUSTRATION ──────────────────────── */
 function AnimatedEnvelope() {
@@ -350,51 +178,61 @@ function NewsletterInline() {
 }
 
 /* ─── COMMENTS SECTION ──────────────────────────────────── */
-function CommentsSection({ articleSlug, isLoggedIn, onLoginRequired, commentCount }) {
+function CommentsSection({ articleSlug, isLoggedIn, onLoginRequired, commentCount, user }) {
   const [comments, setComments] = useState([])
   const [text, setText]         = useState("")
   const [loading, setLoading]   = useState(true)
   const [posting, setPosting]   = useState(false)
 
   // Fetch real comments from API
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch(`/api/comments?slug=${articleSlug}`)
-        if (res.ok) {
-          const data = await res.json()
-          setComments(data.comments || [])
-        }
-      } catch (e) {
-        console.error("Failed to load comments:", e)
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [articleSlug])
+ useEffect(() => {
 
-  async function handleSubmit() {
-    if (!text.trim() || posting) return
-    if (!isLoggedIn) { onLoginRequired("comment"); return }
-    setPosting(true)
-    try {
-      const res = await fetch("/api/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: articleSlug, text: text.trim() }),
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setComments(prev => [data.comment, ...prev])
-        setText("")
-      }
-    } catch (e) {
-      console.error("Failed to post comment:", e)
-    } finally {
-      setPosting(false)
-    }
+  async function loadComments() {
+
+    const { data } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("article_slug", articleSlug)
+      .order("created_at", { ascending: false })
+
+    setComments(data || [])
+    setLoading(false)
+
   }
+
+  loadComments()
+
+}, [articleSlug])
+
+
+ async function handleSubmit() {
+
+  if (!text.trim()) return
+
+  if (!isLoggedIn) {
+    onLoginRequired("comment")
+    return
+  }
+
+  setPosting(true)
+
+  const { data } = await supabase
+    .from("comments")
+    .insert({
+      article_slug: articleSlug,
+      text: text.trim(),
+      user_id: user.id,
+      userName: user.email
+    })
+    .select()
+
+  if (data) {
+    setComments(prev => [data[0], ...prev])
+    setText("")
+  }
+
+  setPosting(false)
+}
 
   return (
     <div id="comments" style={{ marginTop: 52, paddingTop: 36, borderTop: `2px solid ${BORDER}` }}>
@@ -481,7 +319,7 @@ function CommentsSection({ articleSlug, isLoggedIn, onLoginRequired, commentCoun
                     {c.userName || c.name}
                   </span>
                   <span style={{ fontFamily: P, fontSize: 12, color: "#b0a090" }}>
-                    {c.createdAt ? new Date(c.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : ""}
+                    {c.createdAt ? new Date(c.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : ""}
                   </span>
                 </div>
                 <p style={{ fontFamily: P, fontSize: 14, color: "#4a3a2a", lineHeight: 1.75 }}>{c.text}</p>
@@ -695,12 +533,26 @@ export default function ArticlePage({ params: paramsPromise }) {
   const article  = articles.find(a => a.slug === params.slug)
 
   // Auth state — replace with your real session hook e.g. useSession()
-  const [isLoggedIn] = useState(false)  // TODO: wire to real auth
+const [isLoggedIn, setIsLoggedIn] = useState(false)
+const [user, setUser] = useState(null)
+
+useEffect(() => {
+  async function checkUser() {
+    const { data } = await supabase.auth.getUser()
+
+    if (data?.user) {
+      setIsLoggedIn(true)
+      setUser(data.user)
+    }
+  }
+
+  checkUser()
+}, [])
 
   const [liked,      setLiked]      = useState(false)
   const [likeCount,  setLikeCount]  = useState(0)
   const [saved,      setSaved]      = useState(false)
-  const [loginModal, setLoginModal] = useState(null)
+
   const [showTop,    setShowTop]    = useState(false)
   const [mounted,    setMounted]    = useState(false)
 
@@ -708,10 +560,18 @@ export default function ArticlePage({ params: paramsPromise }) {
     setMounted(true)
     if (!article) return
     // Fetch real like count from DB
-    fetch(`/api/likes?slug=${article.slug}`)
-      .then(r => r.json())
-      .then(d => setLikeCount(d.count ?? article.likes ?? 0))
-      .catch(() => setLikeCount(article.likes ?? 0))
+  async function loadLikes(){
+
+  const { count } = await supabase
+    .from("likes")
+    .select("*", { count: "exact", head: true })
+    .eq("article_slug", article.slug)
+
+  setLikeCount(count || 0)
+
+}
+
+loadLikes()
   }, [article])
 
   useEffect(() => {
@@ -728,26 +588,70 @@ export default function ArticlePage({ params: paramsPromise }) {
   })()
   const excerpts = articles.filter(a => a.slug !== article.slug).slice(0, 9)
   const tags     = article.tags ? (Array.isArray(article.tags) ? article.tags : article.tags.split(",").map(t => t.trim())) : []
-
-  function requireLogin(reason) { setLoginModal(reason) }
+const router = useRouter()
+  function requireLogin() {
+  router.push(`/signin?redirect=/articles/${article.slug}`)
+}
 
   async function handleLike() {
-    if (!isLoggedIn) { requireLogin("like"); return }
-    const next = !liked
-    setLiked(next)
-    setLikeCount(c => next ? c + 1 : c - 1)
-    await fetch("/api/likes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug: article.slug, action: next ? "like" : "unlike" }),
-    }).catch(console.error)
+
+  if (!isLoggedIn) {
+    requireLogin("like")
+    return
   }
 
-  async function handleSave() {
-    if (!isLoggedIn) { requireLogin("save"); return }
-    setSaved(!saved)
+  const next = !liked
+  setLiked(next)
+  setLikeCount(c => next ? c + 1 : c - 1)
+
+  if (next) {
+
+    await supabase
+      .from("likes")
+      .insert({
+        article_slug: article.slug,
+        user_id: user.id
+      })
+
+  } else {
+
+    await supabase
+      .from("likes")
+      .delete()
+      .eq("article_slug", article.slug)
+      .eq("user_id", user.id)
+
+  }
+}
+ async function handleSave() {
+
+  if (!isLoggedIn) {
+    requireLogin("save")
+    return
   }
 
+  const next = !saved
+  setSaved(next)
+
+  if (next) {
+
+    await supabase
+      .from("saved_articles")
+      .insert({
+        article_slug: article.slug,
+        user_id: user.id
+      })
+
+  } else {
+
+    await supabase
+      .from("saved_articles")
+      .delete()
+      .eq("article_slug", article.slug)
+      .eq("user_id", user.id)
+
+  }
+}
   // Share bar used in two places
   const ShareBar = () => (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
@@ -823,7 +727,7 @@ export default function ArticlePage({ params: paramsPromise }) {
       `}</style>
 
       <ReadingProgress />
-      {loginModal && <LoginModal reason={loginModal} onClose={() => setLoginModal(null)} />}
+    
 
       <div style={{ background: BG, minHeight: "100vh", fontFamily: P }}>
 
@@ -952,12 +856,14 @@ export default function ArticlePage({ params: paramsPromise }) {
               <NewsletterInline />
 
               {/* Comments */}
+              
               <CommentsSection
-                articleSlug={article.slug}
-                isLoggedIn={isLoggedIn}
-                onLoginRequired={requireLogin}
-                commentCount={0}
-              />
+  articleSlug={article.slug}
+  isLoggedIn={isLoggedIn}
+  onLoginRequired={requireLogin}
+  commentCount={0}
+  user={user}
+/>
 
               {/* Related articles */}
               <RelatedArticles articles={related} category={article.category} />
