@@ -1,76 +1,94 @@
 "use client"
 
 import { useState } from "react"
-import { Eye, EyeOff } from "lucide-react"
+import Link from "next/link"
+import toast from "react-hot-toast"
+import { motion } from "framer-motion"
+import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { supabase } from "../lib/supabaseClient"
-import AuthLayout from "../components/AuthLayout"
-export const dynamic = "force-dynamic"
-export default function SignIn(){
+
+export default function SignUpPage(){
 
 const [email,setEmail] = useState("")
 const [password,setPassword] = useState("")
 const [showPassword,setShowPassword] = useState(false)
 const [loading,setLoading] = useState(false)
 
-async function handleLogin(e){
+async function handleSignup(e){
 
 e.preventDefault()
 setLoading(true)
 
-const { error } = await supabase.auth.signInWithPassword({
+const { error } = await supabase.auth.signUp({
 email,
 password
 })
 
 setLoading(false)
 
-if(!error){
-window.location.href="/dashboard"
+if(error){
+toast.error(error.message)
+}else{
+toast.success("Account created! Check email.")
 }
 
 }
 
-async function googleLogin(){
+return(
 
-await supabase.auth.signInWithOAuth({
-provider:"google"
-})
+<section className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-br from-[#fff8f3] via-[#fafafa] to-[#fff2e8]">
 
-}
+<motion.div
+initial={{opacity:0,y:40}}
+animate={{opacity:1,y:0}}
+transition={{duration:0.6}}
+className="w-full max-w-md bg-white/80 backdrop-blur-xl border border-[#efe4d7] rounded-2xl shadow-xl p-8"
 
-return (
+>
 
-<AuthLayout activeTab="signin">
+<h1 className="text-3xl font-bold text-center mb-2">
+Create Account
+</h1>
 
-<h2 className="text-2xl font-semibold mb-2">
-Welcome 
-</h2>
-
-<p className="text-gray-500 text-sm mb-6">
-Enter your details to sign up.
+<p className="text-gray-500 text-center mb-6 text-sm">
+Start your journey today
 </p>
 
-<form onSubmit={handleLogin} className="space-y-4">
-
-<input
-type="email"
-placeholder="Email address"
-value={email}
-onChange={(e)=>setEmail(e.target.value)}
-required
-className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-/>
+<form onSubmit={handleSignup} className="space-y-5">
 
 <div className="relative">
 
+<Mail size={18} className="absolute left-3 top-3 text-gray-400"/>
+
+<input
+type="email"
+required
+value={email}
+onChange={(e)=>setEmail(e.target.value)}
+className="peer w-full pl-10 pr-3 py-2 border border-[#e8dfd4] rounded-lg outline-none focus:ring-2 focus:ring-[#d4621a]"
+/>
+
+<label className="absolute left-10 top-2 text-sm text-gray-400 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#d4621a] bg-white px-1 transition-all">
+Email
+</label>
+
+</div>
+
+<div className="relative">
+
+<Lock size={18} className="absolute left-3 top-3 text-gray-400"/>
+
 <input
 type={showPassword ? "text":"password"}
-placeholder="Password"
+required
 value={password}
 onChange={(e)=>setPassword(e.target.value)}
-required
-className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:ring-2 focus:ring-blue-500 outline-none"
+className="peer w-full pl-10 pr-10 py-2 border border-[#e8dfd4] rounded-lg outline-none focus:ring-2 focus:ring-[#d4621a]"
 />
+
+<label className="absolute left-10 top-2 text-sm text-gray-400 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#d4621a] bg-white px-1 transition-all">
+Password
+</label>
 
 <button
 type="button"
@@ -79,43 +97,39 @@ className="absolute right-3 top-2.5 text-gray-400"
 
 >
 
-{showPassword ? <EyeOff size={18}/> : <Eye size={18}/>} </button>
+{showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+
+</button>
 
 </div>
 
 <button
 type="submit"
-className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+disabled={loading}
+className="w-full py-2 rounded-lg text-white font-semibold hover:scale-[1.02] transition"
+style={{background:"linear-gradient(135deg,#d4621a,#c8521a)"}}
 
 >
 
-{loading ? "Signing up..." : "Sign Up"} </button>
-
-</form>
-
-<div className="flex items-center gap-3 my-6">
-<div className="flex-1 h-px bg-gray-200"/>
-<span className="text-xs text-gray-400">OR</span>
-<div className="flex-1 h-px bg-gray-200"/>
-</div>
-
-<button
-onClick={googleLogin}
-className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg hover:bg-gray-50"
-
->
-
-<img
-src="https://www.svgrepo.com/show/475656/google-color.svg"
-className="w-5"
-/>
-
-Continue with Google
+{loading ? "Creating..." : "Sign Up"}
 
 </button>
 
-</AuthLayout>
+</form>
+
+<p className="text-sm text-center mt-6">
+
+Already have an account?{" "}
+
+<Link href="/signin" className="text-[#d4621a] font-semibold hover:underline">
+Sign in
+</Link>
+
+</p>
+
+</motion.div>
+
+</section>
 
 )
-
 }
