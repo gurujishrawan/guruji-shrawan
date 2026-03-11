@@ -4,6 +4,11 @@ import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { supabase } from "../lib/supabaseClient"
 import AuthLayout from "../components/AuthLayout"
+import { useRouter } from "next/navigation"
+
+const router = useRouter()
+
+
 export const dynamic = "force-dynamic"
 export default function SignIn(){
 
@@ -25,7 +30,7 @@ password
 setLoading(false)
 
 if(!error){
-window.location.href="/dashboard"
+router.push("/dashboard")
 }
 
 }

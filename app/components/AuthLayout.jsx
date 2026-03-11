@@ -1,120 +1,85 @@
 "use client"
 
-import { useState } from "react"
-import { Eye, EyeOff } from "lucide-react"
-import { supabase } from "../lib/supabaseClient"
-import AuthLayout from "../components/AuthLayout"
+import Link from "next/link"
 
-export default function SignIn(){
-
-const [email,setEmail] = useState("")
-const [password,setPassword] = useState("")
-const [showPassword,setShowPassword] = useState(false)
-const [loading,setLoading] = useState(false)
-
-async function handleLogin(e){
-
-e.preventDefault()
-setLoading(true)
-
-const { error } = await supabase.auth.signInWithPassword({
-email,
-password
-})
-
-setLoading(false)
-
-if(!error){
-window.location.href="/dashboard"
-}
-
-}
-
-async function googleLogin(){
-
-await supabase.auth.signInWithOAuth({
-provider:"google"
-})
-
-}
+export default function AuthLayout({ children, activeTab }) {
 
 return (
 
-<AuthLayout activeTab="signin">
+<section className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-br from-blue-50 via-white to-blue-100">
 
-<h2 className="text-2xl font-semibold mb-2">
-Welcome back
-</h2>
+<div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden grid md:grid-cols-2">
 
-<p className="text-gray-500 text-sm mb-6">
-Enter your details to sign in.
+{/* LEFT SIDE */}
+
+<div className="hidden md:flex flex-col justify-between bg-gradient-to-br from-blue-600 to-blue-800 text-white p-12">
+
+<div>
+
+<h1 className="text-2xl font-semibold mb-4">
+Guruji Shrawan
+</h1>
+
+<p className="text-blue-100 text-sm leading-relaxed">
+
+Explore teachings on clarity, relationships,
+and conscious living.
+
+<br/><br/>
+
+Join thousands discovering deeper
+understanding through articles,
+books and videos.
+
 </p>
 
-<form onSubmit={handleLogin} className="space-y-4">
+</div>
 
-<input
-type="email"
-placeholder="Email address"
-value={email}
-onChange={(e)=>setEmail(e.target.value)}
-required
-className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-/>
-
-<div className="relative">
-
-<input
-type={showPassword ? "text":"password"}
-placeholder="Password"
-value={password}
-onChange={(e)=>setPassword(e.target.value)}
-required
-className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:ring-2 focus:ring-blue-500 outline-none"
-/>
-
-<button
-type="button"
-onClick={()=>setShowPassword(!showPassword)}
-className="absolute right-3 top-2.5 text-gray-400"
-
->
-
-{showPassword ? <EyeOff size={18}/> : <Eye size={18}/>} </button>
+<p className="text-blue-200 text-sm">
+Spiritual clarity for modern life
+</p>
 
 </div>
 
-<button
-type="submit"
-className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+{/* RIGHT SIDE */}
 
+<div className="p-12">
+
+{/* Tabs */}
+
+<div className="flex bg-gray-100 rounded-lg p-1 mb-8">
+
+<Link
+href="/signin"
+className={`flex-1 text-center py-2 text-sm rounded-md font-medium ${
+activeTab === "signin"
+? "bg-white shadow text-gray-800"
+: "text-gray-500"
+}`}
 >
+Sign In
+</Link>
 
-{loading ? "Signing in..." : "Sign In"} </button>
+<Link
+href="/signup"
+className={`flex-1 text-center py-2 text-sm rounded-md font-medium ${
+activeTab === "signup"
+? "bg-white shadow text-gray-800"
+: "text-gray-500"
+}`}
+>
+Sign Up
+</Link>
 
-</form>
-
-<div className="flex items-center gap-3 my-6">
-<div className="flex-1 h-px bg-gray-200"/>
-<span className="text-xs text-gray-400">OR</span>
-<div className="flex-1 h-px bg-gray-200"/>
 </div>
 
-<button
-onClick={googleLogin}
-className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg hover:bg-gray-50"
+{children}
 
->
+</div>
 
-<img
-src="https://www.svgrepo.com/show/475656/google-color.svg"
-className="w-5"
-/>
+</div>
 
-Continue with Google
-
-</button>
-
-</AuthLayout>
+</section>
 
 )
 
