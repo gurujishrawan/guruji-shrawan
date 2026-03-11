@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { supabase } from "../lib/supabaseClient"
 import AuthLayout from "../components/AuthLayout"
-
+export const dynamic = "force-dynamic"
 export default function SignIn(){
 
 const [email,setEmail] = useState("")
