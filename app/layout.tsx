@@ -1,52 +1,69 @@
-import "./globals.css"
-import { Poppins } from "next/font/google"
-import { LanguageProvider } from "./context/LanguageContext"
-import type { ReactNode } from "react"
-import type { Metadata } from "next"
-import Script from "next/script"
+import "./globals.css";
+import { Poppins } from "next/font/google";
+import { LanguageProvider } from "./context/LanguageContext";
+import type { ReactNode } from "react";
+import type { Metadata } from "next";
 
-import ClientLayout from "./layoutclient"
+
+
+
+import ClientLayout from "./layoutclient";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300","400","500","600","700","800"],
-  display: "swap",
-})
+  weight: ["300", "400", "500", "600", "700", "800"],
+});
 
 export const metadata: Metadata = {
-  title: "Guruji Shrawan",
+  title: "Guruji Shrawan Official Website",
   description:
     "Explore the teachings, articles, books, and videos of Guruji Shrawan on spirituality, self-inquiry, relationships, and conscious living.",
+  keywords: [
+    "spiritual teacher",
+    "self inquiry",
+    "vedanta teachings",
+    "life clarity",
+    "inner awakening",
+  ],
   verification: {
     google: "PV_yw-25yz-0yldphda62paYM3zKguklzyORuD4jHtM",
   },
-}
+};
 
-type RootLayoutProps = {
-  children: ReactNode
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        {/* Preconnect for faster ads */}
-        <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
-        <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
-
-        {/* Google Adsense Script */}
-        <Script
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2716405637818905"
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
+        <meta name="google-adsense-account" content="ca-pub-2716405637818905"></meta>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Guruji Shrawan",
+              url: "https://guruji-shrawan.vercel.app",
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Guruji Shrawan",
+              jobTitle: "Contemporary Spiritual Teacher",
+            }),
+          }}
         />
       </head>
-
       <body className={`${poppins.className} bg-[#f7f5f2] text-[#1c1c1c]`}>
         <LanguageProvider>
           <ClientLayout>{children}</ClientLayout>
         </LanguageProvider>
       </body>
     </html>
-  )
+  );
 }
+
