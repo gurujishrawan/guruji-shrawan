@@ -34,7 +34,7 @@ export default function ShareButton({ article, s = {}, variant = "icon", positio
   const title = article?.title || "Guruji Shrawan"
   const url   = typeof window !== "undefined"
     ? `${window.location.origin}/articles/${slug}`
-    : `https://gurujishrawan.com/articles/${slug}`
+    : `https://guruji-shrawan.vercel.app/articles/${slug}`
 
   /* detect mobile */
   useEffect(() => {
