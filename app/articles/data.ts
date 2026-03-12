@@ -5,8 +5,6 @@ export type Article = {
   excerpt: string
   featuredImage?: string
   readTime: string
-  views: number
-  likes: number
   publishedAt: string
   content: string
   tags: string[]
@@ -21,8 +19,7 @@ excerpt:
 "Our mood often depends on situations and people. But can we reclaim emotional independence?",
 featuredImage: "/images/mood.jpg",
 readTime: "8 min",
-views: 7400,
-likes: 320,
+
 publishedAt: "2026-03-08",
 tags:["mind"],
 content: `
@@ -130,8 +127,7 @@ excerpt:
 "Social media often feels addictive and distracting, but the deeper question is whether the real issue lies within the technology or within our own psychological tendencies.",
 featuredImage: "/images/social-media-awareness.jpg",
 readTime: "15 min",
-views: 5200,
-likes: 240,
+
 publishedAt: "2026-03-11",
 tags:["social media","self awareness","mental health","technology"],
 content: `
@@ -309,8 +305,7 @@ excerpt:
 "The tensions between Israel and Iran reveal how religion, when intertwined with identity and power, can intensify geopolitical conflicts. Yet the deeper issue may not be religion itself, but the ego that uses religion for domination and division.",
 featuredImage: "/images/israel-iran-religion-conflict.jpg",
 readTime: "18 min",
-views: 6400,
-likes: 310,
+
 publishedAt: "2026-03-11",
 tags:["religion","geopolitics","iran","israel","philosophy"],
 content: `
@@ -537,8 +532,7 @@ excerpt:
 "Swami Vivekananda is celebrated as a youth icon, but if he appeared today, the youth themselves might resist him the most. His real mission was not to comfort society but to challenge its deepest assumptions.",
 featuredImage: "/images/vivekananda-youth.jpg",
 readTime: "18 min",
-views: 5800,
-likes: 270,
+
 publishedAt: "2026-03-11",
 tags:["vivekananda","youth","philosophy","conditioning","self inquiry"],
 content: `
@@ -787,8 +781,7 @@ excerpt:
 "डर तब तक बना रहता है जब तक जीवन में उससे बड़ा कोई उद्देश्य नहीं होता। जब मन किसी महान सत्य या लक्ष्य से जुड़ता है, तब भय की पकड़ धीरे-धीरे कमजोर होने लगती है।",
 featuredImage: "/images/fear-and-purpose.jpg",
 readTime: "14 min",
-views: 5100,
-likes: 235,
+
 publishedAt: "2026-03-11",
 tags:["fear","self awareness","spirituality","mind"],
 content: `
@@ -950,8 +943,6 @@ excerpt:
 "हमारा अधिकांश अनुभव इन्द्रियों से आता है, लेकिन उन अनुभवों का अर्थ बनाने वाला तत्व मन है। इन्द्रियों से परे मन और चेतना को समझना ही आंतरिक जागरूकता की शुरुआत है।",
 featuredImage: "/images/mind-and-senses.jpg",
 readTime: "14 min",
-views: 4900,
-likes: 220,
 publishedAt: "2026-03-11",
 tags:["mind","consciousness","spirituality","self awareness"],
 content: `
@@ -1124,8 +1115,7 @@ excerpt:
 "Many people fear that complete freedom would lead to chaos. But true freedom does not create disorder. A free mind is an intelligent mind, and intelligence naturally brings order to life.",
 featuredImage: "/images/free-mind-intelligence.jpg",
 readTime: "16 min",
-views: 5700,
-likes: 260,
+
 publishedAt: "2026-03-11",
 tags:["freedom","intelligence","self awareness","mind"],
 content: `
@@ -1332,8 +1322,7 @@ excerpt:
 "Revolutions promise liberation, yet history often reveals a cycle where new systems replicate the patterns of the old. The story of modern Iran illustrates how political change may rotate endlessly unless deeper psychological transformation occurs.",
 featuredImage: "/images/iran-revolution-mayas-wheel.jpg",
 readTime: "17 min",
-views: 6200,
-likes: 300,
+
 publishedAt: "2026-03-11",
 tags:["revolution","politics","philosophy","maya","self inquiry"],
 content: `
@@ -1551,8 +1540,7 @@ excerpt:
 "External education expands our ability to act in the world, but real education also examines the mind that uses that knowledge.",
 featuredImage: "/images/education.jpg",
 readTime: "9 min",
-views: 3600,
-likes: 180,
+
 publishedAt: "2026-03-11",
 tags:["education","society","mind"],
 content: `
@@ -1659,8 +1647,7 @@ excerpt:
 "When the inner meaning of a festival fades, rituals continue but their purpose disappears. Holi’s fire once symbolized inner discernment, not merely a bonfire.",
 featuredImage: "/images/holi-fire.jpg",
 readTime: "8 min",
-views: 4100,
-likes: 190,
+
 publishedAt: "2026-03-11",
 tags:["culture","holi","philosophy"],
 content: `
@@ -1741,8 +1728,7 @@ excerpt:
 "सोशल मीडिया पर दिखने वाली चमकदार लग्ज़री लाइफ़ अक्सर जीवन की असली गहराई को छिपा देती है। सवाल यह है कि क्या महँगी चीज़ें सच में जीवन को मूल्यवान बनाती हैं?",
 featuredImage: "/images/social-luxury.jpg",
 readTime: "7 min",
-views: 4800,
-likes: 260,
+
 publishedAt: "2026-03-11",
 tags:["society","social media","life","luxury"],
 content: `
@@ -1809,8 +1795,7 @@ excerpt:
 "बड़े स्कैंडल केवल व्यक्तियों की कहानी नहीं होते, वे उस व्यवस्था को भी उजागर करते हैं जो शक्ति और प्रसिद्धि के पीछे छिपी रहती है।",
 featuredImage: "/images/epstein-files.jpg",
 readTime: "8 min",
-views: 5200,
-likes: 240,
+
 publishedAt: "2026-03-11",
 tags:["society","power","media","scandal"],
 content: `
@@ -1875,8 +1860,7 @@ excerpt:
 "Superficial spirituality offers comfort without transformation, but the Bhagavad Gita teaches that real change requires honesty, discipline, and inner clarity.",
 featuredImage: "/images/gita-wisdom.jpg",
 readTime: "9 min",
-views: 4600,
-likes: 230,
+
 publishedAt: "2026-03-11",
 tags:["dharma","bhagavad gita","spirituality","self awareness"],
 content: `
@@ -1965,8 +1949,7 @@ excerpt:
 "The story of Adam, Eve, and Jesus can be understood as a symbolic map of human consciousness. Adam and Eve represent the beginning of human freedom and temptation, while Jesus represents the highest potential of human spiritual evolution.",
 featuredImage: "/images/adam-eve-jesus-consciousness.jpg",
 readTime: "17 min",
-views: 6100,
-likes: 290,
+
 publishedAt: "2026-03-11",
 tags:["jesus","adam and eve","religion","philosophy","consciousness"],
 content: `
@@ -2176,8 +2159,7 @@ excerpt:
 "जब समाज की गलत सोच पीढ़ियों तक चलती रहती है, तो कभी-कभी महिलाएँ भी अनजाने में उसी व्यवस्था को आगे बढ़ाने लगती हैं जो उनके ही अस्तित्व को कमज़ोर करती है।",
 featuredImage: "/images/women-society.jpg",
 readTime: "8 min",
-views: 5100,
-likes: 240,
+
 publishedAt: "2026-03-11",
 tags:["society","women","social issues","gender"],
 content: `
@@ -2244,8 +2226,7 @@ excerpt:
 "सीमित संसाधनों और औपचारिक शिक्षा की कमी के बावजूद श्रीनिवास रामानुजन ने गणित की दुनिया में ऐसे सूत्र दिए जिन्होंने आधुनिक गणित को गहराई से प्रभावित किया।",
 featuredImage: "/images/ramanujan.jpg",
 readTime: "9 min",
-views: 4700,
-likes: 220,
+
 publishedAt: "2026-03-11",
 tags:["biography","science","mathematics","india"],
 content: `
@@ -2329,8 +2310,7 @@ excerpt:
 "आंतरिक शक्ति केवल इच्छा या प्रेरक शब्दों से नहीं बनती। वास्तविक ताकत जीवन की चुनौतियों से टकराने और उनसे सीखने की प्रक्रिया में विकसित होती है।",
 featuredImage: "/images/inner-strength.jpg",
 readTime: "10 min",
-views: 5400,
-likes: 270,
+
 publishedAt: "2026-03-11",
 tags:["mind","self development","life","inner strength"],
 content: `
@@ -2415,8 +2395,7 @@ excerpt:
 "The idea of being a Hindu is often misunderstood as belonging to a religion. But in deeper philosophical traditions, Sanatan Dharma points toward awakened intelligence beyond rigid religious identity.",
 featuredImage: "/images/sanatan-dharma.jpg",
 readTime: "10 min",
-views: 5300,
-likes: 260,
+
 publishedAt: "2026-03-11",
 tags:["dharma","sanatan dharma","philosophy","spirituality"],
 content: `
@@ -2507,8 +2486,7 @@ excerpt:
 "मानव जीवन के अधिकांश निर्णय दो शक्तियों से प्रभावित होते हैं — वासना और डर। जब तक व्यक्ति अपने भीतर इन दोनों को ईमानदारी से नहीं देखता, तब तक जीवन भ्रम और संघर्ष के चक्र में फँसा रहता है।",
 featuredImage: "/images/desire-fear.jpg",
 readTime: "11 min",
-views: 5600,
-likes: 300,
+
 publishedAt: "2026-03-11",
 tags:["mind","self awareness","philosophy","life"],
 content: `
@@ -2625,8 +2603,7 @@ excerpt:
 "सच्चा प्रेम केवल सांत्वना देने वाला भाव नहीं है। वह व्यक्ति को उसकी वास्तविक संभावना तक जगाने वाली ललकार भी है।",
 featuredImage: "/images/true-love-challenge.jpg",
 readTime: "10 min",
-views: 5900,
-likes: 310,
+
 publishedAt: "2026-03-11",
 tags:["relationships","love","self growth","life"],
 content: `
@@ -2723,8 +2700,7 @@ excerpt:
 "Most of what we call love is shaped by expectations and mental patterns. But genuine love begins only when the mind moves beyond these patterns and discovers inner peace.",
 featuredImage: "/images/love-beyond-patterns.jpg",
 readTime: "11 min",
-views: 6100,
-likes: 330,
+
 publishedAt: "2026-03-11",
 tags:["love","relationships","mind","philosophy"],
 content: `
@@ -2847,8 +2823,7 @@ excerpt:
 "Valentine’s Day is often seen as a celebration of romance and gifts, but the story of Saint Valentine points toward a deeper understanding of love rooted in courage, sacrifice, and human dignity.",
 featuredImage: "/images/valentines-day-meaning.jpg",
 readTime: "11 min",
-views: 6200,
-likes: 340,
+
 publishedAt: "2026-03-11",
 tags:["love","society","history","valentines day"],
 content: `
@@ -2945,8 +2920,7 @@ excerpt:
 "Scriptures are not meant to be memorized like information but understood and lived. Their true essence reveals itself through awareness, reflection, and sincere inquiry.",
 featuredImage: "/images/scriptures-essence.jpg",
 readTime: "12 min",
-views: 6400,
-likes: 350,
+
 publishedAt: "2026-03-11",
 tags:["dharma","scriptures","wisdom","self awareness"],
 content: `
@@ -3069,8 +3043,7 @@ excerpt:
 "जाति व्यवस्था को अक्सर हिन्दू धर्म से जोड़ा जाता है, लेकिन इतिहास, दर्शन और समाजशास्त्र का गहरा अध्ययन एक अधिक जटिल तस्वीर प्रस्तुत करता है।",
 featuredImage: "/images/caste-system-india.jpg",
 readTime: "13 min",
-views: 7200,
-likes: 410,
+
 publishedAt: "2026-03-11",
 tags:["society","caste system","hindu philosophy","india"],
 content: `
@@ -3267,8 +3240,7 @@ excerpt:
 "Modern self-help promises success and improvement of the individual self, while Vedanta questions the very nature of the self itself. This philosophical difference creates two entirely different approaches to human fulfillment.",
 featuredImage: "/images/vedanta-vs-selfhelp.jpg",
 readTime: "14 min",
-views: 5800,
-likes: 270,
+
 publishedAt: "2026-03-11",
 tags:["vedanta","philosophy","self inquiry","spirituality"],
 content: `
@@ -3456,8 +3428,7 @@ excerpt:
 "भारतीय आध्यात्मिक परंपरा में पुराण, उपनिषद और गीता तीन अलग-अलग स्तरों पर मनुष्य को समझने और जीवन की गहराई को देखने का मार्ग दिखाते हैं।",
 featuredImage: "/images/puran-upanishad.jpg",
 readTime: "12 min",
-views: 6100,
-likes: 290,
+
 publishedAt: "2026-03-11",
 tags:["dharma","upanishads","puranas","bhagavad gita","philosophy"],
 content: `
@@ -3589,8 +3560,7 @@ excerpt:
 "अध्यात्म संकल्पों का पूर्ण निषेध नहीं करता। वह केवल छोटे, स्वार्थपूर्ण संकल्पों के त्याग और महत् संकल्प—सत्य और आत्मबोध की दिशा में जीवन लगाने—की बात करता है।",
 featuredImage: "/images/sankalp-adhyatm.jpg",
 readTime: "14 min",
-views: 5200,
-likes: 240,
+
 publishedAt: "2026-03-11",
 tags:["dharma","bhagavad gita","spirituality","self inquiry"],
 content: `
@@ -3777,8 +3747,7 @@ excerpt:
 "If surrender to the Divine does not arise easily, the Bhagavad Gita offers a compassionate and gradual path — through practice, dedicated action, and detachment from results.",
 featuredImage: "/images/reach-shri-krishna.jpg",
 readTime: "16 min",
-views: 5400,
-likes: 270,
+
 publishedAt: "2026-03-11",
 tags:["bhagavad gita","krishna","spiritual practice","dharma"],
 content: `
@@ -3969,8 +3938,7 @@ excerpt:
 "The Bhagavad Gita explains Dharma as the universal principle that sustains truth and justice, while Swadharma represents the personal expression of that principle through one’s role and responsibilities.",
 featuredImage: "/images/dharma-bhagavad-gita.jpg",
 readTime: "15 min",
-views: 5600,
-likes: 285,
+
 publishedAt: "2026-03-11",
 tags:["dharma","bhagavad gita","swadharma","indian philosophy"],
 content: `
@@ -4136,8 +4104,7 @@ excerpt:
 "नया साल केवल कैलेंडर बदलने का अवसर नहीं है। वास्तविक परिवर्तन तब शुरू होता है जब मनुष्य अपने जीवन को संवेदनशीलता और जागरूकता के साथ देखना शुरू करता है।",
 featuredImage: "/images/new-year-change.jpg",
 readTime: "13 min",
-views: 6400,
-likes: 310,
+
 publishedAt: "2026-03-11",
 tags:["mind","self awareness","life change","sensitivity"],
 content: `
@@ -4364,8 +4331,7 @@ excerpt:
 "Freedom is often understood as the ability to do what we want, yet deeper inquiry reveals that true freedom involves understanding the inner forces—desire, fear, and conditioning—that shape our lives.",
 featuredImage: "/images/freedom.jpg",
 readTime: "15 min",
-views: 6000,
-likes: 260,
+
 publishedAt: "2026-03-11",
 tags:["freedom","self awareness","philosophy","mind"],
 content: `

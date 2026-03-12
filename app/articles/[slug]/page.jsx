@@ -43,56 +43,6 @@ function ReadingProgress() {
   return <div style={{position:"fixed",top:0,left:0,zIndex:999,height:3,width:`${p}%`,background:`linear-gradient(90deg,${ORANGE},${GOLD})`,borderRadius:"0 2px 2px 0",transition:"width .1s linear",pointerEvents:"none"}}/>
 }
 
-/* ─────────────────────────────────────────────────────────────
-   NEWSLETTER INLINE
-───────────────────────────────────────────────────────────── */
-function NewsletterInline() {
-  const [email,setEmail]=useState("")
-  const [sub,setSub]=useState(false)
-  const [busy,setBusy]=useState(false)
-  const [err,setErr]=useState("")
-
-  async function go(){
-    if(!email.includes("@")){setErr("Enter a valid email.");return}
-    setBusy(true);setErr("")
-    const {error}=await supabase.from("newsletter_subscribers").upsert(
-      {email:email.trim().toLowerCase()},{onConflict:"email"}
-    )
-    setBusy(false)
-    if(error){setErr("Something went wrong. Try again.");return}
-    setSub(true)
-  }
-
-  return (
-    <div className="nl-wrap">
-      <div style={{padding:"32px 28px",background:"linear-gradient(135deg,#fff8f2,#fff4e0)",borderRadius:18,border:`1.5px solid ${BORDER}`}}>
-        <p style={{fontFamily:SANS,fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.16em",color:ORANGE,marginBottom:8}}>Newsletter</p>
-        <h3 style={{fontFamily:SANS,fontSize:19,fontWeight:800,color:TEXT,marginBottom:6,lineHeight:1.3}}>Wisdom in Your Inbox</h3>
-        <p style={{fontFamily:SANS,fontSize:13,color:MUTED,lineHeight:1.75,marginBottom:20}}>
-          One thoughtful email a week — curated articles, quotes and insights from Guruji Shrawan. No noise.
-        </p>
-        {sub?(
-          <div style={{background:"#f0fdf4",border:"1.5px solid #86efac",borderRadius:10,padding:"13px 18px",fontFamily:SANS,fontSize:14,color:"#15803d",fontWeight:600,display:"flex",alignItems:"center",gap:8}}>
-            <Check size={16}/> You're in! Wisdom is on its way. 🙏
-          </div>
-        ):(
-          <>
-            {err&&<p style={{fontFamily:SANS,fontSize:12,color:"#dc2626",marginBottom:10}}>{err}</p>}
-            <div className="nl-row">
-              <input value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&go()}
-                placeholder="Your email address" type="email"
-                style={{flex:1,padding:"11px 16px",borderRadius:10,border:`1.5px solid ${BORDER}`,background:"#fff",fontFamily:SANS,fontSize:14,color:TEXT,outline:"none",minWidth:0}}/>
-              <button onClick={go} disabled={busy}
-                style={{padding:"11px 22px",borderRadius:10,background:busy?"#e0d0c0":`linear-gradient(135deg,${ORANGE},#8a2e06)`,color:"#fff",fontFamily:SANS,fontSize:14,fontWeight:700,border:"none",cursor:busy?"not-allowed":"pointer",whiteSpace:"nowrap",flexShrink:0}}>
-                {busy?<Loader2 size={16} style={{animation:"spin 1s linear infinite"}}/>:"Subscribe"}
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
 
 /* ─────────────────────────────────────────────────────────────
    COMMENTS
@@ -218,13 +168,7 @@ function CommentsSection({articleSlug,user,onLoginRequired}){
 ───────────────────────────────────────────────────────────── */
 function ArticleSidebar({article,allArticles,user,onLogout,likeCount,liked,saved,onLike,onSave,viewCount}){
   const more=allArticles.filter(a=>a.slug!==article.slug).slice(0,5)
-  const [email,setEmail]=useState("")
-  const [done,setDone]=useState(false)
-  async function handleSub(){
-    if(!email.includes("@"))return
-    await supabase.from("newsletter_subscribers").upsert({email:email.trim().toLowerCase()},{onConflict:"email"})
-    setDone(true)
-  }
+
 
   return(
     <aside className="sidebar-root">
@@ -247,17 +191,16 @@ function ArticleSidebar({article,allArticles,user,onLogout,likeCount,liked,saved
       <div style={{background:CARD,borderRadius:14,padding:"16px 18px",border:`1.5px solid ${BORDER}`,marginBottom:20}}>
         <p style={{fontFamily:SANS,fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.16em",color:GOLD,marginBottom:12}}>This Article</p>
         <div style={{display:"flex",flexDirection:"column",gap:2}}>
-          <button onClick={onLike} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:10,background:liked?"#fef2f2":"transparent",border:`1.5px solid ${liked?"#fecaca":"transparent"}`,cursor:"pointer",transition:"all .15s",width:"100%",textAlign:"left"}}>
+          <button onClick={onLike} className="side-action" style={{border:`1.5px solid ${liked?"#fecaca":"transparent"}`,background:liked?"#fef2f2":"transparent"}}>
             <Heart size={16} fill={liked?"#ef4444":"none"} style={{color:liked?"#ef4444":MUTED,flexShrink:0}}/>
             <span style={{fontFamily:SANS,fontSize:13,fontWeight:600,color:liked?"#ef4444":TEXT}}>{liked?"Liked":"Like"}</span>
             <span style={{fontFamily:SANS,fontSize:12,color:MUTED,marginLeft:"auto"}}>{likeCount}</span>
           </button>
-          <button onClick={onSave} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:10,background:saved?"#fff8f0":"transparent",border:`1.5px solid ${saved?`${ORANGE}44`:"transparent"}`,cursor:"pointer",transition:"all .15s",width:"100%",textAlign:"left"}}>
+          <button onClick={onSave} className="side-action" style={{border:`1.5px solid ${saved?`${ORANGE}44`:"transparent"}`,background:saved?"#fff8f0":"transparent"}}>
             <Bookmark size={16} fill={saved?"currentColor":"none"} style={{color:saved?ORANGE:MUTED,flexShrink:0}}/>
             <span style={{fontFamily:SANS,fontSize:13,fontWeight:600,color:saved?ORANGE:TEXT}}>{saved?"Saved":"Save"}</span>
           </button>
-          <a href="#comments" style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:10,textDecoration:"none",transition:"background .15s"}}
-            onMouseEnter={e=>e.currentTarget.style.background=BG} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+          <a href="#comments" className="side-action" style={{textDecoration:"none"}}>
             <MessageCircle size={16} style={{color:MUTED,flexShrink:0}}/>
             <span style={{fontFamily:SANS,fontSize:13,fontWeight:600,color:TEXT}}>Comment</span>
           </a>
@@ -275,10 +218,7 @@ function ArticleSidebar({article,allArticles,user,onLogout,likeCount,liked,saved
         <p style={{fontFamily:SANS,fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.16em",color:GOLD,marginBottom:12}}>Explore Topics</p>
         <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
           {TOPICS.map(t=>(
-            <Link key={t} href={`/articles?topic=${encodeURIComponent(t.toLowerCase())}`}
-              style={{fontFamily:SANS,fontSize:11,fontWeight:600,padding:"5px 11px",borderRadius:99,background:BG,color:"#5a4a3a",border:`1px solid ${BORDER}`,textDecoration:"none",transition:"all .15s"}}
-              onMouseEnter={e=>{e.currentTarget.style.background=ORANGE;e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor=ORANGE}}
-              onMouseLeave={e=>{e.currentTarget.style.background=BG;e.currentTarget.style.color="#5a4a3a";e.currentTarget.style.borderColor=BORDER}}>
+            <Link key={t} href={`/articles?topic=${encodeURIComponent(t.toLowerCase())}`} className="topic-pill">
               {t}
             </Link>
           ))}
@@ -291,9 +231,8 @@ function ArticleSidebar({article,allArticles,user,onLogout,likeCount,liked,saved
           <Flame size={11} style={{color:ORANGE}}/> More Articles
         </p>
         {more.map((a,i)=>(
-          <Link key={a.slug} href={`/articles/${a.slug}`}
-            style={{display:"flex",gap:10,padding:"10px 0",textDecoration:"none",borderBottom:i<more.length-1?`1px solid #f5f0ea`:"none",transition:"opacity .15s"}}
-            onMouseEnter={e=>e.currentTarget.style.opacity=".65"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+          <Link key={a.slug} href={`/articles/${a.slug}`} className="more-art-link"
+            style={{borderBottom:i<more.length-1?`1px solid #f5f0ea`:"none"}}>
             <div style={{position:"relative",width:52,height:42,borderRadius:8,overflow:"hidden",flexShrink:0}}>
               <Image src={a.featuredImage||"/images/default.jpg"} fill alt={a.title} style={{objectFit:"cover"}}/>
             </div>
@@ -306,23 +245,7 @@ function ArticleSidebar({article,allArticles,user,onLogout,likeCount,liked,saved
       </div>
 
       {/* Newsletter */}
-      <div style={{background:`linear-gradient(145deg,${ORANGE},#7a2606)`,borderRadius:14,padding:"20px 18px",position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,borderRadius:"50%",background:"rgba(255,255,255,0.07)"}}/>
-        <p style={{fontFamily:SANS,fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.14em",color:"#ffd580",marginBottom:5}}>Newsletter</p>
-        <h3 style={{fontFamily:SANS,fontSize:15,fontWeight:800,color:"#fff",lineHeight:1.35,marginBottom:6}}>Wisdom in Your Inbox</h3>
-        <p style={{fontFamily:SANS,fontSize:12,color:"rgba(255,255,255,0.68)",lineHeight:1.6,marginBottom:14}}>One email per week. No noise.</p>
-        {done?(
-          <div style={{background:"rgba(255,255,255,0.18)",borderRadius:9,padding:10,textAlign:"center",fontFamily:SANS,fontSize:13,color:"#fff",fontWeight:600}}>✓ Subscribed!</div>
-        ):(
-          <>
-            <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Your email" type="email"
-              style={{width:"100%",padding:"9px 12px",borderRadius:9,border:"none",fontFamily:SANS,fontSize:13,color:TEXT,outline:"none",marginBottom:8,boxSizing:"border-box"}}/>
-            <button onClick={handleSub} style={{width:"100%",padding:"9px",borderRadius:9,background:"#ffd580",border:"none",fontFamily:SANS,fontSize:13,fontWeight:700,color:"#6a2c06",cursor:"pointer"}}>
-              Subscribe Free
-            </button>
-          </>
-        )}
-      </div>
+       
     </aside>
   )
 }
@@ -338,10 +261,7 @@ function RelatedArticles({articles}){
       <h2 style={{fontFamily:SANS,fontSize:20,fontWeight:800,color:TEXT,marginBottom:24}}>You Might Also Like</h2>
       <div className="related-grid">
         {articles.map(a=>(
-          <Link key={a.slug} href={`/articles/${a.slug}`}
-            style={{textDecoration:"none",display:"block",borderRadius:14,overflow:"hidden",background:CARD,border:`1.5px solid ${BORDER}`,transition:"all .2s"}}
-            onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 8px 28px rgba(180,80,20,0.13)";e.currentTarget.style.transform="translateY(-2px)"}}
-            onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";e.currentTarget.style.transform="translateY(0)"}}>
+          <Link key={a.slug} href={`/articles/${a.slug}`} className="rel-card">
             <div style={{position:"relative",width:"100%",paddingBottom:"60%",overflow:"hidden"}}>
               <Image src={a.featuredImage||"/images/default.jpg"} fill alt={a.title} style={{objectFit:"cover"}}/>
             </div>
@@ -512,19 +432,193 @@ export default function ArticlePage({params:paramsPromise}){
       {/* ── Global styles + responsive CSS ── */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Poppins:wght@400;500;600;700;800;900&display=swap');
-        @keyframes mFade  {from{opacity:0}to{opacity:1}}
-        @keyframes mSlide {from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes spin   {to{transform:rotate(360deg)}}
-        @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes mFade    {from{opacity:0}to{opacity:1}}
+        @keyframes mSlide   {from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes spin     {to{transform:rotate(360deg)}}
+        @keyframes slideUp  {from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes excerptIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes quoteGlow{0%,100%{opacity:.55}50%{opacity:1}}
 
         *{box-sizing:border-box;margin:0;padding:0;}
 
-        /* Share button variants */
-        .sb-outline{font-family:${SANS};font-size:13px;font-weight:600;background:transparent;border:1.5px solid ${BORDER};border-radius:9px;color:#6a5a4a;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:7px 14px;transition:all .15s;}
-        .sb-outline:hover{border-color:${ORANGE};color:${ORANGE};background:#fff8f3;}
+        /* ── Share button variants ── */
+        .sb-outline{font-family:${SANS};font-size:13px;font-weight:600;background:transparent;border:1.5px solid ${BORDER};border-radius:9px;color:#6a5a4a;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:7px 14px;transition:border-color .22s ease,color .22s ease,background .22s ease,box-shadow .22s ease;}
+        .sb-outline:hover{border-color:${ORANGE};color:${ORANGE};background:#fff8f3;box-shadow:0 2px 10px rgba(200,85,26,0.12);}
         .sb-mob{background:none;border:none;color:#6a5a4a;cursor:pointer;display:inline-flex;align-items:center;padding:0;}
-        .sb-float-pill{background:none;border:none;color:rgba(255,255,255,0.78);cursor:pointer;display:inline-flex;align-items:center;padding:0;transition:opacity .15s;}
-        .sb-float-pill:hover{opacity:.75;}
+        .sb-float-pill{background:none;border:none;color:rgba(255,255,255,0.78);cursor:pointer;display:inline-flex;align-items:center;padding:0;transition:opacity .2s ease,transform .2s ease;}
+        .sb-float-pill:hover{opacity:.65;transform:scale(1.06);}
+
+        /* ── Action pill buttons (like / save / comment) ── */
+        .ap-btn{
+          display:inline-flex;align-items:center;gap:6px;
+          border-radius:99px;border:1.5px solid ${BORDER};
+          background:transparent;color:${MUTED};
+          font-family:${SANS};font-size:13px;font-weight:600;
+          cursor:pointer;
+          transition:border-color .25s ease,color .25s ease,background .25s ease,
+                      box-shadow .25s ease,transform .18s ease;
+          white-space:nowrap;
+        }
+        .ap-btn:hover{transform:translateY(-1px);box-shadow:0 3px 12px rgba(200,85,26,0.14);}
+        .ap-btn:active{transform:translateY(0) scale(.97);}
+
+        /* like states */
+        .ap-btn.liked{border-color:#fecaca;background:#fef2f2;color:#ef4444;}
+        .ap-btn.liked:hover{border-color:#fca5a5;background:#fff5f5;box-shadow:0 3px 12px rgba(239,68,68,0.18);}
+        .ap-btn:not(.liked):not(.saved):hover{border-color:${ORANGE};color:${ORANGE};background:#fff8f3;}
+
+        /* save states */
+        .ap-btn.saved{border-color:${ORANGE}66;background:#fff8f0;color:${ORANGE};}
+        .ap-btn.saved:hover{border-color:${ORANGE};background:#fff3e8;box-shadow:0 3px 12px rgba(200,85,26,0.18);}
+
+        /* comment link (same shape) */
+        .ap-link{
+          display:inline-flex;align-items:center;gap:6px;
+          border-radius:99px;border:1.5px solid ${BORDER};color:${MUTED};
+          font-family:${SANS};font-size:13px;font-weight:600;
+          text-decoration:none;
+          transition:border-color .25s ease,color .25s ease,background .25s ease,
+                      box-shadow .25s ease,transform .18s ease;
+        }
+        .ap-link:hover{border-color:${ORANGE};color:${ORANGE};background:#fff8f3;transform:translateY(-1px);box-shadow:0 3px 12px rgba(200,85,26,0.12);}
+        .ap-link:active{transform:translateY(0) scale(.97);}
+
+        /* ── Floating pill buttons ── */
+        .float-btn{
+          display:flex;align-items:center;gap:6px;background:none;border:none;
+          cursor:pointer;font-family:'Poppins',system-ui,sans-serif;font-size:13px;
+          font-weight:600;
+          transition:opacity .2s ease,transform .2s ease,color .2s ease;
+        }
+        .float-btn:hover{opacity:.72;transform:scale(1.08);}
+        .float-btn:active{transform:scale(.96);}
+
+        /* ── Breadcrumb link ── */
+        .bc-link{
+          display:inline-flex;align-items:center;gap:5px;
+          font-family:${SANS};font-size:12px;font-weight:600;color:${MUTED};
+          text-decoration:none;
+          transition:color .22s ease;
+        }
+        .bc-link:hover{color:${ORANGE};}
+
+        /* ── Tag pills ── */
+        .tag-pill{
+          font-family:${SANS};font-size:11px;font-weight:600;
+          padding:5px 13px;border-radius:99px;
+          background:#fdf5e0;color:#7a5810;border:1px solid #e8c97a;
+          text-decoration:none;
+          transition:background .22s ease,color .22s ease,border-color .22s ease,transform .18s ease;
+        }
+        .tag-pill:hover{background:${GOLD};color:#fff;border-color:${GOLD};transform:translateY(-1px);}
+
+        /* ── Topic pills (sidebar) ── */
+        .topic-pill{
+          font-family:${SANS};font-size:11px;font-weight:600;
+          padding:5px 11px;border-radius:99px;
+          background:${BG};color:#5a4a3a;border:1px solid ${BORDER};
+          text-decoration:none;
+          transition:background .22s ease,color .22s ease,border-color .22s ease,transform .18s ease;
+        }
+        .topic-pill:hover{background:${ORANGE};color:#fff;border-color:${ORANGE};transform:translateY(-1px);}
+
+        /* ── Sidebar more-articles hover ── */
+        .more-art-link{display:flex;gap:10px;padding:10px 0;text-decoration:none;transition:opacity .22s ease;}
+        .more-art-link:hover{opacity:.62;}
+
+        /* ── Related article cards ── */
+        .rel-card{
+          text-decoration:none;display:block;border-radius:14px;overflow:hidden;
+          background:${CARD};border:1.5px solid ${BORDER};
+          transition:box-shadow .28s ease,transform .28s ease;
+        }
+        .rel-card:hover{box-shadow:0 8px 28px rgba(180,80,20,0.13);transform:translateY(-3px);}
+
+        /* ── Sidebar like/save rows ── */
+        .side-action{
+          display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+          border:1.5px solid transparent;cursor:pointer;width:100%;text-align:left;
+          background:transparent;
+          transition:background .22s ease,border-color .22s ease,color .22s ease;
+        }
+        .side-action:hover{background:${BG};}
+
+        /* ── Back-to-top ── */
+        .back-top{
+          position:fixed;bottom:80px;right:20px;z-index:300;
+          width:40px;height:40px;border-radius:50%;
+          background:linear-gradient(135deg,${ORANGE},#7a2606);
+          color:#fff;border:none;cursor:pointer;
+          box-shadow:0 4px 14px rgba(200,85,26,0.38);
+          display:flex;align-items:center;justify-content:center;font-size:16px;
+          transition:transform .22s ease,box-shadow .22s ease;
+        }
+        .back-top:hover{transform:scale(1.12) translateY(-2px);box-shadow:0 7px 20px rgba(200,85,26,0.50);}
+        .back-top:active{transform:scale(.97);}
+
+        /* ── Excerpt card ── */
+        .excerpt-card{
+          margin:28px 0 0;
+          background:linear-gradient(135deg,#fffaf4 0%,#fff5e6 60%,#fff8f0 100%);
+          border-radius:18px;
+          padding:28px 30px 24px;
+          border:1.5px solid #f0d4b0;
+          position:relative;overflow:hidden;
+          animation:excerptIn .45s .1s ease-out both;
+          box-shadow:0 4px 24px rgba(200,85,26,0.07),inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+        .excerpt-card::before{
+          content:'';
+          position:absolute;top:0;left:0;
+          width:4px;height:100%;
+          background:linear-gradient(180deg,${ORANGE},${GOLD},${ORANGE}80);
+          border-radius:4px 0 0 4px;
+        }
+        /* decorative large quote mark behind */
+        .excerpt-card::after{
+          content:'\u201C';
+          position:absolute;top:-18px;right:18px;
+          font-family:Georgia,serif;font-size:140px;font-weight:700;
+          color:${ORANGE};opacity:0.055;line-height:1;
+          pointer-events:none;user-select:none;
+          animation:quoteGlow 4s ease-in-out infinite;
+        }
+        .excerpt-label{
+          display:inline-flex;align-items:center;gap:6px;
+          font-family:${SANS};font-size:9px;font-weight:700;
+          text-transform:uppercase;letter-spacing:0.18em;color:${ORANGE};
+          margin-bottom:14px;
+        }
+        .excerpt-label::before{
+          content:'';width:18px;height:1.5px;
+          background:linear-gradient(90deg,${ORANGE},${ORANGE}40);
+          border-radius:1px;
+        }
+        .excerpt-label::after{
+          content:'';width:18px;height:1.5px;
+          background:linear-gradient(90deg,${ORANGE}40,${ORANGE});
+          border-radius:1px;
+        }
+        .excerpt-text{
+          font-family:${BODY};font-size:17px;font-style:italic;
+          color:#3a2010;line-height:1.82;
+          position:relative;z-index:1;
+        }
+        .excerpt-footer{
+          margin-top:14px;padding-top:12px;
+          border-top:1px solid #f0d8c0;
+          display:flex;align-items:center;gap:8px;
+        }
+        .excerpt-avatar{
+          width:26px;height:26px;border-radius:50%;
+          background:linear-gradient(135deg,${ORANGE},#7a2606);
+          display:flex;align-items:center;justify-content:center;
+          font-size:12px;flex-shrink:0;
+        }
+        .excerpt-byline{
+          font-family:${SANS};font-size:10px;font-weight:700;
+          text-transform:uppercase;letter-spacing:0.12em;color:${MUTED};
+        }
 
         /* ── Page layout ── */
         .page-grid{
@@ -607,9 +701,7 @@ export default function ArticlePage({params:paramsPromise}){
         /* Related grid */
         .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
 
-        /* Newsletter row */
-        .nl-row{display:flex;gap:10;}
-        .nl-wrap{margin:48px 0;}
+     
 
         /* Floating desktop pill */
         .float-pill{
@@ -698,8 +790,7 @@ export default function ArticlePage({params:paramsPromise}){
 
             {/* Breadcrumb */}
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:22}}>
-              <Link href="/articles" style={{display:"inline-flex",alignItems:"center",gap:5,fontFamily:SANS,fontSize:12,fontWeight:600,color:MUTED,textDecoration:"none"}}
-                onMouseEnter={e=>e.currentTarget.style.color=ORANGE} onMouseLeave={e=>e.currentTarget.style.color=MUTED}>
+              <Link href="/articles" className="bc-link">
                 <ArrowLeft size={13}/> Articles
               </Link>
               <span style={{fontFamily:SANS,fontSize:12,color:"#d0c4b4"}}>/</span>
@@ -742,14 +833,13 @@ export default function ArticlePage({params:paramsPromise}){
             {/* ── TOP ACTION BAR ── */}
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,padding:"11px 0",borderTop:`1px solid ${BORDER}`,borderBottom:`1px solid ${BORDER}`,marginBottom:24}}>
               <div style={{display:"flex",alignItems:"center",gap:6}}>
-                <button onClick={handleLike} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:99,border:`1.5px solid ${liked?"#fecaca":BORDER}`,background:liked?"#fef2f2":"transparent",color:liked?"#ef4444":MUTED,fontFamily:SANS,fontSize:13,fontWeight:600,cursor:"pointer",transition:"all .15s"}}>
+                <button onClick={handleLike} className={`ap-btn${liked?" liked":""}`} style={{padding:"7px 14px"}}>
                   <Heart size={14} fill={liked?"currentColor":"none"}/>{likeCount}
                 </button>
-                <button onClick={handleSave} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:99,border:`1.5px solid ${saved?`${ORANGE}66`:BORDER}`,background:saved?"#fff8f0":"transparent",color:saved?ORANGE:MUTED,fontFamily:SANS,fontSize:13,fontWeight:600,cursor:"pointer",transition:"all .15s"}}>
+                <button onClick={handleSave} className={`ap-btn${saved?" saved":""}`} style={{padding:"7px 14px"}}>
                   <Bookmark size={14} fill={saved?"currentColor":"none"}/>{saved?"Saved":"Save"}
                 </button>
-                <a href="#comments" style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:99,border:`1.5px solid ${BORDER}`,color:MUTED,fontFamily:SANS,fontSize:13,fontWeight:600,textDecoration:"none",transition:"all .15s"}}
-                  onMouseEnter={e=>{e.currentTarget.style.borderColor=ORANGE;e.currentTarget.style.color=ORANGE}} onMouseLeave={e=>{e.currentTarget.style.borderColor=BORDER;e.currentTarget.style.color=MUTED}}>
+                <a href="#comments" className="ap-link" style={{padding:"7px 14px"}}>
                   <MessageCircle size={14}/>
                 </a>
               </div>
@@ -770,14 +860,12 @@ export default function ArticlePage({params:paramsPromise}){
 
             {/* ── EXCERPT CARD ── */}
             {article.excerpt&&(
-              <div style={{margin:"28px 0 0",background:"linear-gradient(135deg,#fff8f2,#fff4e6)",borderRadius:16,padding:"22px 26px",border:"1.5px solid #f0d8c0",position:"relative",overflow:"hidden"}}>
-                <div style={{position:"absolute",top:0,left:0,width:4,height:"100%",background:"linear-gradient(180deg,"+ORANGE+","+GOLD+")",borderRadius:"4px 0 0 4px"}}/>
-                <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
-                  <div style={{fontSize:28,lineHeight:1,color:ORANGE,fontFamily:BODY,fontWeight:700,flexShrink:0,marginTop:2}}>&ldquo;</div>
-                  <div style={{flex:1}}>
-                    <p style={{fontFamily:BODY,fontSize:16,fontStyle:"italic",color:"#3a2a14",lineHeight:1.78,marginBottom:10}}>{article.excerpt}</p>
-                    <p style={{fontFamily:SANS,fontSize:10,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.12em",color:MUTED}}>Editor's Note · Guruji Shrawan</p>
-                  </div>
+              <div className="excerpt-card">
+                <div className="excerpt-label">Editor's Note</div>
+                <p className="excerpt-text">{article.excerpt}</p>
+                <div className="excerpt-footer">
+                  <div className="excerpt-avatar">🔥</div>
+                  <span className="excerpt-byline">Guruji Shrawan · Guruji Shrawan Foundation</span>
                 </div>
               </div>
             )}
@@ -791,10 +879,7 @@ export default function ArticlePage({params:paramsPromise}){
             {tags.length>0&&(
               <div style={{display:"flex",flexWrap:"wrap",gap:7,paddingTop:22,marginTop:16,borderTop:`1px solid ${BORDER}`}}>
                 {tags.map(tag=>(
-                  <Link key={tag} href={`/articles?topic=${encodeURIComponent(tag.toLowerCase())}`}
-                    style={{fontFamily:SANS,fontSize:11,fontWeight:600,padding:"5px 13px",borderRadius:99,background:"#fdf5e0",color:"#7a5810",border:"1px solid #e8c97a",textDecoration:"none",transition:"all .15s"}}
-                    onMouseEnter={e=>{e.currentTarget.style.background=GOLD;e.currentTarget.style.color="#fff"}}
-                    onMouseLeave={e=>{e.currentTarget.style.background="#fdf5e0";e.currentTarget.style.color="#7a5810"}}>
+                  <Link key={tag} href={`/articles?topic=${encodeURIComponent(tag.toLowerCase())}`} className="tag-pill">
                     #{tag}
                   </Link>
                 ))}
@@ -815,18 +900,17 @@ export default function ArticlePage({params:paramsPromise}){
             {/* ── BOTTOM ACTION BAR ── */}
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,padding:"16px 0",borderTop:`1px solid ${BORDER}`,borderBottom:`1px solid ${BORDER}`,marginTop:24}}>
               <div style={{display:"flex",alignItems:"center",gap:6}}>
-                <button onClick={handleLike} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 16px",borderRadius:99,border:`1.5px solid ${liked?"#fecaca":BORDER}`,background:liked?"#fef2f2":"transparent",color:liked?"#ef4444":MUTED,fontFamily:SANS,fontSize:13,fontWeight:600,cursor:"pointer",transition:"all .15s"}}>
+                <button onClick={handleLike} className={`ap-btn${liked?" liked":""}`} style={{padding:"8px 16px"}}>
                   <Heart size={15} fill={liked?"currentColor":"none"}/>{liked?"Liked":"Like this"}
                 </button>
-                <button onClick={handleSave} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 16px",borderRadius:99,border:`1.5px solid ${saved?`${ORANGE}66`:BORDER}`,background:saved?"#fff8f0":"transparent",color:saved?ORANGE:MUTED,fontFamily:SANS,fontSize:13,fontWeight:600,cursor:"pointer",transition:"all .15s"}}>
+                <button onClick={handleSave} className={`ap-btn${saved?" saved":""}`} style={{padding:"8px 16px"}}>
                   <Bookmark size={15} fill={saved?"currentColor":"none"}/>{saved?"Saved":"Save"}
                 </button>
               </div>
               {mounted&&<ShareButton article={article} s={{fontBody:SANS,fontDisplay:SANS,btnOutline:"sb-outline"}} variant="button" position="above"/>}
             </div>
 
-            {/* ── NEWSLETTER ── */}
-            <NewsletterInline/>
+
 
             {/* ── COMMENTS ── */}
             <CommentsSection articleSlug={article.slug} user={user} onLoginRequired={requireLogin}/>
@@ -874,11 +958,7 @@ export default function ArticlePage({params:paramsPromise}){
 
       {/* Back to top */}
       {showTop&&(
-        <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})}
-          className="back-top"
-          style={{position:"fixed",bottom:80,right:20,zIndex:300,width:40,height:40,borderRadius:"50%",background:`linear-gradient(135deg,${ORANGE},#7a2606)`,color:"#fff",border:"none",cursor:"pointer",boxShadow:"0 4px 14px rgba(200,85,26,0.38)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,transition:"transform .15s"}}
-          onMouseEnter={e=>e.currentTarget.style.transform="scale(1.1)"}
-          onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>↑</button>
+        <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} className="back-top">↑</button>
       )}
     </>
   )

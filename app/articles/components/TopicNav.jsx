@@ -226,16 +226,15 @@ export default function TopicNav({ s }) {
   return (
     <div className="relative bg-white" style={{ borderBottom: "1px solid #ede5da" }} ref={dropdownRef}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-     <div className={`flex flex-col md:flex-row md:flex-wrap md:items-center ${s?.scrollbarHide || ""}`}>
+   <div className={`flex flex-col md:flex-row md:items-center ${s?.scrollbarHide || ""}`}>
 
           {/* Tabs - responsive horizontal scroll on small screens */}
-   <div className={`flex items-center flex-1 min-w-0 overflow-x-auto md:overflow-visible whitespace-nowrap scrollbar-hide ${s?.scrollbarHide || ""}`}>
+  <div className={`flex items-center flex-1 min-w-0 overflow-x-auto whitespace-nowrap scrollbar-hide ${s?.scrollbarHide || ""}`}>
             {TABS.map((label) => (
               <button
                 key={label}
                 onClick={() => handleTab(label)}
-                className={`${s?.topicTab || ""} ${active === label ? s?.activeTab || "" : ""} px-3 py-3 text-[13px] md:text-[14px] flex items-center gap-2 whitespace-nowrap`}
-                aria-expanded={openTab === label}
+               className={`${s?.topicTab || ""} ${active === label ? s?.activeTab || "" : ""} px-3 py-3 text-[13px] md:text-[14px] flex items-center gap-2 whitespace-nowrap flex-shrink-0`}
                 aria-controls={openTab === label ? "nav-dropdown-panel" : undefined}
               >
                 <span>{label}</span>

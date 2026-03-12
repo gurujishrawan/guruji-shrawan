@@ -1,48 +1,36 @@
 "use client"
 
-import {
-  Instagram,
-  Youtube,
-  Facebook,
-  Twitter,
-  MessageCircle
-} from "lucide-react"
+import { useEffect, useState } from "react"
+import Loader from "./Loader"
 
-export default function PremiumLoader() {
+export default function Page() {
+
+  const [data,setData] = useState(null)
+  const [loading,setLoading] = useState(true)
+
+  useEffect(()=>{
+
+    async function loadData(){
+
+      const res = await fetch("/api/data")
+      const result = await res.json()
+
+      setData(result)
+      setLoading(false)
+
+    }
+
+    loadData()
+
+  },[])
+
+  if(loading){
+    return <Loader/>
+  }
 
   return (
-    <div className="loaderRoot">
-
-      <div className="orbit">
-
-        <div className="centerGlow"></div>
-
-        <div className="orbitItem item1">
-          <Instagram size={22}/>
-        </div>
-
-        <div className="orbitItem item2">
-          <Youtube size={22}/>
-        </div>
-
-        <div className="orbitItem item3">
-          <Twitter size={22}/>
-        </div>
-
-        <div className="orbitItem item4">
-          <MessageCircle size={22}/>
-        </div>
-
-        <div className="orbitItem item5">
-          <Facebook size={22}/>
-        </div>
-
-      </div>
-
-      <p className="loaderText">
-        Loading...
-      </p>
-
+    <div>
+      <h1>Page Loaded</h1>
     </div>
   )
 }

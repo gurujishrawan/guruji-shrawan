@@ -106,7 +106,7 @@ export default function Navbar() {
   const NAV = [
     { label: t?.nav?.home      || "Home",        href: "/"             },
     { label: t?.nav?.articles  || "Articles",    href: "/articles"     },
-    { label: "YouTube",                           href: "/youtube"      },
+    { label: "YouTube",                           href: "https://www.youtube.com/@gurujishrawan"      },
     { label: "Books",                             href: "/books"        },
     { label: "Video Series",                      href: "/video-series" },
     { label: t?.nav?.biography || "Biography",   href: "/biography"    },
@@ -270,6 +270,13 @@ export default function Navbar() {
           background: ${ORANGE}; flex-shrink: 0;
           transition: opacity .15s;
         }
+          .nb-ham svg {
+  transition: transform .28s ease, opacity .2s ease;
+}
+
+.nb-ham.open svg {
+  transform: rotate(180deg);
+}
 
         /* ── AUTH BUTTONS ── */
         .nb-login {
@@ -585,10 +592,14 @@ export default function Navbar() {
           </div>
 
           {/* Hamburger — only visible on mobile */}
-          <button className="nb-ham" onClick={openDrawer} aria-label="Open menu" type="button">
-            <Menu size={18}/>
-          </button>
-
+    <button
+  className={`nb-ham ${drawer ? "open" : ""}`}
+  onClick={() => setDrawer((prev) => !prev)}
+  aria-label={drawer ? "Close menu" : "Open menu"}
+  type="button"
+>
+  {drawer ? <X size={18}/> : <Menu size={18}/>}
+</button>
         </div>
       </header>
 
@@ -605,7 +616,7 @@ export default function Navbar() {
             <div className="nb-dw-hd">
               <Link href="/" className="nb-logo" onClick={closeDrawer} aria-label="Home">
                 <Image
-                  src="/Untitled_design__2_.jpg"
+                  src="/images/logo.png"
                   alt="Guruji Shrawan"
                   width={72}
                   height={28}
