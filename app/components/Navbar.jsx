@@ -171,26 +171,31 @@ export default function Navbar() {
         .nb-in {
           max-width: 1220px; margin: 0 auto;
           padding: 0 24px;
-          height: 64px;
+         height: 72px;
           display: flex; align-items: center; gap: 0;
         }
 
         /* ── LOGO ── */
-        .nb-logo {
-          display: flex; align-items: center;
-          text-decoration: none; flex-shrink: 0;
-          margin-right: 32px;
-          transition: opacity .2s;
-        }
-        .nb-logo:hover { opacity: .82; }
-        .nb-logo img {
-          display: block;
-          /* white logo on light bg → invert to make it dark */
-          filter: invert(1) brightness(0.15);
-          transition: filter .2s;
-        }
-        .nb-logo:hover img { filter: invert(1) brightness(0); }
+  .nb-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-right: 18px;   /* reduced from 32px */
+  max-width: 120px;     /* limits logo space */
+}
 
+.nb-logo img {
+  display: block;
+  max-height: 32px;     /* slightly smaller */
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  filter: invert(1) brightness(0.15);
+  transition: filter .2s;
+}
+        .nb-logo:hover img { filter: invert(1) brightness(0); }
+  .nb-logo:hover { opacity: .82; }
         /* ── DESKTOP NAV ── */
         .nb-nav {
           display: flex; align-items: center; gap: 0;
@@ -199,7 +204,7 @@ export default function Navbar() {
         .nb-a {
           position: relative;
           display: inline-block;
-          padding: 6px 14px;
+          padding: 6px 10px;
           font-size: 13.5px; font-weight: 500; color: #5a4a3a;
           text-decoration: none;
           letter-spacing: 0.005em;
@@ -486,14 +491,14 @@ export default function Navbar() {
 
           {/* Logo — your Devanagari brand image */}
           <Link href="/" className="nb-logo" aria-label="Guruji Shrawan Home">
-            <Image
-              src="/images/logo.png"
-              alt="Guruji Shrawan"
-              width={96}
-              height={36}
-              style={{ height: 36, width: "auto", objectFit: "contain" }}
-              priority
-            />
+           <Image
+  src="/images/logo.png"
+  alt="Guruji Shrawan"
+  width={160}
+  height={48}
+  style={{ height: 48, width: "auto", objectFit: "contain" }}
+  priority
+/>
           </Link>
 
           {/* subtle separator */}
