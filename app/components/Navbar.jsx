@@ -487,7 +487,7 @@ export default function Navbar() {
           {/* Logo — your Devanagari brand image */}
           <Link href="/" className="nb-logo" aria-label="Guruji Shrawan Home">
             <Image
-              src="/images/logo.jpg"
+              src="/images/logo.png"
               alt="Guruji Shrawan"
               width={96}
               height={36}
