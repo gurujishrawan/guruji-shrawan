@@ -15,7 +15,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Guruji Shrawan Official Website",
+  title: "Guruji Shrawan",
   description:
     "Explore the teachings, articles, books, and videos of Guruji Shrawan on spirituality, self-inquiry, relationships, and conscious living.",
   keywords: [
@@ -35,6 +35,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <meta name="google-adsense-account" content="ca-pub-2716405637818905"></meta>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2716405637818905"
+     crossOrigin="anonymous"></script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
