@@ -33,7 +33,7 @@ const LINKS = {
   About:[
     {label:"Biography",href:"/biography"},
     {label:"Media",href:"/media"},
-    {label:"Contact",href:"mailto:gurujishrawan@gmail.com"},
+    {label:"Email",href:"mailto:gurujishrawan@gmail.com"},
     {label:"Privacy Policy",href:"/privacy"},
     {label:"Terms of Services",href:"/terms"},
   ],
@@ -251,7 +251,8 @@ export default function Footer(){
             <div className="ft-bot-links">
               <Link href="/privacy" className="ft-bot-lnk">Privacy Policy</Link>
               <Link href="/terms" className="ft-bot-lnk">Terms</Link>
-              <a href="mailto:hello@gurujishrawan.com" className="ft-bot-lnk">Contact</a>
+              <Link href="/contactus" className="ft-bot-lnk">Contact</Link>
+               <Link href="/about-us" className="ft-bot-lnk">About Us</Link>
             </div>
 
           </div>
