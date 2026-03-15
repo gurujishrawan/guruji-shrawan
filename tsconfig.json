@@ -35,7 +35,7 @@
     "**/*.mts",
     "**/*.ts",
     "**/*.tsx"
-, "app/api/auth/[...Nextauth]/route.js", "app/context/LanguageContext.jsx", "app/lib/supabaseClient.js", "app/signin/page.jsx", "app/signup/page.jsx", "next.config.js", "app/components/BookSection.jsx", "app/articles/components/Loginmodal.jsx"  ],
+, "app/api/auth/[...Nextauth]/route.js", "app/context/LanguageContext.jsx", "app/lib/supabaseClient.js", "app/signin/page.jsx", "app/signup/page.jsx", "next.config.js", "app/components/BookSection.jsx", "app/articles/components/Loginmodal.tsx"  ],
 
   "exclude": ["node_modules"]
 }
