@@ -1,211 +1,380 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { FaTimes, FaChevronRight, FaHeart } from "react-icons/fa"
+import { FaTimes, FaChevronRight } from "react-icons/fa"
 
-/* ══════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
    AnnouncementBar
-   — Appears above the Navbar on every page.
-   — Cycles through multiple announcements.
-   — Dismissible (stores in sessionStorage).
-   — Fully accessible: role="banner", aria-label,
-     keyboard-dismissible.
-   — Add to layout.tsx above <ClientLayout>.
-══════════════════════════════════════════════ */
+   
+   CHANGES vs previous version:
+   ✅ Responsive — on small screens the text truncates gracefully,
+      CTA pill stays visible, dots hidden on very small screens
+   ✅ Re-appears every visit — uses localStorage with a 24-hour
+      expiry instead of sessionStorage (which cleared on every tab)
+   ✅ Per-message dismissal — user can dismiss one message;
+      it won't show again for 24h, but other messages still rotate
+   ✅ Smooth height collapse animation on dismiss
+   ✅ Auto-rotation pauses on hover (better UX)
+   ✅ Accessible: role="region", aria-live, keyboard nav
+══════════════════════════════════════════════════════════════ */
 
 const MESSAGES = [
   {
-    id: "book-launch",
-    icon: "📖",
-    text: "New Book Out Now:",
+    id:        "book-2024",
+    icon:      "📖",
+    text:      "New Book:",
     highlight: "Baccho Ki Parvarish",
-    cta: "Explore →",
-    href: "/books/baccho-ki-parvarish",
-    color: "#c8551a",
+    cta:       "Explore",
+    href:      "/books/baccho-ki-parvarish",
+    color:     "#c8551a",
+    dark:      "#8a2e06",
   },
   {
-    id: "donate",
-    icon: "🙏",
-    text: "Contribute and help spread the pure wisdom of the Gita to every home.",
+    id:        "donate-gita",
+    icon:      "🙏",
+    text:      "Help spread the pure wisdom of the Gita to every home.",
     highlight: "Donate Now",
-    cta: "Click Here",
-    href: "/donate",
-    color: "#b8841a",
+    cta:       "Donate",
+    href:      "/donate",
+    color:     "#b8841a",
+    dark:      "#7a5010",
   },
   {
-    id: "articles",
-    icon: "✨",
-    text: "Explore new teachings on Vedanta, relationships and conscious living.",
+    id:        "articles-new",
+    icon:      "✨",
+    text:      "New teachings on Vedanta, relationships & conscious living.",
     highlight: "Read Articles",
-    cta: "Browse →",
-    href: "/articles",
-    color: "#c8551a",
+    cta:       "Browse",
+    href:      "/articles",
+    color:     "#c8551a",
+    dark:      "#8a2e06",
   },
   {
-    id: "youtube",
-    icon: "▶",
-    text: "Watch the latest satsang and Q&A sessions on",
+    id:        "youtube-satsang",
+    icon:      "▶",
+    text:      "Latest satsang & Q&A sessions now live on",
     highlight: "YouTube Channel",
-    cta: "Watch →",
-    href: "https://youtube.com/@gurujishrawan",
-    color: "#b8841a",
-    external: true,
+    cta:       "Watch",
+    href:      "https://youtube.com/@gurujishrawan",
+    color:     "#b8841a",
+    dark:      "#7a5010",
+    external:  true,
   },
 ]
 
+/* How long (ms) before a dismissed bar reappears — 24 hours */
+const DISMISS_TTL = 24 * 60 * 60 * 1000
+
+function isDismissed(id: string): boolean {
+  try {
+    const raw = localStorage.getItem(`gs_ann_${id}`)
+    if (!raw) return false
+    const { until } = JSON.parse(raw)
+    return Date.now() < until
+  } catch { return false }
+}
+
+function setDismissed(id: string) {
+  try {
+    localStorage.setItem(`gs_ann_${id}`, JSON.stringify({ until: Date.now() + DISMISS_TTL }))
+  } catch {}
+}
+
 export default function AnnouncementBar() {
+  const [mounted,  setMounted]  = useState(false)
   const [visible,  setVisible]  = useState(false)
+  const [closing,  setClosing]  = useState(false)   // height-collapse animation
   const [msgIdx,   setMsgIdx]   = useState(0)
   const [fading,   setFading]   = useState(false)
+  const [paused,   setPaused]   = useState(false)   // pause rotation on hover
 
-  /* Check if dismissed this session */
+  /* ── On mount: find first non-dismissed message ── */
   useEffect(() => {
-    const dismissed = sessionStorage.getItem("gs_ann_dismissed")
-    if (!dismissed) setVisible(true)
+    setMounted(true)
+    const firstVisible = MESSAGES.findIndex(m => !isDismissed(m.id))
+    if (firstVisible !== -1) {
+      setMsgIdx(firstVisible)
+      setVisible(true)
+    }
+  }, [])
 
-    /* Rotate messages every 5 s */
+  /* ── Auto-rotate every 5 s (pauses on hover) ── */
+  useEffect(() => {
+    if (!visible || paused) return
     const t = setInterval(() => {
       setFading(true)
       setTimeout(() => {
-        setMsgIdx(i => (i + 1) % MESSAGES.length)
+        setMsgIdx(prev => {
+          // find next non-dismissed message
+          let next = (prev + 1) % MESSAGES.length
+          let tries = 0
+          while (isDismissed(MESSAGES[next].id) && tries < MESSAGES.length) {
+            next = (next + 1) % MESSAGES.length
+            tries++
+          }
+          return next
+        })
         setFading(false)
-      }, 300)
+      }, 280)
     }, 5000)
     return () => clearInterval(t)
-  }, [])
+  }, [visible, paused])
 
-  function dismiss() {
-    setVisible(false)
-    sessionStorage.setItem("gs_ann_dismissed", "1")
-  }
+  /* ── Dismiss current message; hide bar if all dismissed ── */
+  const dismiss = useCallback(() => {
+    const current = MESSAGES[msgIdx]
+    setDismissed(current.id)
 
-  if (!visible) return null
+    const nextVisible = MESSAGES.findIndex((m, i) => i !== msgIdx && !isDismissed(m.id))
+    if (nextVisible === -1) {
+      // all dismissed — collapse the bar
+      setClosing(true)
+      setTimeout(() => { setVisible(false); setClosing(false) }, 320)
+    } else {
+      // jump to next visible message with a fade
+      setFading(true)
+      setTimeout(() => { setMsgIdx(nextVisible); setFading(false) }, 280)
+    }
+  }, [msgIdx])
+
+  /* ── Jump to specific message ── */
+  const jumpTo = useCallback((i: number) => {
+    if (i === msgIdx) return
+    setFading(true)
+    setTimeout(() => { setMsgIdx(i); setFading(false) }, 280)
+  }, [msgIdx])
+
+  /* SSR guard — don't render until client has checked localStorage */
+  if (!mounted || !visible) return null
 
   const msg = MESSAGES[msgIdx]
+  const bg  = `linear-gradient(135deg, ${msg.color}, ${msg.dark})`
 
   return (
-    <div
-      role="banner"
-      aria-label="Site announcement"
-      style={{
-        background: `linear-gradient(135deg, ${msg.color}, ${msg.color === "#c8551a" ? "#8a2e06" : "#7a5010"})`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 10,
-        padding: "9px 16px",
-        position: "relative",
-        transition: "opacity .3s ease",
-        opacity: fading ? 0 : 1,
-        minHeight: 40,
-        zIndex: 200,
-      }}
-    >
-      {/* Icon */}
-      <span
-        aria-hidden="true"
-        style={{ fontSize: 13, lineHeight: 1, flexShrink: 0 }}
-      >
-        {msg.icon}
-      </span>
+    <>
+      <style>{`
+        @keyframes ann-slide-down {
+          from { max-height: 0; opacity: 0; }
+          to   { max-height: 80px; opacity: 1; }
+        }
+        @keyframes ann-slide-up {
+          from { max-height: 80px; opacity: 1; }
+          to   { max-height: 0; opacity: 0; }
+        }
+        .ann-bar {
+          animation: ann-slide-down .3s ease forwards;
+          overflow: hidden;
+        }
+        .ann-bar.ann-closing {
+          animation: ann-slide-up .32s ease forwards;
+        }
+        .ann-inner {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 9px 44px 9px 12px; /* right pad for close btn */
+          min-height: 40px;
+          position: relative;
+          transition: opacity .28s ease;
+        }
+        /* icon — hide on very small screens */
+        .ann-icon {
+          font-size: 13px;
+          line-height: 1;
+          flex-shrink: 0;
+        }
+        /* text block */
+        .ann-text {
+          font-family: 'Poppins', system-ui, sans-serif;
+          font-size: 12px;
+          font-weight: 500;
+          color: rgba(255,255,255,.9);
+          line-height: 1.4;
+          margin: 0;
+          text-align: center;
+          /* allow truncation on tiny screens */
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          min-width: 0;
+          flex: 1;
+        }
+        .ann-text strong {
+          color: #fff;
+          font-weight: 700;
+        }
+        /* CTA pill */
+        .ann-cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-family: 'Poppins', system-ui, sans-serif;
+          font-size: 11px;
+          font-weight: 800;
+          color: #fff;
+          text-decoration: none;
+          background: rgba(255,255,255,.18);
+          border: 1px solid rgba(255,255,255,.3);
+          border-radius: 99px;
+          padding: 4px 11px;
+          flex-shrink: 0;
+          transition: background .18s ease;
+          white-space: nowrap;
+        }
+        .ann-cta:hover { background: rgba(255,255,255,.28); }
+        .ann-cta:focus-visible {
+          outline: 2px solid rgba(255,255,255,.7);
+          outline-offset: 2px;
+        }
+        /* dots */
+        .ann-dots {
+          display: flex;
+          gap: 4px;
+          flex-shrink: 0;
+        }
+        .ann-dot {
+          height: 5px;
+          border-radius: 99px;
+          background: rgba(255,255,255,.35);
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          transition: width .3s ease, background .3s ease;
+        }
+        .ann-dot:focus-visible {
+          outline: 2px solid rgba(255,255,255,.7);
+          outline-offset: 2px;
+        }
+        /* close button */
+        .ann-close {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: rgba(255,255,255,.12);
+          border: 1px solid rgba(255,255,255,.2);
+          border-radius: 50%;
+          width: 26px;
+          height: 26px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: rgba(255,255,255,.8);
+          flex-shrink: 0;
+          transition: background .18s ease;
+        }
+        .ann-close:hover { background: rgba(255,255,255,.24); }
+        .ann-close:focus-visible {
+          outline: 2px solid rgba(255,255,255,.7);
+          outline-offset: 2px;
+        }
 
-      {/* Message */}
-      <p
-        style={{
-          fontFamily: "'Poppins', system-ui, sans-serif",
-          fontSize: 12,
-          fontWeight: 500,
-          color: "rgba(255,255,255,.88)",
-          lineHeight: 1.4,
-          margin: 0,
-          textAlign: "center",
-        }}
-      >
-        {msg.text}{" "}
-        <strong style={{ color: "#fff", fontWeight: 700 }}>{msg.highlight}</strong>
-      </p>
+        /* ── Responsive breakpoints ── */
 
-      {/* CTA */}
-      <Link
-        href={msg.href}
-        target={msg.external ? "_blank" : undefined}
-        rel={msg.external ? "noopener noreferrer" : undefined}
-        aria-label={`${msg.cta} — ${msg.highlight}`}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 4,
-          fontFamily: "'Poppins', system-ui, sans-serif",
-          fontSize: 11,
-          fontWeight: 800,
-          color: "#fff",
-          textDecoration: "none",
-          background: "rgba(255,255,255,.18)",
-          border: "1px solid rgba(255,255,255,.3)",
-          borderRadius: 99,
-          padding: "4px 12px",
-          flexShrink: 0,
-          transition: "background .2s ease",
-          whiteSpace: "nowrap",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.28)")}
-        onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,.18)")}
-      >
-        {msg.cta} <FaChevronRight size={8} />
-      </Link>
+        /* Hide dots on very small phones */
+        @media (max-width: 400px) {
+          .ann-dots  { display: none; }
+          .ann-icon  { display: none; }
+          .ann-text  { font-size: 11px; }
+        }
 
-      {/* Progress dots */}
+        /* On narrow screens: allow text to wrap (2 lines) instead of truncating */
+        @media (max-width: 540px) {
+          .ann-text {
+            white-space: normal;
+            text-overflow: unset;
+            text-align: left;
+            font-size: 11.5px;
+          }
+          .ann-inner {
+            flex-wrap: wrap;
+            padding: 8px 40px 8px 10px;
+            gap: 6px;
+            justify-content: flex-start;
+          }
+          .ann-dots { order: 10; } /* push dots to end */
+        }
+
+        /* Tablet and up: full layout */
+        @media (min-width: 541px) {
+          .ann-inner {
+            padding: 9px 48px 9px 16px;
+            gap: 10px;
+          }
+          .ann-text {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-size: 12px;
+          }
+        }
+      `}</style>
+
       <div
-        style={{ display: "flex", gap: 4, flexShrink: 0 }}
-        aria-hidden="true"
+        className={`ann-bar ${closing ? "ann-closing" : ""}`}
+        style={{ background: bg, zIndex: 200 }}
+        role="region"
+        aria-label="Site announcement"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
       >
-        {MESSAGES.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => { setFading(true); setTimeout(() => { setMsgIdx(i); setFading(false) }, 280) }}
-            style={{
-              width: i === msgIdx ? 16 : 5,
-              height: 5,
-              borderRadius: 99,
-              background: i === msgIdx ? "rgba(255,255,255,.9)" : "rgba(255,255,255,.35)",
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
-              transition: "width .3s ease, background .3s ease",
-            }}
-            aria-label={`Go to announcement ${i + 1}`}
-          />
-        ))}
-      </div>
+        <div
+          className="ann-inner"
+          style={{ opacity: fading ? 0 : 1 }}
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {/* Icon */}
+          <span className="ann-icon" aria-hidden="true">{msg.icon}</span>
 
-      {/* Close */}
-      <button
-        onClick={dismiss}
-        aria-label="Dismiss announcement"
-        style={{
-          position: "absolute",
-          right: 12,
-          top: "50%",
-          transform: "translateY(-50%)",
-          background: "rgba(255,255,255,.12)",
-          border: "1px solid rgba(255,255,255,.2)",
-          borderRadius: "50%",
-          width: 26,
-          height: 26,
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "rgba(255,255,255,.8)",
-          flexShrink: 0,
-          transition: "background .2s ease",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.22)")}
-        onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,.12)")}
-      >
-        <FaTimes size={9} />
-      </button>
-    </div>
+          {/* Message text */}
+          <p className="ann-text">
+            {msg.text}{" "}
+            <strong>{msg.highlight}</strong>
+          </p>
+
+          {/* CTA */}
+          <Link
+            href={msg.href}
+            target={msg.external ? "_blank" : undefined}
+            rel={msg.external ? "noopener noreferrer" : undefined}
+            className="ann-cta"
+            aria-label={`${msg.cta} — ${msg.highlight}`}
+          >
+            {msg.cta} <FaChevronRight size={8} aria-hidden="true" />
+          </Link>
+
+          {/* Progress dots */}
+          <div className="ann-dots" role="tablist" aria-label="Announcements">
+            {MESSAGES.map((m, i) => (
+              <button
+                key={m.id}
+                className="ann-dot"
+                role="tab"
+                aria-selected={i === msgIdx}
+                aria-label={`Announcement ${i + 1}: ${m.highlight}`}
+                onClick={() => jumpTo(i)}
+                style={{
+                  width:      i === msgIdx ? 16 : 5,
+                  background: i === msgIdx ? "rgba(255,255,255,.9)" : "rgba(255,255,255,.35)",
+                  opacity:    isDismissed(m.id) ? 0.3 : 1,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Close / dismiss */}
+          <button
+            className="ann-close"
+            onClick={dismiss}
+            aria-label={`Dismiss: ${msg.highlight}. Will reappear after 24 hours.`}
+          >
+            <FaTimes size={9} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+    </>
   )
 }
