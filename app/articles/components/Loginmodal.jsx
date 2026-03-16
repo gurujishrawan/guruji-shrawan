@@ -4,11 +4,18 @@ import { useState, useEffect, useRef } from "react"
 import { X, Eye, EyeOff, Loader2, Check, ArrowLeft } from "lucide-react"
 import { supabase } from "../../lib/supabaseClient"
 
-/* ─── design tokens (matches the rest of your site) ─── */
-const P      = "'Poppins', system-ui, sans-serif"
-const ORANGE = "#d4621a"
+/* ─── design tokens — matches your site exactly ─── */
+const SANS   = "'Poppins', system-ui, sans-serif"
+const BODY   = "'Lora', Georgia, serif"
+const ORANGE = "#c8551a"
+const GOLD   = "#b8841a"
+const BG     = "#faf7f2"
+const CARD   = "#ffffff"
+const BORDER = "#e8ddd0"
+const TEXT   = "#1a1008"
+const MUTED  = "#8a7a6a"
 
-/* ─── Google icon SVG ─── */
+/* ─── Google icon ─── */
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -22,54 +29,45 @@ function GoogleIcon() {
 
 /* ─── Context-aware prompts ─── */
 const PROMPTS = {
-  like:    { emoji: "♡",  title: "Like this article",   sub: "Show appreciation for content you love." },
-  comment: { emoji: "💬", title: "Join the discussion",  sub: "Share your thoughts with the community." },
-  save:    { emoji: "🔖", title: "Save for later",       sub: "Build your personal reading list." },
-  reply:   { emoji: "↩",  title: "Reply to a comment",  sub: "Continue the conversation." },
-  default: { emoji: "🔥", title: "Welcome to Guruji Shrawan", sub: "Join thousands of seekers." },
+  like:    { emoji: "♡",  title: "Like this article",    sub: "Show appreciation for content you love." },
+  comment: { emoji: "💬", title: "Join the discussion",   sub: "Share your thoughts with the community." },
+  save:    { emoji: "🔖", title: "Save for later",        sub: "Build your personal reading list." },
+  reply:   { emoji: "↩",  title: "Reply to a comment",   sub: "Continue the conversation." },
+  default: { emoji: "🔥", title: "Welcome Back",          sub: "Join thousands of seekers on the path." },
 }
 
-/* ══════════════════════════════════════════════════════════
-   LOGIN MODAL
-   Props:
-     reason    — "like" | "comment" | "save" | "reply" | null
-     onClose   — () => void
-     onSuccess — (user) => void   called after successful auth
-   ══════════════════════════════════════════════════════════ */
 export default function LoginModal({ reason = null, onClose, onSuccess }) {
-  /* view: "main" | "forgot" | "check-email" | "check-reset" */
-  const [view,    setView]    = useState("main")
-  const [tab,     setTab]     = useState("login")   // "login" | "signup"
-  const [showPw,  setShowPw]  = useState(false)
-  const [name,    setName]    = useState("")
-  const [email,   setEmail]   = useState("")
-  const [pw,      setPw]      = useState("")
-  const [loading, setLoading] = useState(false)
-  const [gLoading, setGLoad]  = useState(false)     // google-specific spinner
-  const [error,   setError]   = useState("")
-  const [success, setSuccess] = useState("")
+  const [view,     setView]    = useState("main")
+  const [tab,      setTab]     = useState("login")
+  const [showPw,   setShowPw]  = useState(false)
+  const [name,     setName]    = useState("")
+  const [email,    setEmail]   = useState("")
+  const [pw,       setPw]      = useState("")
+  const [loading,  setLoading] = useState(false)
+  const [gLoading, setGLoad]   = useState(false)
+  const [error,    setError]   = useState("")
+  const [success,  setSuccess] = useState("")
   const bgRef = useRef(null)
 
-  /* lock body scroll while open */
   useEffect(() => {
     document.body.style.overflow = "hidden"
     return () => { document.body.style.overflow = "" }
   }, [])
 
-  /* clear messages on tab / field change */
   useEffect(() => { setError(""); setSuccess("") }, [tab, email, pw, name])
 
   const prompt = PROMPTS[reason] || PROMPTS.default
 
-  /* ── helpers ── */
+  /* ── input base style ── */
   const iSt = {
     width: "100%", padding: "11px 14px", borderRadius: 10,
-    border: "1.5px solid #e2e8f0", background: "#f8fafc",
-    fontFamily: P, fontSize: 14, color: "#0f172a",
-    outline: "none", boxSizing: "border-box", transition: "border-color .15s",
+    border: `1.5px solid ${BORDER}`, background: BG,
+    fontFamily: SANS, fontSize: 14, color: TEXT,
+    outline: "none", boxSizing: "border-box",
+    transition: "border-color .18s, box-shadow .18s",
   }
-  const focusBorder = e => e.target.style.borderColor = "#1d4ed8"
-  const blurBorder  = e => e.target.style.borderColor = "#e2e8f0"
+  const onFocus = e => { e.target.style.borderColor = ORANGE; e.target.style.boxShadow = `0 0 0 3px rgba(200,85,26,0.12)` }
+  const onBlur  = e => { e.target.style.borderColor = BORDER;  e.target.style.boxShadow = "none" }
 
   /* ── Google OAuth ── */
   async function handleGoogle() {
@@ -82,30 +80,23 @@ export default function LoginModal({ reason = null, onClose, onSuccess }) {
       },
     })
     if (err) { setError(err.message); setGLoad(false) }
-    // on success Supabase redirects the page — no further action needed here
   }
 
-  /* ── Email / Password submit ── */
+  /* ── Email / Password ── */
   async function handleSubmit() {
-    if (!email.trim())  { setError("Email is required."); return }
-    if (!pw.trim())     { setError("Password is required."); return }
+    if (!email.trim()) { setError("Email is required."); return }
+    if (!pw.trim())    { setError("Password is required."); return }
     if (tab === "signup" && pw.length < 6) { setError("Password must be at least 6 characters."); return }
-
     setLoading(true); setError("")
 
     if (tab === "login") {
-      const { data, error: err } = await supabase.auth.signInWithPassword({
-        email: email.trim(), password: pw,
-      })
+      const { data, error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password: pw })
       setLoading(false)
       if (err) { setError(err.message); return }
-      onSuccess?.(data.user)
-      onClose()
-
+      onSuccess?.(data.user); onClose()
     } else {
       const { data, error: err } = await supabase.auth.signUp({
-        email: email.trim(),
-        password: pw,
+        email: email.trim(), password: pw,
         options: {
           data: { full_name: name.trim() || email.split("@")[0] },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
@@ -113,14 +104,8 @@ export default function LoginModal({ reason = null, onClose, onSuccess }) {
       })
       setLoading(false)
       if (err) { setError(err.message); return }
-      /* Supabase returns a session immediately if email-confirm is OFF,
-         otherwise it returns null session and sends a confirm email */
-      if (data.session) {
-        onSuccess?.(data.user)
-        onClose()
-      } else {
-        setView("check-email")
-      }
+      if (data.session) { onSuccess?.(data.user); onClose() }
+      else setView("check-email")
     }
   }
 
@@ -136,265 +121,323 @@ export default function LoginModal({ reason = null, onClose, onSuccess }) {
     setView("check-reset")
   }
 
-  /* ══ RENDER ════════════════════════════════════════════════ */
   return (
     <>
       <style>{`
-        @keyframes mdFade  { from{opacity:0} to{opacity:1} }
-        @keyframes mdSlide { from{opacity:0;transform:translateY(24px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-        @keyframes spin    { to{transform:rotate(360deg)} }
-        .lm-spin { animation: spin .9s linear infinite }
-        .lm-google:hover { background: #f1f5f9 !important }
-        .lm-tab-active  { background:#fff !important; color:#1e293b !important; box-shadow:0 1px 4px rgba(0,0,0,.10) !important }
-        .lm-tab-passive { background:transparent !important; color:#94a3b8 !important }
-        .lm-submit:not(:disabled):hover { background:#1e40af !important }
-        .lm-link { color:#3b82f6; background:none; border:none; cursor:pointer; font-family:${P}; font-size:13px; font-weight:600 }
-        .lm-link:hover { text-decoration:underline }
+        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@400;500;600;700;800&display=swap');
+        @keyframes lm-fade   { from{opacity:0} to{opacity:1} }
+        @keyframes lm-slide  { from{opacity:0;transform:translateY(28px) scale(.96)} to{opacity:1;transform:translateY(0) scale(1)} }
+        @keyframes lm-spin   { to{transform:rotate(360deg)} }
+        @keyframes lm-shimmer{ 0%,100%{opacity:.6} 50%{opacity:1} }
+        .lm-spin-anim { animation: lm-spin .85s linear infinite }
+
+        /* Google btn */
+        .lm-google {
+          width:100%; padding:11px 16px; border-radius:12px;
+          border:1.5px solid ${BORDER}; background:${CARD};
+          font-family:${SANS}; font-size:14px; font-weight:600; color:${TEXT};
+          display:flex; align-items:center; justify-content:center; gap:10px;
+          cursor:pointer; margin-bottom:18px;
+          transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
+        }
+        .lm-google:hover:not(:disabled) {
+          border-color:${ORANGE};
+          background:#fff8f3;
+          box-shadow:0 4px 16px rgba(200,85,26,.12);
+        }
+
+        /* Tab buttons */
+        .lm-tab {
+          flex:1; padding:8px 0; font-family:${SANS}; font-size:13px;
+          font-weight:600; border:none; border-radius:9px; cursor:pointer;
+          transition:all .18s ease;
+        }
+        .lm-tab-on  { background:${CARD}; color:${ORANGE}; box-shadow:0 2px 8px rgba(200,85,26,.14) }
+        .lm-tab-off { background:transparent; color:${MUTED} }
+
+        /* Submit btn */
+        .lm-submit {
+          width:100%; margin-top:16px; padding:13px;
+          border-radius:12px; border:none; cursor:pointer;
+          background:linear-gradient(135deg,${ORANGE},#8a2e06);
+          color:#fff; font-family:${SANS}; font-size:14px; font-weight:700;
+          display:flex; align-items:center; justify-content:center; gap:8px;
+          box-shadow:0 6px 22px rgba(200,85,26,.32);
+          transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+        }
+        .lm-submit:hover:not(:disabled) {
+          transform:translateY(-2px);
+          box-shadow:0 10px 30px rgba(200,85,26,.42);
+        }
+        .lm-submit:active:not(:disabled) { transform:scale(.97) }
+        .lm-submit:disabled { opacity:.55; cursor:not-allowed }
+
+        /* Link buttons */
+        .lm-link {
+          color:${ORANGE}; background:none; border:none; cursor:pointer;
+          font-family:${SANS}; font-size:13px; font-weight:600;
+          transition:opacity .15s;
+        }
+        .lm-link:hover { opacity:.7; text-decoration:underline }
+
+        /* Left panel gradient orb */
+        .lm-orb1 { position:absolute; top:-50px; right:-50px; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,.07); pointer-events:none }
+        .lm-orb2 { position:absolute; bottom:-40px; left:-30px; width:110px; height:110px; border-radius:50%; background:rgba(255,255,255,.05); pointer-events:none }
+        .lm-orb3 { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:200px; height:200px; border-radius:50%; background:radial-gradient(circle,rgba(200,85,26,.18),transparent 70%); pointer-events:none }
+
+        /* Responsive */
+        @media (max-width: 580px) {
+          .lm-card { grid-template-columns:1fr !important; max-width:100% !important; border-radius:20px 20px 0 0 !important; margin-top:auto !important }
+          .lm-left { display:none !important }
+          .lm-right { padding:28px 22px 24px !important; max-height:92svh !important }
+          .lm-backdrop { align-items:flex-end !important; padding:0 !important }
+          .lm-card { animation: lm-slide-up .26s cubic-bezier(.16,1,.3,1) !important }
+        }
+        @keyframes lm-slide-up { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:translateY(0)} }
+        @media (max-width:360px) {
+          .lm-right { padding:22px 16px 20px !important }
+        }
       `}</style>
 
       {/* Backdrop */}
       <div
         ref={bgRef}
+        className="lm-backdrop"
         onClick={e => e.target === bgRef.current && onClose()}
         style={{
-          position: "fixed", inset: 0, zIndex: 700,
-          background: "rgba(8,14,30,0.52)", backdropFilter: "blur(4px)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          padding: "16px", animation: "mdFade .18s ease-out",
+          position:"fixed", inset:0, zIndex:700,
+          background:"rgba(26,16,8,0.60)", backdropFilter:"blur(5px)",
+          display:"flex", alignItems:"center", justifyContent:"center",
+          padding:"16px", animation:"lm-fade .18s ease-out",
         }}
       >
         {/* Card */}
-        <div style={{
-          display: "grid", gridTemplateColumns: "210px 1fr",
-          width: "100%", maxWidth: 640, borderRadius: 22, overflow: "hidden",
-          background: "#fff",
-          boxShadow: "0 24px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)",
-          animation: "mdSlide .22s cubic-bezier(.16,1,.3,1)",
-        }}>
+        <div
+          className="lm-card"
+          style={{
+            display:"grid", gridTemplateColumns:"220px 1fr",
+            width:"100%", maxWidth:620, borderRadius:24, overflow:"hidden",
+            background:CARD,
+            boxShadow:"0 32px 100px rgba(26,16,8,0.22), 0 0 0 1px rgba(200,85,26,0.1)",
+            animation:"lm-slide .24s cubic-bezier(.16,1,.3,1)",
+          }}
+        >
+          {/* ══ LEFT PANEL ══ */}
+          <div
+            className="lm-left"
+            style={{
+              background:`linear-gradient(165deg,#2a1005 0%,${ORANGE} 55%,${GOLD} 100%)`,
+              padding:"36px 24px", display:"flex", flexDirection:"column",
+              justifyContent:"space-between", position:"relative", overflow:"hidden",
+            }}
+          >
+            <div className="lm-orb1"/><div className="lm-orb2"/><div className="lm-orb3"/>
 
-          {/* ── LEFT ACCENT PANEL ── */}
-          <div style={{
-            background: "linear-gradient(175deg, #1e3a8a 0%, #1d4ed8 55%, #3b82f6 100%)",
-            padding: "36px 22px", display: "flex", flexDirection: "column",
-            justifyContent: "space-between", position: "relative", overflow: "hidden",
-          }}>
-            {/* decorative circles */}
-            <div style={{ position:"absolute", top:-40, right:-40, width:120, height:120, borderRadius:"50%", background:"rgba(255,255,255,0.06)" }}/>
-            <div style={{ position:"absolute", bottom:-30, left:-20, width:90, height:90, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }}/>
-
-            <div style={{ position:"relative" }}>
-              {/* site logo mark */}
+            <div style={{position:"relative", zIndex:1}}>
+              {/* Logo mark */}
               <div style={{
-                width:44, height:44, borderRadius:12, marginBottom:28,
-                background:"rgba(255,255,255,0.15)", backdropFilter:"blur(8px)",
+                width:46, height:46, borderRadius:14, marginBottom:30,
+                background:"rgba(255,255,255,0.13)", backdropFilter:"blur(8px)",
                 display:"flex", alignItems:"center", justifyContent:"center",
-                fontSize:22, border:"1px solid rgba(255,255,255,0.2)",
+                fontSize:22, border:"1px solid rgba(255,255,255,0.22)",
+                boxShadow:"0 4px 16px rgba(0,0,0,0.12)",
               }}>🔥</div>
 
-              <p style={{ fontFamily:P, fontSize:30, lineHeight:1, marginBottom:10 }}>{prompt.emoji}</p>
-              <h2 style={{ fontFamily:P, fontSize:16, fontWeight:700, color:"#fff", lineHeight:1.35, marginBottom:8 }}>
+              <p style={{fontFamily:BODY, fontSize:34, lineHeight:1, marginBottom:12, filter:"drop-shadow(0 2px 8px rgba(0,0,0,0.2))"}}>{prompt.emoji}</p>
+              <h2 style={{fontFamily:BODY, fontSize:18, fontWeight:700, fontStyle:"italic", color:"#fff", lineHeight:1.35, marginBottom:10, letterSpacing:"-.01em"}}>
                 {prompt.title}
               </h2>
-              <p style={{ fontFamily:P, fontSize:12, color:"rgba(255,255,255,0.58)", lineHeight:1.65 }}>
+              <p style={{fontFamily:SANS, fontSize:12, color:"rgba(255,255,255,0.62)", lineHeight:1.7}}>
                 {prompt.sub}
               </p>
             </div>
 
-            {/* trust line */}
-            <div style={{ position:"relative" }}>
-              <div style={{ width:28, height:2, background:"rgba(255,255,255,0.25)", borderRadius:99, marginBottom:10 }}/>
-              <p style={{ fontFamily:P, fontSize:11, color:"rgba(255,255,255,0.30)", lineHeight:1.65 }}>
-                Thousands of seekers.<br/>One community.
+            {/* Bottom trust block */}
+            <div style={{position:"relative", zIndex:1}}>
+              <div style={{height:"1px", background:"rgba(255,255,255,0.15)", marginBottom:14}}/>
+              <p style={{fontFamily:SANS, fontSize:11, color:"rgba(255,255,255,0.38)", lineHeight:1.7}}>
+                Guruji Shrawan Foundation<br/>
+                Thousands of seekers. One path.
               </p>
             </div>
           </div>
 
-          {/* ── RIGHT FORM PANEL ── */}
-          <div style={{ padding:"30px 30px 26px", position:"relative", overflowY:"auto", maxHeight:"90vh" }}>
-
-            {/* Close button */}
+          {/* ══ RIGHT FORM PANEL ══ */}
+          <div
+            className="lm-right"
+            style={{
+              padding:"30px 28px 26px", position:"relative",
+              overflowY:"auto", maxHeight:"90svh", background:BG,
+            }}
+          >
+            {/* Close */}
             <button onClick={onClose} style={{
               position:"absolute", top:14, right:14,
-              width:28, height:28, borderRadius:"50%",
-              background:"#f1f5f9", border:"none", cursor:"pointer",
-              display:"flex", alignItems:"center", justifyContent:"center", color:"#64748b",
-            }}><X size={13}/></button>
+              width:30, height:30, borderRadius:"50%",
+              background:CARD, border:`1.5px solid ${BORDER}`,
+              cursor:"pointer", display:"flex", alignItems:"center",
+              justifyContent:"center", color:MUTED,
+              transition:"border-color .18s, color .18s",
+            }}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor=ORANGE;e.currentTarget.style.color=ORANGE}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor=BORDER;e.currentTarget.style.color=MUTED}}
+            >
+              <X size={13}/>
+            </button>
 
-            {/* ════ VIEW: CHECK EMAIL (after signup) ════ */}
+            {/* ── VIEW: CHECK EMAIL ── */}
             {view === "check-email" && (
-              <div style={{ paddingTop:16, textAlign:"center" }}>
-                <div style={{ fontSize:52, marginBottom:14 }}>📬</div>
-                <h3 style={{ fontFamily:P, fontSize:18, fontWeight:700, color:"#0f172a", marginBottom:8 }}>Check your inbox</h3>
-                <p style={{ fontFamily:P, fontSize:13, color:"#64748b", lineHeight:1.7, marginBottom:22 }}>
-                  We sent a confirmation link to<br/><strong style={{ color:"#0f172a" }}>{email}</strong>.<br/>
-                  Click it to activate your account, then come back here.
+              <div style={{paddingTop:16, textAlign:"center"}}>
+                <div style={{fontSize:52, marginBottom:14}}>📬</div>
+                <h3 style={{fontFamily:BODY, fontSize:20, fontWeight:700, fontStyle:"italic", color:TEXT, marginBottom:8}}>Check your inbox</h3>
+                <p style={{fontFamily:SANS, fontSize:13, color:MUTED, lineHeight:1.75, marginBottom:24}}>
+                  We sent a confirmation link to<br/>
+                  <strong style={{color:ORANGE}}>{email}</strong>.<br/>
+                  Click it to activate your account.
                 </p>
-                <button onClick={onClose} style={{ padding:"10px 28px", borderRadius:10, border:"none", cursor:"pointer", background:"#1d4ed8", color:"#fff", fontFamily:P, fontSize:13, fontWeight:600 }}>Got it</button>
-                <p style={{ fontFamily:P, fontSize:12, color:"#94a3b8", marginTop:14 }}>
-                  Didn't get it?{" "}
-                  <button className="lm-link" onClick={() => { setView("main"); setTab("signup") }}>Try again</button>
+                <button onClick={onClose} className="lm-submit" style={{marginTop:0}}>Got it 🙏</button>
+                <p style={{fontFamily:SANS, fontSize:12, color:MUTED, marginTop:14}}>
+                  Didn&apos;t get it?{" "}
+                  <button className="lm-link" onClick={()=>{setView("main");setTab("signup")}}>Try again</button>
                 </p>
               </div>
             )}
 
-            {/* ════ VIEW: CHECK EMAIL (after password reset) ════ */}
+            {/* ── VIEW: CHECK RESET ── */}
             {view === "check-reset" && (
-              <div style={{ paddingTop:16, textAlign:"center" }}>
-                <div style={{ fontSize:52, marginBottom:14 }}>🔑</div>
-                <h3 style={{ fontFamily:P, fontSize:18, fontWeight:700, color:"#0f172a", marginBottom:8 }}>Reset link sent</h3>
-                <p style={{ fontFamily:P, fontSize:13, color:"#64748b", lineHeight:1.7, marginBottom:22 }}>
-                  Check your inbox at<br/><strong style={{ color:"#0f172a" }}>{email}</strong><br/>
-                  and click the link to set a new password.
+              <div style={{paddingTop:16, textAlign:"center"}}>
+                <div style={{fontSize:52, marginBottom:14}}>🔑</div>
+                <h3 style={{fontFamily:BODY, fontSize:20, fontWeight:700, fontStyle:"italic", color:TEXT, marginBottom:8}}>Reset link sent</h3>
+                <p style={{fontFamily:SANS, fontSize:13, color:MUTED, lineHeight:1.75, marginBottom:24}}>
+                  Check your inbox at<br/>
+                  <strong style={{color:ORANGE}}>{email}</strong><br/>
+                  and follow the link to set a new password.
                 </p>
-                <button onClick={() => setView("main")} style={{ padding:"10px 28px", borderRadius:10, border:"none", cursor:"pointer", background:"#1d4ed8", color:"#fff", fontFamily:P, fontSize:13, fontWeight:600 }}>Back to sign in</button>
+                <button onClick={()=>setView("main")} className="lm-submit" style={{marginTop:0}}>Back to Sign In</button>
               </div>
             )}
 
-            {/* ════ VIEW: FORGOT PASSWORD ════ */}
+            {/* ── VIEW: FORGOT PASSWORD ── */}
             {view === "forgot" && (
-              <div style={{ paddingTop:4 }}>
-                <button onClick={() => { setView("main"); setError("") }} style={{ display:"flex", alignItems:"center", gap:5, fontFamily:P, fontSize:12, color:"#64748b", background:"none", border:"none", cursor:"pointer", marginBottom:20 }}>
+              <div style={{paddingTop:4}}>
+                <button
+                  onClick={()=>{setView("main");setError("")}}
+                  style={{display:"flex",alignItems:"center",gap:5,fontFamily:SANS,fontSize:12,color:MUTED,background:"none",border:"none",cursor:"pointer",marginBottom:22,transition:"color .15s"}}
+                  onMouseEnter={e=>e.currentTarget.style.color=ORANGE}
+                  onMouseLeave={e=>e.currentTarget.style.color=MUTED}
+                >
                   <ArrowLeft size={13}/> Back to sign in
                 </button>
-                <h3 style={{ fontFamily:P, fontSize:20, fontWeight:700, color:"#0f172a", marginBottom:4 }}>Forgot password?</h3>
-                <p style={{ fontFamily:P, fontSize:13, color:"#64748b", marginBottom:20, lineHeight:1.5 }}>
-                  Enter your email and we'll send you a reset link.
+                <h3 style={{fontFamily:BODY, fontSize:22, fontWeight:700, fontStyle:"italic", color:TEXT, marginBottom:6}}>Forgot password?</h3>
+                <p style={{fontFamily:SANS, fontSize:13, color:MUTED, marginBottom:22, lineHeight:1.6}}>
+                  Enter your email and we&apos;ll send a reset link.
                 </p>
-
                 {error && <ErrorBanner msg={error}/>}
-                {success && <SuccessBanner msg={success}/>}
-
                 <input
-                  value={email} onChange={e => setEmail(e.target.value)}
+                  value={email} onChange={e=>setEmail(e.target.value)}
                   type="email" placeholder="Email address" style={iSt}
-                  onFocus={focusBorder} onBlur={blurBorder}
-                  onKeyDown={e => e.key === "Enter" && handleForgot()}
+                  onFocus={onFocus} onBlur={onBlur}
+                  onKeyDown={e=>e.key==="Enter"&&handleForgot()}
                 />
-
-                <button onClick={handleForgot} disabled={loading} className="lm-submit" style={{
-                  width:"100%", marginTop:14, padding:"12px",
-                  borderRadius:10, border:"none", cursor: loading?"not-allowed":"pointer",
-                  background: loading?"#93c5fd":"#1d4ed8", color:"#fff",
-                  fontFamily:P, fontSize:14, fontWeight:600,
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:8,
-                  transition:"background .15s",
-                }}>
-                  {loading ? <><Loader2 size={15} className="lm-spin"/> Sending…</> : "Send Reset Link"}
+                <button onClick={handleForgot} disabled={loading} className="lm-submit">
+                  {loading ? <><Loader2 size={15} className="lm-spin-anim"/> Sending…</> : "Send Reset Link →"}
                 </button>
               </div>
             )}
 
-            {/* ════ VIEW: MAIN (login / signup) ════ */}
+            {/* ── VIEW: MAIN ── */}
             {view === "main" && (
               <>
                 {/* Pill tabs */}
-                <div style={{ display:"flex", background:"#f1f5f9", borderRadius:11, padding:3, marginBottom:22 }}>
-                  {[["login","Sign In"],["signup","Sign Up"]].map(([k,l]) => (
+                <div style={{display:"flex", background:CARD, border:`1.5px solid ${BORDER}`, borderRadius:13, padding:4, marginBottom:24, gap:4}}>
+                  {[["login","Sign In"],["signup","Sign Up"]].map(([k,l])=>(
                     <button
-                      key={k} onClick={() => setTab(k)}
-                      className={tab===k ? "lm-tab-active" : "lm-tab-passive"}
-                      style={{ flex:1, padding:"8px 0", fontFamily:P, fontSize:13, fontWeight:600, border:"none", borderRadius:9, cursor:"pointer", transition:"all .15s" }}
+                      key={k} onClick={()=>setTab(k)}
+                      className={`lm-tab ${tab===k?"lm-tab-on":"lm-tab-off"}`}
                     >{l}</button>
                   ))}
                 </div>
 
-                <h3 style={{ fontFamily:P, fontSize:19, fontWeight:700, color:"#0f172a", marginBottom:3 }}>
-                  {tab === "login" ? "Welcome back" : "Create your account"}
+                <h3 style={{fontFamily:BODY, fontSize:22, fontWeight:700, fontStyle:"italic", color:TEXT, marginBottom:3, letterSpacing:"-.01em"}}>
+                  {tab==="login" ? "Welcome back" : "Create account"}
                 </h3>
-                <p style={{ fontFamily:P, fontSize:13, color:"#64748b", marginBottom:18, lineHeight:1.5 }}>
-                  {tab === "login" ? "Sign in to your Guruji Shrawan account." : "Free forever. No spam ever."}
+                <p style={{fontFamily:SANS, fontSize:13, color:MUTED, marginBottom:20, lineHeight:1.55}}>
+                  {tab==="login" ? "Sign in to your Guruji Shrawan account." : "Free forever. No spam, ever."}
                 </p>
 
-                {/* ── Google button ── */}
-                <button onClick={handleGoogle} disabled={gLoading} className="lm-google" style={{
-                  width:"100%", padding:"11px 16px", borderRadius:10,
-                  border:"1.5px solid #e2e8f0", background:"#fff",
-                  fontFamily:P, fontSize:14, fontWeight:600, color:"#0f172a",
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:10,
-                  cursor: gLoading?"not-allowed":"pointer", marginBottom:16,
-                  transition:"background .15s",
-                }}>
+                {/* Google */}
+                <button onClick={handleGoogle} disabled={gLoading} className="lm-google">
                   {gLoading
-                    ? <Loader2 size={17} className="lm-spin" style={{ color:"#94a3b8" }}/>
+                    ? <Loader2 size={17} className="lm-spin-anim" style={{color:MUTED}}/>
                     : <GoogleIcon/>}
-                  {tab === "login" ? "Continue with Google" : "Sign up with Google"}
+                  {tab==="login" ? "Continue with Google" : "Sign up with Google"}
                 </button>
 
-                {/* divider */}
-                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
-                  <div style={{ flex:1, height:1, background:"#e2e8f0" }}/>
-                  <span style={{ fontFamily:P, fontSize:11, color:"#94a3b8", fontWeight:500, whiteSpace:"nowrap" }}>or continue with email</span>
-                  <div style={{ flex:1, height:1, background:"#e2e8f0" }}/>
+                {/* Divider */}
+                <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:18}}>
+                  <div style={{flex:1, height:1, background:BORDER}}/>
+                  <span style={{fontFamily:SANS, fontSize:11, color:MUTED, fontWeight:500, whiteSpace:"nowrap"}}>or with email</span>
+                  <div style={{flex:1, height:1, background:BORDER}}/>
                 </div>
 
-                {/* error / success banners */}
                 {error   && <ErrorBanner   msg={error}/>}
                 {success && <SuccessBanner msg={success}/>}
 
                 {/* Fields */}
-                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                  {tab === "signup" && (
-                    <input value={name} onChange={e => setName(e.target.value)}
+                <div style={{display:"flex", flexDirection:"column", gap:10}}>
+                  {tab==="signup" && (
+                    <input value={name} onChange={e=>setName(e.target.value)}
                       placeholder="Full name" style={iSt}
-                      onFocus={focusBorder} onBlur={blurBorder}/>
+                      onFocus={onFocus} onBlur={onBlur}/>
                   )}
-                  <input value={email} onChange={e => setEmail(e.target.value)}
+                  <input value={email} onChange={e=>setEmail(e.target.value)}
                     type="email" placeholder="Email address" style={iSt}
-                    onFocus={focusBorder} onBlur={blurBorder}
-                    onKeyDown={e => e.key === "Enter" && !pw && document.getElementById("lm-pw")?.focus()}/>
-                  <div style={{ position:"relative" }}>
-                    <input id="lm-pw" value={pw} onChange={e => setPw(e.target.value)}
+                    onFocus={onFocus} onBlur={onBlur}
+                    onKeyDown={e=>e.key==="Enter"&&!pw&&document.getElementById("lm-pw")?.focus()}/>
+                  <div style={{position:"relative"}}>
+                    <input id="lm-pw" value={pw} onChange={e=>setPw(e.target.value)}
                       type={showPw?"text":"password"} placeholder="Password"
-                      style={{ ...iSt, paddingRight:44 }}
-                      onFocus={focusBorder} onBlur={blurBorder}
-                      onKeyDown={e => e.key === "Enter" && handleSubmit()}/>
-                    <button onClick={() => setShowPw(!showPw)} style={{
+                      style={{...iSt, paddingRight:44}}
+                      onFocus={onFocus} onBlur={onBlur}
+                      onKeyDown={e=>e.key==="Enter"&&handleSubmit()}/>
+                    <button onClick={()=>setShowPw(!showPw)} style={{
                       position:"absolute", right:12, top:"50%", transform:"translateY(-50%)",
-                      background:"none", border:"none", color:"#94a3b8", cursor:"pointer",
-                      display:"flex", alignItems:"center",
+                      background:"none", border:"none", color:MUTED, cursor:"pointer",
+                      display:"flex", alignItems:"center", padding:2,
                     }}>
                       {showPw ? <EyeOff size={15}/> : <Eye size={15}/>}
                     </button>
                   </div>
                 </div>
 
-                {/* Forgot link */}
-                {tab === "login" && (
-                  <div style={{ textAlign:"right", marginTop:7 }}>
-                    <button className="lm-link" onClick={() => { setView("forgot"); setError("") }}>
+                {/* Forgot */}
+                {tab==="login" && (
+                  <div style={{textAlign:"right", marginTop:8}}>
+                    <button className="lm-link" style={{fontSize:12}} onClick={()=>{setView("forgot");setError("")}}>
                       Forgot password?
                     </button>
                   </div>
                 )}
 
-                {/* Submit */}
-                <button onClick={handleSubmit} disabled={loading} className="lm-submit" style={{
-                  width:"100%", marginTop:16, padding:"12px",
-                  borderRadius:10, border:"none",
-                  cursor: loading?"not-allowed":"pointer",
-                  background: loading?"#93c5fd":"#1d4ed8",
-                  color:"#fff", fontFamily:P, fontSize:14, fontWeight:600,
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:8,
-                  transition:"background .15s",
-                }}>
+                <button onClick={handleSubmit} disabled={loading} className="lm-submit">
                   {loading
-                    ? <><Loader2 size={15} className="lm-spin"/> Please wait…</>
-                    : tab === "login" ? "Sign In →" : "Create Account →"}
+                    ? <><Loader2 size={15} className="lm-spin-anim"/> Please wait…</>
+                    : tab==="login" ? "Sign In →" : "Create Account →"}
                 </button>
 
                 {/* Switch tab */}
-                <p style={{ fontFamily:P, fontSize:12, color:"#94a3b8", textAlign:"center", marginTop:14 }}>
-                  {tab === "login" ? "Don't have an account? " : "Already have an account? "}
-                  <button className="lm-link" onClick={() => setTab(tab==="login"?"signup":"login")}>
-                    {tab === "login" ? "Sign up free" : "Sign in"}
+                <p style={{fontFamily:SANS, fontSize:12, color:MUTED, textAlign:"center", marginTop:16}}>
+                  {tab==="login" ? "Don't have an account? " : "Already have an account? "}
+                  <button className="lm-link" onClick={()=>setTab(tab==="login"?"signup":"login")}>
+                    {tab==="login" ? "Sign up free" : "Sign in"}
                   </button>
                 </p>
 
                 {/* Legal */}
-                <p style={{ fontFamily:P, fontSize:10.5, color:"#b0bec5", textAlign:"center", marginTop:12, lineHeight:1.6 }}>
+                <p style={{fontFamily:SANS, fontSize:10.5, color:"#c0b0a0", textAlign:"center", marginTop:14, lineHeight:1.65}}>
                   By continuing you agree to our{" "}
-                  <a href="/terms" style={{ color:"#94a3b8" }}>Terms</a> &{" "}
-                  <a href="/privacy" style={{ color:"#94a3b8" }}>Privacy Policy</a>.
+                  <a href="/terms" style={{color:MUTED, textDecoration:"underline"}}>Terms</a>{" & "}
+                  <a href="/privacy" style={{color:MUTED, textDecoration:"underline"}}>Privacy Policy</a>.
                 </p>
               </>
             )}
@@ -405,18 +448,28 @@ export default function LoginModal({ reason = null, onClose, onSuccess }) {
   )
 }
 
-/* ── small banner helpers ── */
+/* ── Banner helpers ── */
 function ErrorBanner({ msg }) {
   return (
-    <div style={{ background:"#fef2f2", border:"1px solid #fecaca", borderRadius:9, padding:"9px 13px", marginBottom:13, fontFamily:P, fontSize:13, color:"#dc2626", display:"flex", alignItems:"flex-start", gap:7 }}>
-      <span style={{ marginTop:1 }}>⚠️</span> {msg}
+    <div style={{
+      background:"#fef5f0", border:`1.5px solid rgba(200,85,26,0.3)`,
+      borderRadius:10, padding:"10px 13px", marginBottom:14,
+      fontFamily:SANS, fontSize:13, color:ORANGE,
+      display:"flex", alignItems:"flex-start", gap:7,
+    }}>
+      <span style={{marginTop:1, flexShrink:0}}>⚠️</span> {msg}
     </div>
   )
 }
 function SuccessBanner({ msg }) {
   return (
-    <div style={{ background:"#f0fdf4", border:"1px solid #86efac", borderRadius:9, padding:"9px 13px", marginBottom:13, fontFamily:P, fontSize:13, color:"#16a34a", display:"flex", alignItems:"flex-start", gap:7 }}>
-      <Check size={14} style={{ marginTop:1, flexShrink:0 }}/> {msg}
+    <div style={{
+      background:"#f0fdf4", border:"1.5px solid #86efac",
+      borderRadius:10, padding:"10px 13px", marginBottom:14,
+      fontFamily:SANS, fontSize:13, color:"#16a34a",
+      display:"flex", alignItems:"flex-start", gap:7,
+    }}>
+      <Check size={14} style={{marginTop:1, flexShrink:0}}/> {msg}
     </div>
   )
 }

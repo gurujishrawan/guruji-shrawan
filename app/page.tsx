@@ -115,6 +115,34 @@ function StatCard({ item }) {
   )
 }
 
+
+/* ── AdSense Banner ── */
+function AdSenseBanner() {
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({})
+    } catch (e) {}
+  }, [])
+
+  return (
+    <div style={{
+      maxWidth: "1160px",
+      margin: "0 auto",
+      padding: "0 28px 48px",
+    }}>
+      <ins
+        className="adsbygoogle"
+        style={{ display: "block" }}
+        data-ad-client="ca-pub-2716405637818905"
+        data-ad-slot="8386201252"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
+    </div>
+  )
+}
+
 /* ══════════════════════════════════════
    HOME PAGE
 ══════════════════════════════════════ */
@@ -1185,6 +1213,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── AdSense horizontal banner — between content and footer ── */}
+      <AdSenseBanner />
 
     </div>
   )

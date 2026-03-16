@@ -37,6 +37,34 @@ function ReadingProgress(){
   return <div style={{position:"fixed",top:0,left:0,zIndex:999,height:3,width:`${p}%`,background:`linear-gradient(90deg,${ORANGE},${GOLD})`,borderRadius:"0 2px 2px 0",transition:"width .1s linear",pointerEvents:"none"}}/>
 }
 
+/* ─── IN-ARTICLE ADSENSE ─── */
+function InArticleAd() {
+  useEffect(() => {
+    try {
+      ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+    } catch (e) {}
+  }, [])
+
+  return (
+    <div style={{
+      margin: "40px 0",
+      textAlign: "center",
+      overflow: "hidden",
+      borderRadius: 12,
+      background: "transparent",
+    }}>
+      <ins
+        className="adsbygoogle"
+        style={{ display: "block", textAlign: "center" }}
+        data-ad-layout="in-article"
+        data-ad-format="fluid"
+        data-ad-client="ca-pub-2716405637818905"
+        data-ad-slot="2823850989"
+      />
+    </div>
+  )
+}
+
 /* ─── NEWSLETTER ─── */
 function NewsletterInline(){
   const [email,setEmail]=useState("")
@@ -59,7 +87,7 @@ function NewsletterInline(){
         <p style={{fontFamily:SANS,fontSize:13,color:MUTED,lineHeight:1.75,marginBottom:20}}>One thoughtful email a week. No noise.</p>
         {sub?(
           <div style={{background:"#f0fdf4",border:"1.5px solid #86efac",borderRadius:10,padding:"13px 18px",fontFamily:SANS,fontSize:14,color:"#15803d",fontWeight:600,display:"flex",alignItems:"center",gap:8}}>
-            <Check size={16}/> You're in! Wisdom is on its way. 🙏
+            <Check size={16}/> You&apos;re in! Wisdom is on its way. 🙏
           </div>
         ):(
           <>
@@ -318,20 +346,20 @@ function MobileBar({liked,likeCount,saved,onLike,onSave,article,mounted}){
       {mounted&&(
         <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3}}>
           <ShareButton article={article} s={{fontBody:SANS,fontDisplay:SANS,btnOutline:"sb-mob"}} variant="icon" position="above"/>
-          <span style={{fontFamily:SANS,fontSize:10,fontWeight:600,color:"#6a5a4a"}}>Share</span>
+          <span style={{fontFamily:SANS,fontSize:10,fontWeight:600,color:"#6a5a4a"}}></span>
         </div>
       )}
     </div>
   )
 }
 
-/* ─── EXCERPT CARD — always visible, no conditional ─── */
+/* ─── EXCERPT CARD ─── */
 function ExcerptCard({text}){
   const body = text?.trim() || "An exploration of truth, presence, and the nature of the mind — through the timeless words of Guruji Shrawan."
   return(
     <div className="excerpt-card">
       <div className="excerpt-eyebrow">
-        <span className="excerpt-line"/>&nbsp;Editor's Note&nbsp;<span className="excerpt-line"/>
+        <span className="excerpt-line"/>&nbsp;Editor&apos;s Note&nbsp;<span className="excerpt-line"/>
       </div>
       <p className="excerpt-body">{body}</p>
       <div className="excerpt-footer">
@@ -444,11 +472,9 @@ export default function ArticlePage({params:paramsPromise}){
         @keyframes quoteGlow { 0%,100%{opacity:.05} 50%{opacity:.12} }
         *{box-sizing:border-box;margin:0;padding:0}
 
-        /* layout */
         .page-grid{display:grid;grid-template-columns:1fr 268px;gap:48px;max-width:1140px;margin:0 auto;padding:0 20px;align-items:start}
         .sidebar-root{position:sticky;top:88px}
 
-        /* body typography */
         .art-body{font-family:${BY};font-size:18px;line-height:1.92;color:#2a1806;letter-spacing:.008em}
         .art-body p{margin-bottom:1.55em}
         .art-body>p:first-child::first-letter{float:left;font-family:${BY};font-size:5em;line-height:.76;padding-right:.09em;padding-top:.06em;color:${O};font-weight:700}
@@ -465,61 +491,35 @@ export default function ArticlePage({params:paramsPromise}){
         .art-body figure{margin:2em 0}
         .art-body figcaption{font-family:${S};font-size:12px;color:${MU};text-align:center;margin-top:-8px}
 
-        /* breadcrumb */
         .bc-link{display:inline-flex;align-items:center;gap:5px;font-family:${S};font-size:12px;font-weight:600;color:${MU};text-decoration:none;transition:color .22s ease}
         .bc-link:hover{color:${O}}
 
-        /* ── ACTION PILL BUTTONS ──
-           All transition properties named individually.
-           Never use "all" — it causes janky repaints.           */
         .ap-btn{
           display:inline-flex;align-items:center;gap:6px;
           border-radius:99px;border:1.5px solid ${B};
           background:transparent;color:${MU};
           font-family:${S};font-size:13px;font-weight:600;
           cursor:pointer;white-space:nowrap;
-          transition:
-            border-color .26s cubic-bezier(.4,0,.2,1),
-            color        .26s cubic-bezier(.4,0,.2,1),
-            background   .26s cubic-bezier(.4,0,.2,1),
-            box-shadow   .26s cubic-bezier(.4,0,.2,1),
-            transform    .18s cubic-bezier(.4,0,.2,1);
+          transition:border-color .26s cubic-bezier(.4,0,.2,1),color .26s cubic-bezier(.4,0,.2,1),background .26s cubic-bezier(.4,0,.2,1),box-shadow .26s cubic-bezier(.4,0,.2,1),transform .18s cubic-bezier(.4,0,.2,1);
         }
-        .ap-btn:hover:not(.liked):not(.saved){
-          border-color:${O};color:${O};background:#fff8f3;
-          transform:translateY(-2px);box-shadow:0 5px 18px rgba(200,85,26,.15);
-        }
+        .ap-btn:hover:not(.liked):not(.saved){border-color:${O};color:${O};background:#fff8f3;transform:translateY(-2px);box-shadow:0 5px 18px rgba(200,85,26,.15)}
         .ap-btn:active{transform:translateY(0) scale(.95)!important;box-shadow:none!important}
         .ap-btn.liked{border-color:#fecaca;background:#fef2f2;color:#ef4444}
         .ap-btn.liked:hover{border-color:#fca5a5;background:#fff5f5;transform:translateY(-2px);box-shadow:0 5px 18px rgba(239,68,68,.18)}
         .ap-btn.saved{border-color:${O}66;background:#fff8f0;color:${O}}
         .ap-btn.saved:hover{border-color:${O};background:#fff3e8;transform:translateY(-2px);box-shadow:0 5px 18px rgba(200,85,26,.18)}
 
-        /* comment anchor */
-        .ap-link{
-          display:inline-flex;align-items:center;gap:6px;
-          border-radius:99px;border:1.5px solid ${B};color:${MU};
-          font-family:${S};font-size:13px;font-weight:600;text-decoration:none;
-          transition:border-color .26s cubic-bezier(.4,0,.2,1),color .26s cubic-bezier(.4,0,.2,1),background .26s cubic-bezier(.4,0,.2,1),box-shadow .26s cubic-bezier(.4,0,.2,1),transform .18s cubic-bezier(.4,0,.2,1);
-        }
+        .ap-link{display:inline-flex;align-items:center;gap:6px;border-radius:99px;border:1.5px solid ${B};color:${MU};font-family:${S};font-size:13px;font-weight:600;text-decoration:none;transition:border-color .26s cubic-bezier(.4,0,.2,1),color .26s cubic-bezier(.4,0,.2,1),background .26s cubic-bezier(.4,0,.2,1),box-shadow .26s cubic-bezier(.4,0,.2,1),transform .18s cubic-bezier(.4,0,.2,1)}
         .ap-link:hover{border-color:${O};color:${O};background:#fff8f3;transform:translateY(-2px);box-shadow:0 5px 18px rgba(200,85,26,.13)}
         .ap-link:active{transform:translateY(0) scale(.95)}
 
-        /* share outline */
-        .sb-outline{
-          font-family:${S};font-size:13px;font-weight:600;
-          background:transparent;border:1.5px solid ${B};border-radius:9px;
-          color:#6a5a4a;cursor:pointer;
-          display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
-          transition:border-color .26s cubic-bezier(.4,0,.2,1),color .26s cubic-bezier(.4,0,.2,1),background .26s cubic-bezier(.4,0,.2,1),box-shadow .26s cubic-bezier(.4,0,.2,1),transform .18s cubic-bezier(.4,0,.2,1);
-        }
+        .sb-outline{font-family:${S};font-size:13px;font-weight:600;background:transparent;border:1.5px solid ${B};border-radius:9px;color:#6a5a4a;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:7px 14px;transition:border-color .26s cubic-bezier(.4,0,.2,1),color .26s cubic-bezier(.4,0,.2,1),background .26s cubic-bezier(.4,0,.2,1),box-shadow .26s cubic-bezier(.4,0,.2,1),transform .18s cubic-bezier(.4,0,.2,1)}
         .sb-outline:hover{border-color:${O};color:${O};background:#fff8f3;box-shadow:0 5px 18px rgba(200,85,26,.13);transform:translateY(-2px)}
         .sb-outline:active{transform:translateY(0) scale(.95)}
         .sb-mob{background:none;border:none;color:#6a5a4a;cursor:pointer;display:inline-flex;align-items:center;padding:0}
         .sb-float-pill{background:none;border:none;color:rgba(255,255,255,.78);cursor:pointer;display:inline-flex;align-items:center;padding:0;transition:opacity .22s ease,transform .2s ease}
         .sb-float-pill:hover{opacity:.6;transform:scale(1.12)}
 
-        /* floating pill */
         .float-pill{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(26,16,8,.92);backdrop-filter:blur(14px);border-radius:99px;padding:10px 24px;display:flex;align-items:center;gap:18px;box-shadow:0 8px 32px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.06);animation:slideUp .28s cubic-bezier(.16,1,.3,1);white-space:nowrap}
         .float-pill-title{font-family:${S};font-size:12px;color:rgba(255,255,255,.42);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .float-pill-div{width:1px;height:18px;background:rgba(255,255,255,.12)}
@@ -527,45 +527,27 @@ export default function ArticlePage({params:paramsPromise}){
         .float-btn:hover{opacity:.6;transform:scale(1.12)}
         .float-btn:active{transform:scale(.93)}
 
-        /* tags */
         .tag-pill{font-family:${S};font-size:11px;font-weight:600;padding:5px 13px;border-radius:99px;background:#fdf5e0;color:#7a5810;border:1px solid #e8c97a;text-decoration:none;transition:background .22s ease,color .22s ease,border-color .22s ease,transform .18s ease}
         .tag-pill:hover{background:${G};color:#fff;border-color:${G};transform:translateY(-1px)}
 
-        /* topic pills */
         .topic-pill{font-family:${S};font-size:11px;font-weight:600;padding:5px 11px;border-radius:99px;background:${BG_};color:#5a4a3a;border:1px solid ${B};text-decoration:none;transition:background .22s ease,color .22s ease,border-color .22s ease,transform .18s ease}
         .topic-pill:hover{background:${O};color:#fff;border-color:${O};transform:translateY(-1px)}
 
-        /* sidebar list */
         .more-art-link{display:flex;gap:10px;padding:10px 0;text-decoration:none;transition:opacity .22s ease}
         .more-art-link:hover{opacity:.58}
 
-        /* sidebar action rows */
         .side-action{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1.5px solid transparent;cursor:pointer;width:100%;text-align:left;background:transparent;transition:background .22s ease}
         .side-action:hover{background:${BG_}}
 
-        /* related cards */
         .rel-card{text-decoration:none;display:block;border-radius:14px;overflow:hidden;background:${CA};border:1.5px solid ${B};transition:box-shadow .3s ease,transform .3s ease}
         .rel-card:hover{box-shadow:0 10px 34px rgba(180,80,20,.14);transform:translateY(-3px)}
 
-        /* back-to-top */
         .back-top{position:fixed;bottom:80px;right:20px;z-index:300;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,${O},#7a2606);color:#fff;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(200,85,26,.38);display:flex;align-items:center;justify-content:center;font-size:16px;transition:transform .22s ease,box-shadow .22s ease}
         .back-top:hover{transform:scale(1.14) translateY(-2px);box-shadow:0 8px 24px rgba(200,85,26,.52)}
         .back-top:active{transform:scale(.94)}
 
-        /* ── EXCERPT CARD ── */
-        .excerpt-card{
-          margin:32px 0 0;
-          position:relative;overflow:hidden;
-          border-radius:18px;
-          padding:28px 30px 24px 34px;
-          background:linear-gradient(135deg,#fffaf4 0%,#fff5e6 55%,#fff9f2 100%);
-          border:1.5px solid #eed0a4;
-          box-shadow:0 6px 30px rgba(200,85,26,.08),inset 0 1px 0 rgba(255,255,255,.92);
-          animation:excerptIn .5s .08s ease-out both;
-        }
-        /* orange left bar */
+        .excerpt-card{margin:32px 0 0;position:relative;overflow:hidden;border-radius:18px;padding:28px 30px 24px 34px;background:linear-gradient(135deg,#fffaf4 0%,#fff5e6 55%,#fff9f2 100%);border:1.5px solid #eed0a4;box-shadow:0 6px 30px rgba(200,85,26,.08),inset 0 1px 0 rgba(255,255,255,.92);animation:excerptIn .5s .08s ease-out both}
         .excerpt-card::before{content:'';position:absolute;top:0;left:0;width:5px;height:100%;background:linear-gradient(180deg,${O},${G} 50%,${O}80);border-radius:4px 0 0 4px}
-        /* giant decorative quote */
         .excerpt-card::after{content:'\u201C';position:absolute;bottom:-28px;right:14px;font-family:Georgia,serif;font-size:160px;font-weight:700;line-height:1;color:${O};pointer-events:none;user-select:none;animation:quoteGlow 4s ease-in-out infinite}
         .excerpt-eyebrow{display:flex;align-items:center;gap:8px;font-family:${S};font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:${O};margin-bottom:14px}
         .excerpt-line{display:inline-block;width:22px;height:1.5px;background:${O};opacity:.45;border-radius:1px;flex-shrink:0}
@@ -574,13 +556,14 @@ export default function ArticlePage({params:paramsPromise}){
         .excerpt-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${O},#7a2606);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
         .excerpt-byline{font-family:${S};font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:${MU}}
 
-        /* misc */
+        /* ad label */
+        .ad-label{font-family:${S};font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.16em;color:#c0b0a0;text-align:center;margin-bottom:4px;display:block}
+
         .nl-row{display:flex;gap:10px}
         .nl-wrap{margin:48px 0}
         .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
         .mobile-bar{display:none}
 
-        /* responsive */
         @media(max-width:900px){
           .page-grid{grid-template-columns:1fr;gap:0}
           .sidebar-root{display:none}
@@ -610,8 +593,6 @@ export default function ArticlePage({params:paramsPromise}){
 
       <div style={{background:BG,minHeight:"100vh"}} className="page-content">
         <div className="page-grid">
-
-          {/* ══════ ARTICLE ══════ */}
           <article style={{minWidth:0,paddingTop:32,paddingBottom:40}}>
 
             {/* Breadcrumb */}
@@ -664,12 +645,24 @@ export default function ArticlePage({params:paramsPromise}){
             </div>
             {article.imageCaption&&<p style={{fontFamily:SANS,fontSize:11,color:MUTED,textAlign:"center",marginTop:8,fontStyle:"italic"}}>{article.imageCaption}</p>}
 
-            {/* EXCERPT CARD — always shown */}
+            {/* Excerpt card */}
             <ExcerptCard text={article.excerpt}/>
 
+            {/* ══ AD #1 — after excerpt, before body ══ */}
+            <div style={{marginTop:32}}>
+              <span className="ad-label">Advertisement</span>
+              <InArticleAd/>
+            </div>
+
             {/* Article body */}
-            <div style={{paddingTop:36}}>
+            <div style={{paddingTop:12}}>
               <div className="art-body" dangerouslySetInnerHTML={{__html:article.content||`<p>${article.excerpt||""}</p>`}}/>
+            </div>
+
+            {/* ══ AD #2 — after body, before tags ══ */}
+            <div style={{marginTop:8}}>
+              <span className="ad-label">Advertisement</span>
+              <InArticleAd/>
             </div>
 
             {/* Tags */}
@@ -686,7 +679,7 @@ export default function ArticlePage({params:paramsPromise}){
               <div style={{width:44,height:44,borderRadius:"50%",background:`linear-gradient(135deg,${ORANGE},#7a2606)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🔥</div>
               <div>
                 <p style={{fontFamily:SANS,fontSize:13,fontWeight:700,color:TEXT,marginBottom:3}}>Guruji Shrawan Foundation</p>
-                <p style={{fontFamily:SANS,fontSize:12,color:MUTED,lineHeight:1.75}}>Created with love by volunteers from transcriptions of Guruji Shrawan's recorded sessions. Every word offered as service to seekers everywhere.</p>
+                <p style={{fontFamily:SANS,fontSize:12,color:MUTED,lineHeight:1.75}}>Created with love by volunteers from transcriptions of Guruji Shrawan&apos;s recorded sessions. Every word offered as service to seekers everywhere.</p>
               </div>
             </div>
 
@@ -709,7 +702,7 @@ export default function ArticlePage({params:paramsPromise}){
             <div style={{height:32}}/>
           </article>
 
-          {/* ══════ SIDEBAR ══════ */}
+          {/* Sidebar */}
           <div style={{paddingTop:32}}>
             <ArticleSidebar article={article} allArticles={articles} user={user} onLogout={handleLogout}
               likeCount={likeCount} liked={liked} saved={saved} onLike={handleLike} onSave={handleSave} viewCount={viewCount}/>
